@@ -1,31 +1,31 @@
-import api from "../api/axios";
+import { authApi } from "../api/axios";
+import type { User } from "../types/auth.types";
 
-export const loginUser = async (data: { email: string; password: string }) => {
-  console.log("Sending Login Data:", data);
+// Login / register / password flows live in Throne8 — this app only reads the shared session.
 
-  const response = await api.post("/auth/login", data);
+/**
+ * Current user from Throne8 (GET /api/v1/auth/profile), mapped to this app's User shape.
+ * Throws a 401 when there is no valid session.
+ */
+export const getMe = async (): Promise<User> => {
+  const response = await authApi.get("/auth/profile");
+  const profile = response.data?.data ?? response.data;
 
-  console.log("SERVICE RESPONSE:", response.data.user);
+  const fullName = [profile.firstName, profile.lastName]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
 
-  return response.data;
+  return {
+    _id: profile.userId,
+    fullName: fullName || profile.email,
+    email: profile.email,
+    // Throne8 also has "moderator" / "mentor"; this app only distinguishes admins.
+    role: profile.role === "admin" ? "admin" : "user",
+  };
 };
 
-export const registerUser = async (data: {
-  fullName: string;
-  email: string;
-  password: string;
-}) => {
-  console.log("Sending Register Data:", data);
-
-  const response = await api.post("/auth/register", data);
-
-  console.log("REGISTER RESPONSE:", response.data.user);
-
-  return response.data;
-};
-
-export const getMe = async () => {
-  const response = await api.get("/auth/me");
-
-  return response.data;
+/** Ends the session for BOTH apps (the cookies are shared). */
+export const logoutUser = async (): Promise<void> => {
+  await authApi.post("/auth/logout");
 };

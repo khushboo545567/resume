@@ -1,21 +1,13 @@
-// ============PROTECTED ROUTE IT WILL ONLY CHECK THE USER IS AUTHENTICATED OR NOT AND FOR ADMIN WE HAVE TO CREATE SEPERATE ADMIN PROCTED REOUTE ===========================
-
-import { Navigate } from "react-router-dom";
-
-import { useAuthStore } from "../store/auth.store";
+// ============ PROTECTED ROUTE: ONLY CHECKS THAT THE USER HAS A VALID THRONE8 SESSION. FOR ADMIN PAGES USE AdminProtectedRoute ============
 
 import type { ReactNode } from "react";
+
+import RequireUser from "./RequireUser";
 
 interface Props {
   children: ReactNode;
 }
 
 export default function ProtectedRoute({ children }: Props) {
-  const user = useAuthStore((state) => state.user);
-
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return children;
+  return <RequireUser>{children}</RequireUser>;
 }

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useAuthStore } from "../../../store/auth.store";
+import { redirectToLogin } from "../../../config/auth.config";
 import { useCreateResume } from "../../resume/hooks/useCreateResume";
 import { ResumeTemplates } from "../../resume/types/resume.types";
 
@@ -15,7 +16,7 @@ export function useQuickActions() {
 
   const handleCreateResume = () => {
     if (!user) {
-      navigate("/login");
+      redirectToLogin();
       return;
     }
 
@@ -24,7 +25,7 @@ export function useQuickActions() {
 
   const handleOpenUploadResume = () => {
     if (!user) {
-      navigate("/login");
+      redirectToLogin();
       return;
     }
 
@@ -33,7 +34,7 @@ export function useQuickActions() {
 
   const handleCheckATSScore = async () => {
     if (!user) {
-      navigate("/login");
+      redirectToLogin();
       return;
     }
 

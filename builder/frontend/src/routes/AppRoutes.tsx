@@ -3,11 +3,9 @@ import { Routes, Route } from "react-router-dom";
 
 import ProtectedRoute from "./ProtectedRoute";
 import AdminProtectedRoute from "./AdminProtectedRoute";
+import ExternalRedirect from "./ExternalRedirect";
 
 import MainLayout from "../layouts/MainLayout";
-
-const LoginPage = lazy(() => import("../pages/LoginPage"));
-const RegisterPage = lazy(() => import("../pages/RegisterPage"));
 
 const HomePage = lazy(() => import("../pages/HomePage"));
 const TemplateGalleryPage = lazy(() => import("../pages/TemplateGalleryPage"));
@@ -60,11 +58,11 @@ export default function AppRoutes() {
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
-        {/* ================= PUBLIC AUTH ================= */}
+        {/* ============ AUTH LIVES IN THRONE8: old URLs just forward there ============ */}
 
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login" element={<ExternalRedirect to="login" />} />
 
-        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/register" element={<ExternalRedirect to="signup" />} />
 
         <Route path="/resume/public/:shareId" element={<PublicResumePage />} />
 

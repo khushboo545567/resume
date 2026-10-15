@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 
 import {
@@ -12,6 +11,7 @@ import CreateResumeModal from "../features/resume/components/CreateResumeModal";
 import type { ResumeTemplate } from "../features/resume/types/resume.types";
 
 import { useAuthStore } from "../store/auth.store";
+import { redirectToLogin } from "../config/auth.config";
 
 const EXPERIENCE_OPTIONS: { label: string; value: ExperienceLevel | "all" }[] =
   [
@@ -39,7 +39,6 @@ function getColumnCount(width: number) {
 }
 
 export default function HomePage() {
-  const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const [selectedTemplateId, setSelectedTemplateId] =
     useState<ResumeTemplate | null>(null);
@@ -103,7 +102,7 @@ export default function HomePage() {
 
   const handleTemplateClick = (templateId: ResumeTemplate) => {
     if (!user) {
-      navigate("/login");
+      redirectToLogin();
       return;
     }
     setSelectedTemplateId(templateId);

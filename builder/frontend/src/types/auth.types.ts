@@ -12,7 +12,10 @@ export interface AuthState {
   isLoading: boolean;
 
   setAuth: (user: User) => void;
+  /** Clears local state only (use signOut to end the shared Throne8 session). */
   logout: () => void;
+  /** Ends the shared session on the backend, then sends the user back to Throne8. */
+  signOut: () => Promise<void>;
   setLoading: (loading: boolean) => void;
   initializeAuth: () => Promise<void>;
 }

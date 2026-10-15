@@ -1,7 +1,8 @@
 import { create } from "zustand";
 
 import type { AuthState } from "../types/auth.types";
-import { getMe } from "../services/auth.service";
+import { getMe, logoutUser } from "../services/auth.service";
+import { THRONE8_URL } from "../config/auth.config";
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
@@ -22,6 +23,17 @@ export const useAuthStore = create<AuthState>((set) => ({
     });
   },
 
+  signOut: async () => {
+    try {
+      await logoutUser();
+    } catch {
+      // Even if the call fails, leave: the next API call will show the real state.
+    }
+
+    set({ user: null, isLoading: false });
+    window.location.replace(`${THRONE8_URL}/login`);
+  },
+
   setLoading: (loading) => {
     set({
       isLoading: loading,
@@ -30,10 +42,10 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   initializeAuth: async () => {
     try {
-      const response = await getMe();
+      const user = await getMe();
 
       set({
-        user: response.user,
+        user,
         isLoading: false,
       });
     } catch {

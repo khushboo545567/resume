@@ -1,6 +1,7 @@
 import { Navigate } from "react-router-dom";
 
 import { useAuthStore } from "../store/auth.store";
+import RequireUser from "./RequireUser";
 
 import type { ReactNode } from "react";
 
@@ -11,13 +12,13 @@ interface Props {
 export default function AdminProtectedRoute({ children }: Props) {
   const user = useAuthStore((state) => state.user);
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (user.role !== "admin") {
-    return <Navigate to="/404" replace />;
-  }
-
-  return children;
+  return (
+    <RequireUser>
+      {user && user.role !== "admin" ? (
+        <Navigate to="/404" replace />
+      ) : (
+        children
+      )}
+    </RequireUser>
+  );
 }
