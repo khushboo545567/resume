@@ -1,5 +1,3 @@
-import html2canvas from "html2canvas-pro";
-import jsPDF from "jspdf";
 import { Download } from "lucide-react";
 
 import { useCoverLetterStore } from "../../../store/coverLetter.store";
@@ -16,6 +14,15 @@ export default function ExportCoverLetterPdfButton() {
     }
 
     try {
+      /*
+       * Load the heavy PDF libraries only when the user clicks
+       * "Download PDF", so they are not part of the initial bundle.
+       */
+      const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+        import("html2canvas-pro"),
+        import("jspdf"),
+      ]);
+
       const A4_WIDTH = 210;
       const A4_HEIGHT = 297;
 

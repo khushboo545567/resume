@@ -184,7 +184,7 @@ export default function ModernTemplate() {
 
             <div className="mt-4 flex flex-wrap gap-2">
 
-              {resume.skills.map((skill) => (
+              {resume.skills.flatMap((category) => category.skills).map((skill) => (
                 <span
                   key={skill}
                   className="rounded-full bg-blue-600 px-3 py-1 text-xs text-white"
@@ -234,7 +234,10 @@ export default function ModernTemplate() {
             <div className="mt-4 space-y-2">
 
               {resume.languages.map((lang) => (
-                <p key={lang}>{lang}</p>
+                <p key={lang.name}>
+                  {lang.name}
+                  {lang.level ? ` (${lang.level})` : ""}
+                </p>
               ))}
 
             </div>

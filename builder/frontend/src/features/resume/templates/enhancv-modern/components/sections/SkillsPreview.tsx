@@ -1,4 +1,3 @@
-import { Wrench } from "lucide-react";
 
 import { useResumeStore } from "../../../../../../store/resume.store";
 

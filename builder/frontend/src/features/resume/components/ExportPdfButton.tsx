@@ -1,6 +1,4 @@
 import { useState } from "react";
-import html2canvas from "html2canvas-pro";
-import jsPDF from "jspdf";
 import { Download, Loader2 } from "lucide-react";
 
 export default function ExportPdfButton() {
@@ -30,6 +28,15 @@ export default function ExportPdfButton() {
     setIsExporting(true);
 
     try {
+      /*
+       * Load the heavy PDF libraries only when the user clicks
+       * "Download PDF", so they are not part of the initial bundle.
+       */
+      const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+        import("html2canvas-pro"),
+        import("jspdf"),
+      ]);
+
       /*
        * ============================================================
        * A4

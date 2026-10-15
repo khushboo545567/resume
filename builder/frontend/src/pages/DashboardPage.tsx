@@ -12,7 +12,6 @@ import QuickActions from "../features/dashboard/components/QuickActions";
 import ResumeGrid from "../features/resume/components/ResumeGrid";
 import CreateResumeModal from "../features/resume/components/CreateResumeModal";
 import AnalyseATSScoreModal from "../features/resume/components/AnalyseATSScoreModal";
-import RecentActivity from "../features/dashboard/components/RecentActivity";
 import ResumeCompletionCard from "../features/resume/components/ResumeCompletionCard";
 import AISuggestionsCard from "../features/dashboard/components/AISuggestionsCard";
 import EmptyResumeState from "../features/resume/components/EmptyResumeState";
@@ -43,10 +42,6 @@ export default function DashboardPage() {
   const resumes = data.recentResumes;
 
   const total = data.stats.totalResumes;
-
-  const draft = data.stats.draftResumes;
-
-  const completed = data.stats.completedResumes;
 
   // ==================== FILTERING ====================
   const filteredResumes = resumes.filter((resume: Resume) => {

@@ -4,7 +4,6 @@ import { FaGithub, FaExternalLinkAlt } from "react-icons/fa";
 
 import { ModernProfessionalTheme as T } from "../theme.modern-professional";
 import SectionHeader from "../shared/SectionHeader";
-import { href } from "react-router-dom";
 
 export default function ProjectsPreview() {
   const resume = useResumeStore((state) => state.resume);

@@ -1,5 +1,4 @@
 import TechnicalDeveloperTemplate from "./TechnicalDeveloperTemplate";
-import ModernTemplate from "./ModernTemplate";
 import MinimalTemplate from "./MinimalTemplate";
 import ExecutiveTemplate from "./ExecutiveTemplate";
 import StudentTemplate from "./StudentTemplate";

@@ -102,7 +102,7 @@ export default function StudentTemplate() {
 
           <div className="mt-4 flex flex-wrap gap-2">
             {resume.skills.length ? (
-              resume.skills.map((skill) => (
+              resume.skills.flatMap((category) => category.skills).map((skill) => (
                 <span
                   key={skill}
                   className="rounded-full bg-blue-600 px-3 py-1 text-sm text-white"

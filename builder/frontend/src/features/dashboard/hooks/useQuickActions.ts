@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useAuthStore } from "../../../store/auth.store";
 import { useCreateResume } from "../../resume/hooks/useCreateResume";
+import { ResumeTemplates } from "../../resume/types/resume.types";
 
 export function useQuickActions() {
   const navigate = useNavigate();
@@ -41,6 +42,8 @@ export function useQuickActions() {
     try {
       const resume = await createResumeMutation.mutateAsync({
         title: "Untitled Resume",
+        targetRole: "",
+        templateId: ResumeTemplates.ATS,
       });
 
       navigate(`/resume/${resume._id}/edit`, { state: { openAts: true } });

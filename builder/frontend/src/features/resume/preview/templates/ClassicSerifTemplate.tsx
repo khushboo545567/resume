@@ -3,10 +3,7 @@ import DynamicSectionRenderer from "../components/DynamicSectionRenderer";
 import { ClassicSerifSectionRegistry } from "../components/SectionRegistry.classic-serif";
 import { MapPin, Mail, Phone } from "lucide-react";
 import ClassicSerifCustomSection from "../components/sections/classic-serif/CustomSectionPreview";
-import * as Icons from "lucide-react";
 import { FaLinkedin } from "react-icons/fa";
-
-console.log(Icons);
 
 export default function ClassicSerifTemplate() {
   const resume = useResumeStore((state) => state.resume);

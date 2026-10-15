@@ -8,9 +8,6 @@ import {
   getResumeById,
 } from "../../services/resume.service";
 
-import type {
-  Resume,
-} from "../../types/resume.types";
 import { DefaultResumeSections } from "../../constants/defaultSections";
 
 export const useResume = () => {

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 
 import ProtectedRoute from "./ProtectedRoute";
@@ -5,107 +6,133 @@ import AdminProtectedRoute from "./AdminProtectedRoute";
 
 import MainLayout from "../layouts/MainLayout";
 
-import LoginPage from "../pages/LoginPage";
-import RegisterPage from "../pages/RegisterPage";
+const LoginPage = lazy(() => import("../pages/LoginPage"));
+const RegisterPage = lazy(() => import("../pages/RegisterPage"));
 
-import HomePage from "../pages/HomePage";
-import TemplateGalleryPage from "../pages/TemplateGalleryPage";
-import CoverLetterGalleryPage from "../pages/CoverLetterGalleryPage";
-import AiPage from "../pages/AiPage";
-import PublicResumePage from "../pages/PublicResumePage";
+const HomePage = lazy(() => import("../pages/HomePage"));
+const TemplateGalleryPage = lazy(() => import("../pages/TemplateGalleryPage"));
+const CoverLetterGalleryPage = lazy(
+  () => import("../pages/CoverLetterGalleryPage"),
+);
+const AiPage = lazy(() => import("../pages/AiPage"));
+const PublicResumePage = lazy(() => import("../pages/PublicResumePage"));
 
-import DashboardPage from "../pages/DashboardPage";
-import MyResumePage from "../pages/MyResumePage";
-import AnalyticsPage from "../pages/AnalyticsPage";
-import Settings from "../pages/SettingsPage";
-import ResumeEditorPage from "../pages/resume/ResumeEditorPage";
-import CoverLetterEditorPage from "../pages/coverLetter/CoverLetterEditorPage";
+const DashboardPage = lazy(() => import("../pages/DashboardPage"));
+const MyResumePage = lazy(() => import("../pages/MyResumePage"));
+const AnalyticsPage = lazy(() => import("../pages/AnalyticsPage"));
+const Settings = lazy(() => import("../pages/SettingsPage"));
+const ResumeEditorPage = lazy(() => import("../pages/resume/ResumeEditorPage"));
+const CoverLetterEditorPage = lazy(
+  () => import("../pages/coverLetter/CoverLetterEditorPage"),
+);
 
-import AdminDashboardPage from "../pages/admin/AdminDashboardPage";
-import UsersPage from "../pages/admin/UsersPage";
-import BookingRequestsPage from "../pages/admin/BookingRequestsPage";
-import NotFoundPage from "../pages/NotFoundPage";
-import InterviewPage from "../pages/InterviewPage";
-import GenerateInterviewPage from "../pages/interview/GenerateInterviewPage";
-import InterviewSessionPage from "../pages/interview/InterviewSessionPage";
-import InterviewHistoryPage from "../pages/interview/InterviewHistoryPage";
-import BookSessionPage from "../pages/interview/BookSessionPage";
+const AdminDashboardPage = lazy(
+  () => import("../pages/admin/AdminDashboardPage"),
+);
+const UsersPage = lazy(() => import("../pages/admin/UsersPage"));
+const BookingRequestsPage = lazy(
+  () => import("../pages/admin/BookingRequestsPage"),
+);
+const NotFoundPage = lazy(() => import("../pages/NotFoundPage"));
+const InterviewPage = lazy(() => import("../pages/InterviewPage"));
+const GenerateInterviewPage = lazy(
+  () => import("../pages/interview/GenerateInterviewPage"),
+);
+const InterviewSessionPage = lazy(
+  () => import("../pages/interview/InterviewSessionPage"),
+);
+const InterviewHistoryPage = lazy(
+  () => import("../pages/interview/InterviewHistoryPage"),
+);
+const BookSessionPage = lazy(
+  () => import("../pages/interview/BookSessionPage"),
+);
+
+function PageLoader() {
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600" />
+    </div>
+  );
+}
 
 export default function AppRoutes() {
   return (
-    <Routes>
-      {/* ================= PUBLIC AUTH ================= */}
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
+        {/* ================= PUBLIC AUTH ================= */}
 
-      <Route path="/login" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage />} />
 
-      <Route path="/register" element={<RegisterPage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
-      <Route path="/resume/public/:shareId" element={<PublicResumePage />} />
+        <Route path="/resume/public/:shareId" element={<PublicResumePage />} />
 
-      {/* ================= PUBLIC + LAYOUT ================= */}
+        {/* ================= PUBLIC + LAYOUT ================= */}
 
-      <Route element={<MainLayout />}>
-        <Route path="/" element={<HomePage />} />
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<HomePage />} />
 
-        <Route path="/home" element={<HomePage />} />
+          <Route path="/home" element={<HomePage />} />
 
-        <Route path="/templates" element={<TemplateGalleryPage />} />
+          <Route path="/templates" element={<TemplateGalleryPage />} />
 
-        <Route path="/cover-letters" element={<CoverLetterGalleryPage />} />
+          <Route path="/cover-letters" element={<CoverLetterGalleryPage />} />
 
-        <Route path="/ai" element={<AiPage />} />
-      </Route>
+          <Route path="/ai" element={<AiPage />} />
+        </Route>
 
-      {/* ================= AUTHENTICATED USER ================= */}
-
-      <Route
-        element={
-          <ProtectedRoute>
-            <MainLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="/dashboard" element={<DashboardPage />} />
-
-        <Route path="/myresume" element={<MyResumePage />} />
-
-        <Route path="/analytics" element={<AnalyticsPage />} />
-
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/interview" element={<InterviewPage />} />
-        <Route path="/interview/ai" element={<GenerateInterviewPage />} />
-        <Route
-          path="/interview/ai/session/:sessionId"
-          element={<InterviewSessionPage />}
-        />
-        <Route path="/interview/book" element={<BookSessionPage />} />
-        <Route path="/interview/history" element={<InterviewHistoryPage />} />
-
-        <Route path="/resume/:id/edit" element={<ResumeEditorPage />} />
+        {/* ================= AUTHENTICATED USER ================= */}
 
         <Route
-          path="/cover-letter/:id/edit"
-          element={<CoverLetterEditorPage />}
-        />
-      </Route>
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/dashboard" element={<DashboardPage />} />
 
-      {/* ================= ADMIN ================= */}
+          <Route path="/myresume" element={<MyResumePage />} />
 
-      <Route
-        element={
-          <AdminProtectedRoute>
-            <MainLayout />
-          </AdminProtectedRoute>
-        }
-      >
-        <Route path="/admin" element={<AdminDashboardPage />} />
+          <Route path="/analytics" element={<AnalyticsPage />} />
 
-        <Route path="/admin/users" element={<UsersPage />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/interview" element={<InterviewPage />} />
+          <Route path="/interview/ai" element={<GenerateInterviewPage />} />
+          <Route
+            path="/interview/ai/session/:sessionId"
+            element={<InterviewSessionPage />}
+          />
+          <Route path="/interview/book" element={<BookSessionPage />} />
+          <Route path="/interview/history" element={<InterviewHistoryPage />} />
 
-        <Route path="/admin/bookings" element={<BookingRequestsPage />} />
-      </Route>
-      <Route path="/404" element={<NotFoundPage />} />
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+          <Route path="/resume/:id/edit" element={<ResumeEditorPage />} />
+
+          <Route
+            path="/cover-letter/:id/edit"
+            element={<CoverLetterEditorPage />}
+          />
+        </Route>
+
+        {/* ================= ADMIN ================= */}
+
+        <Route
+          element={
+            <AdminProtectedRoute>
+              <MainLayout />
+            </AdminProtectedRoute>
+          }
+        >
+          <Route path="/admin" element={<AdminDashboardPage />} />
+
+          <Route path="/admin/users" element={<UsersPage />} />
+
+          <Route path="/admin/bookings" element={<BookingRequestsPage />} />
+        </Route>
+        <Route path="/404" element={<NotFoundPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </Suspense>
   );
 }

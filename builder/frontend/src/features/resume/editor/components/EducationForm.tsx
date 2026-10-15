@@ -1,5 +1,4 @@
 import { useGenerateCoursework } from "../../../ai/hooks/useGenerateCoursework";
-import { useResumeStore as useResumeStoreAI } from "../../../../store/resume.store";
 
 import { useForm } from "react-hook-form";
 

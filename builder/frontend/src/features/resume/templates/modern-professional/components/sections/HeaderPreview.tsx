@@ -43,7 +43,7 @@ export default function HeaderPreview() {
 
   if (!resume) return null;
 
-  const { personalInfo, summary } = resume;
+  const { personalInfo } = resume;
 
   const zoom = personalInfo.photoZoom ?? 1;
   const position = personalInfo.photoPosition ?? { x: 0, y: 0 };

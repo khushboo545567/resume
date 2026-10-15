@@ -14,7 +14,7 @@ export default function ResumeThumbnail({
   resume,
 }: Props) {
   switch (resume.templateId) {
-    case "modern":
+    case "modern-professional":
       return (
         <ModernThumbnail
           resume={resume}
@@ -35,7 +35,7 @@ export default function ResumeThumbnail({
         />
       );
 
-    case "minimal":
+    case "minimal-clean":
       return (
         <MinimalThumbnail
           resume={resume}

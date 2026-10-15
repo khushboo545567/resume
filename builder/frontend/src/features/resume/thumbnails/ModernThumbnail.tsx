@@ -36,7 +36,7 @@ export default function ModernThumbnail({ resume }: Props) {
           <div className="mt-3 h-[2px] rounded bg-slate-300" />
 
           <div className="mt-2 flex flex-wrap gap-1">
-            {resume.skills.slice(0, 4).map((skill) => (
+            {resume.skills.flatMap((category) => category.skills).slice(0, 4).map((skill) => (
               <div key={skill} className="rounded bg-slate-100 px-1 text-[5px]">
                 {skill}
               </div>

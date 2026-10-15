@@ -6,7 +6,6 @@ import { uploadAndParseIntoResume } from "../../../services/resume.service";
 import { useLatestATS, useAnalyzeATS } from "../../../../ats/hooks/useATSScore";
 import ATSResultsView from "../../../../ats/components/ATSResultsView";
 import JobDescriptionInput from "./JobDescriptionInput";
-import { useRef, useState as useStateAlias } from "react";
 interface Props {
   isOpen: boolean;
   onClose: () => void;
