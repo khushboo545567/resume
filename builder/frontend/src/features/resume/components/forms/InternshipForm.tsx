@@ -7,7 +7,6 @@ import type { Resume } from "../../types/resume.types";
 import { useGenerateInternship } from "../../../ai/hooks/useGenerateInternship";
 import AIInternshipContextModal from "../../../ai/components/AIInternshipContextModal";
 import MonthYearPicker from "../../editor/components/MonthYearPicker";
-// import AIQuickContextModal from "../../../ai/components/AIQuickContextModal";
 interface Props {
   onClose: () => void;
   editIndex?: number;

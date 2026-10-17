@@ -1,6 +1,3 @@
-// import api from "./axios"; // <-- tumhare axios instance ka path
-// import api from; // 
-
 import api from "../api/axios";
 
 export interface UploadPhotoResponse {

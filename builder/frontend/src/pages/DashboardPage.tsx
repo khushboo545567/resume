@@ -1,7 +1,5 @@
 import { useState } from "react";
 
-// import DashboardLayout from "../layouts/DashboardLayout";
-
 import DashboardHeader from "../features/dashboard/components/DashboardHeader";
 import DashboardStats from "../features/dashboard/components/DashboardStats";
 
@@ -33,7 +31,6 @@ export default function DashboardPage() {
   );
 
   const { data, isLoading, refetch } = useDashboard();
-  console.log(data);
 
   if (isLoading || !data) {
     return <div>Loading...</div>;

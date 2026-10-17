@@ -37,11 +37,6 @@ export const updateResume = async (
 /**
  * Get All Resumes
  */
-// export const getResumes = async (): Promise<Resume[]> => {
-//   const response = await api.get("/resumes");
-
-//   return response.data.resumes;
-// };
 
 export interface GetResumesResponse {
   success: boolean;
@@ -64,7 +59,6 @@ export const getResumes = async (
       page,
     },
   });
-  console.log("pagination resume data", response.data);
   return response.data;
 };
 

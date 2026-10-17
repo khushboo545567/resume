@@ -26,7 +26,6 @@ export default function ProjectsPreview() {
           projectSection?.title ||
           "Projects"
         }
-        // icon={<FolderKanban size={16} />}
       />
 
       <div className={`${T.spacing.itemHeader} space-y-4`}>

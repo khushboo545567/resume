@@ -22,6 +22,9 @@ const PHOTO_SIZE = 160;
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 2.5;
 
+const clamp = (val: number, max: number) =>
+  Math.max(-max, Math.min(max, val));
+
 export default function HeaderPreview() {
   const resume = useResumeStore((state) => state.resume);
 
@@ -41,15 +44,42 @@ export default function HeaderPreview() {
     moved: boolean;
   } | null>(null);
 
+  // Hooks must run on every render, so they live ABOVE the early return below.
+  const zoom = resume?.personalInfo.photoZoom ?? 1;
+
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!dragInfo.current) return;
+      const dx = e.clientX - dragInfo.current.startX;
+      const dy = e.clientY - dragInfo.current.startY;
+
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragInfo.current.moved = true;
+
+      const fracX = dx / PHOTO_SIZE;
+      const fracY = dy / PHOTO_SIZE;
+      const max = (zoom - 1) / 2;
+
+      const newX = clamp(dragInfo.current.startPos.x + fracX, max);
+      const newY = clamp(dragInfo.current.startPos.y + fracY, max);
+
+      updatePersonalInfo({ photoPosition: { x: newX, y: newY } });
+    },
+    [zoom, updatePersonalInfo],
+  );
+
+  const handleMouseUp = useCallback(() => {
+    const wasDrag = dragInfo.current?.moved;
+    window.removeEventListener("mousemove", handleMouseMove);
+    dragInfo.current = null;
+    // A click without dragging opens the file picker.
+    if (!wasDrag) inputRef.current?.click();
+  }, [handleMouseMove]);
+
   if (!resume) return null;
 
   const { personalInfo } = resume;
 
-  const zoom = personalInfo.photoZoom ?? 1;
   const position = personalInfo.photoPosition ?? { x: 0, y: 0 };
-
-  const clamp = (val: number, max: number) =>
-    Math.max(-max, Math.min(max, val));
 
   const openFilePicker = () => {
     inputRef.current?.click();
@@ -87,42 +117,8 @@ export default function HeaderPreview() {
       moved: false,
     };
     window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("mouseup", handleMouseUp, { once: true });
   };
-
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
-      if (!dragInfo.current) return;
-      const dx = e.clientX - dragInfo.current.startX;
-      const dy = e.clientY - dragInfo.current.startY;
-
-      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
-        dragInfo.current.moved = true;
-      }
-
-      const fracX = dx / PHOTO_SIZE;
-      const fracY = dy / PHOTO_SIZE;
-      const max = (zoom - 1) / 2;
-
-      const newX = clamp(dragInfo.current.startPos.x + fracX, max);
-      const newY = clamp(dragInfo.current.startPos.y + fracY, max);
-
-      updatePersonalInfo({ photoPosition: { x: newX, y: newY } });
-    },
-    [zoom, updatePersonalInfo],
-  );
-
-  const handleMouseUp = useCallback(() => {
-    const wasDrag = dragInfo.current?.moved;
-    window.removeEventListener("mousemove", handleMouseMove);
-    window.removeEventListener("mouseup", handleMouseUp);
-    dragInfo.current = null;
-
-    if (!wasDrag) {
-      // it was a click, not a drag → open file picker
-      openFilePicker();
-    }
-  }, [handleMouseMove]);
 
   // SCROLL TO ZOOM
   const handleWheel = (e: React.WheelEvent) => {

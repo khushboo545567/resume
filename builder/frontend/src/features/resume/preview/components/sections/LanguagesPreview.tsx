@@ -10,7 +10,6 @@ export default function LanguagesPreview() {
   const languages = (resume.languages ?? []).filter((lang) =>
     lang.name?.trim(),
   );
-  console.log("languagse length", languages.length);
   if (!languages.length) return null;
 
   return (

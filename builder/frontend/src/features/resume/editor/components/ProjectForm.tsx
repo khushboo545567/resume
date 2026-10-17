@@ -226,7 +226,6 @@ export default function ProjectForm({
    */
 
   const onSubmit = (data: ProjectFormData) => {
-    console.log("PROJECT FORM DATA", data);
 
     /*
      * Convert:
@@ -267,8 +266,6 @@ export default function ProjectForm({
 
       link: data.link?.trim() ?? "",
     };
-
-    console.log("CLEANED PROJECT DATA", cleanedData);
 
     if (editIndex !== undefined) {
       updateProject(editIndex, cleanedData);

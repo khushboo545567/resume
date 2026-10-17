@@ -54,31 +54,6 @@ export default function TagAutocompleteInput({
 
   return (
     <div>
-      {/* <div className="mt-1.5 flex min-h-11 w-full flex-wrap items-center gap-2 rounded-lg border border-border bg-navbar px-3 py-2 focus-within:border-border-strong focus-within:ring-2 focus-within:ring-ring">
-        {tags.map((tag) => (
-          <span
-            key={tag}
-            className="inline-flex items-center gap-1 rounded-md bg-btn-hover-bg px-2 py-1 text-xs font-medium text-heading"
-          >
-            {tag}
-            <button
-              type="button"
-              onClick={() => removeTag(tag)}
-              className="text-heading/50 hover:text-red-600"
-            >
-              <X size={12} />
-            </button>
-          </span>
-        ))}
-        <input
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onBlur={() => commitTag(inputValue)}
-          placeholder={tags.length ? "" : placeholder}
-          className="min-w-30 flex-1 bg-transparent text-sm text-heading outline-none"
-        />
-      </div> */}
 
       <div className="mt-1.5 flex min-h-11 w-full flex-wrap items-center gap-2 rounded-lg border border-border bg-navbar px-3 py-2 focus-within:border-border-strong focus-within:ring-2 focus-within:ring-ring">
         <input

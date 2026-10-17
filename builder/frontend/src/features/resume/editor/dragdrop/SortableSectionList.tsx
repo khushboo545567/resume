@@ -34,7 +34,6 @@ export default function SortableSectionList({
   const sensors = useSensors(useSensor(PointerSensor));
 
   if (!resume) return null;
-  console.log("Resume Sections:", resume.sections);
 
   const sections = [...resume.sections].sort((a, b) => a.order - b.order);
 

@@ -25,7 +25,6 @@ export default function ExperiencePreview() {
           experienceSection?.title ||
           "Experience"
         }
-        // icon={<Briefcase size={16} />}
       />
 
       <div className={`${T.spacing.itemHeader} space-y-4`}>

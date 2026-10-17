@@ -1,21 +1,4 @@
 // -------- ORG CODE ----------------
-// import { useQuery } from "@tanstack/react-query";
-
-// import { getResumes } from "../services/resume.service";
-
-// export const useResumes = () => {
-//   const query = useQuery({
-//     queryKey: ["resumes"],
-//     queryFn: getResumes,
-//   });
-
-//   return {
-//     resumes: query.data ?? [],
-//     loading: query.isPending,
-//     error: query.error,
-//     refetch: query.refetch,
-//   };
-// };
 
 import { useInfiniteQuery } from "@tanstack/react-query";
 

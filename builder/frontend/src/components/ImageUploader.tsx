@@ -3,9 +3,6 @@ import { FaCamera } from "react-icons/fa";
 import { useResumeStore } from "../store/resume.store";
 import { uploadProfilePhoto } from "../services/upload.service";
 
-// import { uploadProfilePhoto } from "../../../services/upload.service";
-// import { useResumeStore } from "../../../store/resume.store";
-
 export default function ImageUploader() {
   const inputRef = useRef<HTMLInputElement>(null);
 

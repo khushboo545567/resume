@@ -61,15 +61,6 @@ export interface Experience {
   technologies?: string[];
 }
 
-// export interface Education {
-//   institution: string;
-//   degree: string;
-//   fieldOfStudy?: string;
-//   startYear: number;
-//   endYear?: number;
-//   cgpa?: string;
-// }
-
 // \
 // resume.types.ts — education entry
 export interface Education {

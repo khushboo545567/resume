@@ -754,31 +754,6 @@ export default function QuickGenerateForm({
                 ))}
               </select>
 
-              {/* <div>
-                <label className={labelClass}>Start Date</label>
-                <EducationDatePicker
-                  monthValue={watch(`education.${index}.startMonth`) || ""}
-                  yearValue={watch(`education.${index}.startYear`) || ""}
-                  onChange={(month, year) => {
-                    setValue(`education.${index}.startMonth`, month);
-                    setValue(`education.${index}.startYear`, year);
-                  }}
-                  maxYear={CURRENT_YEAR}
-                />
-              </div>
-              <div>
-                <label className={labelClass}>End Date</label>
-                <EducationDatePicker
-                  monthValue={watch(`education.${index}.endMonth`) || ""}
-                  yearValue={watch(`education.${index}.endYear`) || ""}
-                  onChange={(month, year) => {
-                    setValue(`education.${index}.endMonth`, month);
-                    setValue(`education.${index}.endYear`, year);
-                  }}
-                  maxYear={CURRENT_YEAR + 10}
-                />
-              </div> */}
-
               <div className="sm:col-span-2">
                 <div className="flex items-center justify-between">
                   <label className={labelClass}>

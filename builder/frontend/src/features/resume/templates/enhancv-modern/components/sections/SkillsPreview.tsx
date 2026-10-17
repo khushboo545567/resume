@@ -1,4 +1,3 @@
-
 import { useResumeStore } from "../../../../../../store/resume.store";
 
 import SectionHeader from "../shared/SectionHeader";
@@ -27,7 +26,6 @@ export default function SkillsPreview() {
           skillsSection?.title ||
           "Skills"
         }
-        // icon={<Wrench size={16} />}
       />
 
       <p

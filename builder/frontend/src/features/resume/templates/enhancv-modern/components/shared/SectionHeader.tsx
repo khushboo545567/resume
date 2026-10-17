@@ -1,8 +1,6 @@
 import type { ReactNode } from "react";
 import { EnhancvModernTheme as T } from "../theme.enhancv-modern";
 
-// import { EnhancvModernTheme} from "../"
-
 interface Props {
   title: string;
   icon?: ReactNode;

@@ -171,13 +171,6 @@ export default function ResumeCard({ resume, onRefresh }: ResumeCardProps) {
           </div>
 
           {/* Menu */}
-          {/* <ResumeCardMenu
-            onRename={() => setRenameOpen(true)}
-            onDuplicate={() => setDuplicateOpen(true)}
-            onDelete={() => setDeleteOpen(true)}
-            onDownload={() => navigate(`/resume/${resume._id}/edit`)}
-            onShare={handleShare}
-          /> */}
         </div>
         {/* Edit Button */}
         <div className="pt-2">

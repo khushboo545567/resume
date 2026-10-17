@@ -24,7 +24,6 @@ export default function EducationPreview() {
           educationSection?.title ||
           "Education"
         }
-        // icon={<GraduationCap size={16} />}
       />
       <div className={`${T.spacing.itemHeader} space-y-4`}>
         {education.map((edu, index) => (

@@ -1,5 +1,3 @@
-// import { Heart } from "lucide-react";
-
 import { useResumeStore } from "../../../../../../store/resume.store";
 
 import SectionHeader from "../shared/SectionHeader";
@@ -27,7 +25,6 @@ export default function InterestsPreview() {
           interestsSection?.title ||
           "Interests"
         }
-        // icon={<Heart size={16} />}
       />
 
       <div className="mt-4 flex flex-wrap gap-2">

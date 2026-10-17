@@ -557,56 +557,10 @@ export const useResumeStore = create<ResumeState>((set) => ({
       };
     }),
 
-  // addCustomSection: (title) =>
-  // set((state) => {
-  //   if (!state.resume) return state;
-
-  //   const id = title
-  //     .toLowerCase()
-  //     .replace(/\s+/g, "-");
-
-  //   // Duplicate section mat add karo
-  //   const exists =
-  //     state.resume.customSections.some(
-  //       (section) => section.id === id
-  //     );
-
-  //   if (exists) return state;
-
-  //   const nextOrder =
-  //     state.resume.sections.length + 1;
-
-  //   const newCustomSection: CustomSection = {
-  //     id,
-  //     type: "custom",
-  //     title,
-  //     enabled: true,
-  //     order: nextOrder,
-  //     items: [],
-  //   };
-
-  //   return {
-  //     resume: {
-  //       ...state.resume,
-
   //       customSections: [
   //         ...state.resume.customSections,
   //         newCustomSection,
   //       ],
-
-  //       sections: [
-  //         ...state.resume.sections,
-  //         {
-  //           id,
-  //           type: "custom",
-  //           title,
-  //           enabled: true,
-  //           order: nextOrder,
-  //         },
-  //       ],
-  //     },
-  //   };
-  // }),
 
   addCustomSection: (title) =>
     set((state) => {

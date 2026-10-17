@@ -2,8 +2,6 @@ import { Briefcase } from "lucide-react";
 
 import { useResumeStore } from "../../../../../../store/resume.store";
 
-// import SectionHeader from "../../shared/peach-modern/SectionHeader";
-
 import { ProfessionalModernTheme as T } from "../../theme.professional-modern";
 import SectionHeader from "../../shared/professional-modern/SectionHeader";
 import { formatMonthYear } from "../../../../editor/utils/formatDate";

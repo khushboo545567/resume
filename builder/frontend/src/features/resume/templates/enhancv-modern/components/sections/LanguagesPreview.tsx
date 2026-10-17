@@ -27,7 +27,6 @@ export default function LanguagesPreview() {
           languagesSection?.title ||
           "Languages"
         }
-        // icon={<Languages size={16} />}
       />
 
       <div

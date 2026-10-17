@@ -143,8 +143,8 @@ export default function Navbar({
                 {user?.fullName ?? "Guest"}
               </p>
 
-              <p className="text-13 text-nav-text">
-                {user ? "Free Plan" : "Guest"}
+              <p className="max-w-40 truncate text-13 text-nav-text">
+                {user ? user.email : "Not logged in"}
               </p>
             </div>
 

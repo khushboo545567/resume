@@ -16,7 +16,6 @@ export default function ExportPdfButton() {
   const [isExporting, setIsExporting] = useState(false);
 
   const handleExport = async () => {
-    console.log("Export Clicked");
 
     const element = document.getElementById("resume-export");
 
@@ -70,8 +69,6 @@ export default function ExportPdfButton() {
         element.querySelectorAll("a[href]"),
       ) as HTMLAnchorElement[];
 
-      console.log("PDF Links Found:", links.length);
-
       /*
        * ============================================================
        * SAVE ELEMENT POSITION
@@ -106,11 +103,6 @@ export default function ExportPdfButton() {
         scrollX: 0,
 
         scrollY: 0,
-      });
-
-      console.log("Canvas:", {
-        width: canvas.width,
-        height: canvas.height,
       });
 
       /*
@@ -240,13 +232,6 @@ export default function ExportPdfButton() {
           return;
         }
 
-        console.log("PDF Link:", href, {
-          x: linkX,
-          y: linkY,
-          width: safeWidth,
-          height: safeHeight,
-        });
-
         pdf.link(linkX, linkY, safeWidth, safeHeight, {
           url: href,
         });
@@ -260,7 +245,6 @@ export default function ExportPdfButton() {
 
       pdf.save("resume.pdf");
 
-      console.log("PDF downloaded successfully");
     } catch (error) {
       console.error("PDF Export Error:", error);
 

@@ -4,7 +4,6 @@ import { useResumeStore } from "../../../../store/resume.store";
 
 export default function ModernTemplate() {
 
-      console.log("Modern Template Rendered");
   const resume = useResumeStore((state) => state.resume);
 
   if (!resume) return null;

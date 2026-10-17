@@ -1,4 +1,3 @@
-
 import { useResumeStore } from "../../../../../../store/resume.store";
 
 import SectionHeader from "../shared/SectionHeader";
@@ -23,7 +22,6 @@ export default function SummaryPreview() {
           summarySection?.title ||
           "Summary"
         }
-        // icon={<FileText size={16} />}
       />
 
       <p

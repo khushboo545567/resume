@@ -1,4 +1,3 @@
-
 import { useResumeStore } from "../../../../../../store/resume.store";
 
 import SectionHeader from "../shared/SectionHeader";
@@ -61,7 +60,6 @@ export default function CertificationsPreview() {
           certificationsSection?.title ||
           "Certifications"
         }
-        // icon={<Award size={16} />}
       />
 
       <div className="mt-4 space-y-3">

@@ -25,7 +25,6 @@ export default function AwardsPreview() {
           awardsSection?.title ||
           "Awards"
         }
-        // icon={<Trophy size={16} />}
       />
 
       <div className="mt-4 space-y-3">

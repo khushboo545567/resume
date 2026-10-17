@@ -7,7 +7,6 @@ import ProjectsSection from "../sections/ProjectsSection";
 import LanguagesSection from "../sections/LanguagesSection";
 import CertificationsSection from "../sections/CertificationsSection";
 import AwardsSection from "../sections/AwardsSection";
-// import AchievementsSection from "../sections/AchievementsSection";
 import InterestsSection from "../sections/InterestsSection";
 import TemplatesSection from "../sections/TemplatesSection";
 import SettingsSection from "../sections/SettingsSection";

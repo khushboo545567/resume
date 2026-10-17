@@ -57,10 +57,6 @@ export default function HeaderPreview() {
         `}
       >
         {personalInfo.phone && (
-          // <span className="flex items-center gap-1">
-          //   <Phone size={11} className="shrink-0" color={T.iconColors.body} />
-          //   {personalInfo.phone}
-          // </span>
           <span style={{ fontFamily: "Arial, Helvetica, sans-serif" }}>
             {personalInfo.phone}
           </span>

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 import { useParams } from "react-router-dom";
 import { useResumeStore } from "../../../../store/resume.store";
-// import { DefaultResumeSections } from "../constants/defaultSections";
 
 import {
   getResumeById,
