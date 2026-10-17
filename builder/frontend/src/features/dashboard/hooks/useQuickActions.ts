@@ -9,12 +9,15 @@ import { ResumeTemplates } from "../../resume/types/resume.types";
 export function useQuickActions() {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
+  const isAuthLoading = useAuthStore((state) => state.isLoading);
 
   const [isCreatingAtsResume, setIsCreatingAtsResume] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const createResumeMutation = useCreateResume();
 
   const handleCreateResume = () => {
+    if (isAuthLoading) return;
+
     if (!user) {
       redirectToLogin();
       return;
@@ -24,6 +27,8 @@ export function useQuickActions() {
   };
 
   const handleOpenUploadResume = () => {
+    if (isAuthLoading) return;
+
     if (!user) {
       redirectToLogin();
       return;
@@ -33,6 +38,8 @@ export function useQuickActions() {
   };
 
   const handleCheckATSScore = async () => {
+    if (isAuthLoading) return;
+
     if (!user) {
       redirectToLogin();
       return;

@@ -75,9 +75,12 @@ const attachRefreshInterceptor = (instance: typeof api) => {
           // Only a definitive "no valid session" ends the session (not network errors / 5xx).
           if (status === 400 || status === 401 || status === 403) {
             window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
+            return Promise.reject(error);
           }
         }
-        return Promise.reject(error);
+        // Refresh failed for a non-definitive reason (network error / 5xx): surface THAT
+        // error instead of the original 401, so callers don't mistake it for a logout.
+        return Promise.reject(refreshError);
       }
     },
   );

@@ -9,7 +9,10 @@ export interface User {
 
 export interface AuthState {
   user: User | null;
+  /** True until the first session check has finished (success or failure). */
   isLoading: boolean;
+  /** True when the session check failed for a reason other than "not logged in" (network / server error). */
+  authError: boolean;
 
   setAuth: (user: User) => void;
   /** Clears local state only (use signOut to end the shared Throne8 session). */

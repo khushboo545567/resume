@@ -6,12 +6,15 @@ interface Props {
   children: ReactNode;
 }
 
+/**
+ * Starts the session check in the background. It does NOT block rendering:
+ * public pages (home, templates, public share links) show immediately, and only
+ * protected routes wait for the result (see RequireUser).
+ */
 export default function AuthInitializer({ children }: Props) {
   const initializeAuth = useAuthStore((state) => state.initializeAuth);
 
   const logout = useAuthStore((state) => state.logout);
-
-  const isLoading = useAuthStore((state) => state.isLoading);
 
   useEffect(() => {
     initializeAuth();
@@ -23,14 +26,6 @@ export default function AuthInitializer({ children }: Props) {
     window.addEventListener(SESSION_EXPIRED_EVENT, logout);
     return () => window.removeEventListener(SESSION_EXPIRED_EVENT, logout);
   }, [logout]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading...
-      </div>
-    );
-  }
 
   return children;
 }

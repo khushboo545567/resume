@@ -21,20 +21,56 @@ interface Props {
 
 /**
  * Renders children only when the shared Throne8 session is valid.
- * Otherwise sends the user to the Throne8 login page and brings them back afterwards.
+ *
+ * - While the first session check is running: spinner (no redirect yet).
+ * - Server/network problem during the check: "try again" screen (NOT a logout).
+ * - No session: send the user to the Throne8 login page and bring them back afterwards.
  */
 export default function RequireUser({ children }: Props) {
+  const isLoading = useAuthStore((state) => state.isLoading);
+
+  if (isLoading) return <FullPageSpinner />;
+
+  return <SessionGate>{children}</SessionGate>;
+}
+
+function SessionGate({ children }: Props) {
   const user = useAuthStore((state) => state.user);
-  // Mounted without a session right after we sent the user to Throne8 = we just came back and
-  // there is STILL no session (e.g. the cookie is not shared on this domain). Stop here
-  // instead of bouncing between the two apps.
+  const authError = useAuthStore((state) => state.authError);
+  const initializeAuth = useAuthStore((state) => state.initializeAuth);
+
+  // This component only mounts after the first session check has finished. If it mounts
+  // without a session right after we sent the user to Throne8, we just came back and there
+  // is STILL no session (e.g. the cookie is not shared on this domain). Stop here instead
+  // of bouncing between the two apps.
   const [loopBlocked] = useState(() => !user && isLoginRedirectCoolingDown());
 
+  const shouldRedirect = !user && !authError && !loopBlocked;
+
   useEffect(() => {
-    if (!user && !loopBlocked) redirectToLogin();
-  }, [user, loopBlocked]);
+    if (shouldRedirect) redirectToLogin();
+  }, [shouldRedirect]);
 
   if (user) return <>{children}</>;
+
+  if (authError) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
+        <p className="text-lg font-semibold">We couldn't check your session</p>
+        <p className="max-w-md text-sm text-slate-500">
+          There was a connection problem. You are not logged out. Please try
+          again.
+        </p>
+        <button
+          type="button"
+          onClick={() => void initializeAuth()}
+          className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white"
+        >
+          Try again
+        </button>
+      </div>
+    );
+  }
 
   if (loopBlocked) {
     return (

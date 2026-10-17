@@ -40,6 +40,7 @@ function getColumnCount(width: number) {
 
 export default function HomePage() {
   const user = useAuthStore((state) => state.user);
+  const isAuthLoading = useAuthStore((state) => state.isLoading);
   const [selectedTemplateId, setSelectedTemplateId] =
     useState<ResumeTemplate | null>(null);
 
@@ -101,6 +102,8 @@ export default function HomePage() {
   const remainingTemplates = filteredTemplates.slice(columns);
 
   const handleTemplateClick = (templateId: ResumeTemplate) => {
+    if (isAuthLoading) return;
+
     if (!user) {
       redirectToLogin();
       return;

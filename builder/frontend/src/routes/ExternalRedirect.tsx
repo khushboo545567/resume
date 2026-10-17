@@ -15,9 +15,11 @@ interface Props {
  */
 export default function ExternalRedirect({ to }: Props) {
   const user = useAuthStore((state) => state.user);
+  const isLoading = useAuthStore((state) => state.isLoading);
 
   useEffect(() => {
-    if (user) return;
+    // Wait for the session check: a logged-in user must not be sent to the login page.
+    if (isLoading || user) return;
 
     if (to === "signup") {
       redirectToSignup();
@@ -25,7 +27,7 @@ export default function ExternalRedirect({ to }: Props) {
       // Come back to the dashboard (not to "/login", which would loop).
       redirectToLogin(`${window.location.origin}/dashboard`);
     }
-  }, [user, to]);
+  }, [user, isLoading, to]);
 
   if (user) return <Navigate to="/dashboard" replace />;
 

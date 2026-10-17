@@ -14,6 +14,7 @@ import {
   Mail,
   Plus,
   Upload,
+  LogOut,
   X,
 } from "lucide-react";
 import { BriefcaseBusiness } from "lucide-react";
@@ -144,6 +145,7 @@ export default function Sidebar({
   forceCollapsed = false,
 }: SidebarProps) {
   const user = useAuthStore((state) => state.user);
+  const signOut = useAuthStore((state) => state.signOut);
 
   const {
     handleCreateResume,
@@ -273,6 +275,22 @@ export default function Sidebar({
             );
           })}
         </nav>
+
+        {/* ================= LOG OUT ================= */}
+
+        {/* Ends the shared Throne8 session, so the user is logged out of both apps. */}
+        {user && (
+          <div className="shrink-0 border-t border-border-sidebar px-4 py-3">
+            <button
+              type="button"
+              onClick={() => void signOut()}
+              className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-15 font-medium text-sidebar-text/80 transition hover:bg-sidebar-hover hover:text-sidebar-text"
+            >
+              <LogOut size={18} />
+              <span>Log out</span>
+            </button>
+          </div>
+        )}
 
         {/* ================= UPGRADE CARD ================= */}
 
