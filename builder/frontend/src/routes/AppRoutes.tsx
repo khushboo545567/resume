@@ -6,6 +6,7 @@ import AdminProtectedRoute from "./AdminProtectedRoute";
 import ExternalRedirect from "./ExternalRedirect";
 
 import MainLayout from "../layouts/MainLayout";
+import { isRouteDisabled } from "../config/disabledRoutes";
 
 const HomePage = lazy(() => import("../pages/HomePage"));
 const TemplateGalleryPage = lazy(() => import("../pages/TemplateGalleryPage"));
@@ -77,7 +78,9 @@ export default function AppRoutes() {
 
           <Route path="/cover-letters" element={<CoverLetterGalleryPage />} />
 
-          <Route path="/ai" element={<AiPage />} />
+          {!isRouteDisabled("/ai") && (
+            <Route path="/ai" element={<AiPage />} />
+          )}
         </Route>
 
         {/* ================= AUTHENTICATED USER ================= */}
@@ -93,9 +96,13 @@ export default function AppRoutes() {
 
           <Route path="/myresume" element={<MyResumePage />} />
 
-          <Route path="/analytics" element={<AnalyticsPage />} />
+          {!isRouteDisabled("/analytics") && (
+            <Route path="/analytics" element={<AnalyticsPage />} />
+          )}
 
-          <Route path="/settings" element={<Settings />} />
+          {!isRouteDisabled("/settings") && (
+            <Route path="/settings" element={<Settings />} />
+          )}
           <Route path="/interview" element={<InterviewPage />} />
           <Route path="/interview/ai" element={<GenerateInterviewPage />} />
           <Route

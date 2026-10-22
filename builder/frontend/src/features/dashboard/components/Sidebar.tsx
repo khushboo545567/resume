@@ -21,6 +21,7 @@ import { BriefcaseBusiness } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 import { useAuthStore } from "../../../store/auth.store";
+import { isRouteDisabled } from "../../../config/disabledRoutes";
 import type { QuickActions } from "../hooks/useQuickActions";
 
 type MenuRole = "public" | "user" | "admin";
@@ -166,7 +167,9 @@ export default function Sidebar({
   /*
    * Show only menus allowed for the current role.
    */
-  const visibleMenus = menus.filter((menu) => menu.roles.includes(currentRole));
+  const visibleMenus = menus.filter(
+    (menu) => menu.roles.includes(currentRole) && !isRouteDisabled(menu.path),
+  );
 
   // Run an action then close the mobile drawer (no-op on desktop).
   const runAndClose = (action: () => void | Promise<void>) => () => {
