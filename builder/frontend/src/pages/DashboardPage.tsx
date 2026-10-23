@@ -17,12 +17,22 @@ import type { Resume } from "../features/resume/types/resume.types";
 
 import { useNavigate } from "react-router-dom";
 
+import { useAuthStore } from "../store/auth.store";
+
 export default function DashboardPage() {
   const [open, setOpen] = useState(false);
   const [analyseOpen, setAnalyseOpen] = useState(false);
   const [search, setSearch] = useState("");
 
   const navigate = useNavigate();
+
+  // Greet the logged-in user by first name (falls back to the first word of
+  // their full name, then to a neutral "there" while the session is loading).
+  const user = useAuthStore((state) => state.user);
+  const firstName =
+    user?.profile?.firstName?.trim() ||
+    user?.fullName?.trim().split(/\s+/)[0] ||
+    "there";
 
   // Filter & Sort States
   const [filter, setFilter] = useState<"all" | "draft" | "completed">("all");
@@ -95,7 +105,7 @@ export default function DashboardPage() {
     <>
       <div className="min-w-0 space-y-6 sm:space-y-8">
         <WelcomeBanner
-          name="Hemendra"
+          name={firstName}
           onCreate={() => setOpen(true)}
           onContinue={() => {
             if (sortedResumes.length > 0) {

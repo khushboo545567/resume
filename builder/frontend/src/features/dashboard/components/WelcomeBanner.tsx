@@ -16,7 +16,7 @@ export default function WelcomeBanner({ name, onCreate, onContinue }: Props) {
           </p>
 
           <h1 className="mt-2 text-2xl font-bold break-words sm:text-3xl lg:text-4xl">
-            Hi, {name} 👋
+            Hi, {name}
           </h1>
 
           <p className="mt-3 max-w-xl text-sm text-btn-text/80 sm:text-base">
