@@ -1,10 +1,45 @@
 export type UserRole = "user" | "admin";
 
+export type UserType = "student" | "working" | "fresher" | "unknown";
+
+/** Extra details from Throne8's GET /auth/profile, shown in the profile popup. */
+export interface UserProfile {
+  firstName?: string;
+  lastName?: string | null;
+  phoneNumber?: string | null;
+  location?: string | null;
+  status?: string;
+  emailVerified?: boolean;
+  phoneVerified?: boolean;
+  createdAt?: string;
+  lastLoginAt?: string | null;
+  userType?: UserType;
+  student?: {
+    collegeName?: string | null;
+    degree?: string | null;
+    fieldOfStudy?: string | null;
+    graduationYear?: number | string | null;
+  };
+  working?: {
+    jobTitle?: string | null;
+    companyName?: string | null;
+    startDate?: string | null;
+    endDate?: string | null;
+  };
+  fresher?: {
+    highestEducation?: string | null;
+    preferredRole?: string | null;
+    cgpa?: number | string | null;
+  };
+}
+
 export interface User {
   _id: string;
   fullName: string;
   email: string;
   role: UserRole;
+  /** Optional, so anything that only needs id/name/email/role is unaffected. */
+  profile?: UserProfile;
 }
 
 export interface AuthState {

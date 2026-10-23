@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Plus, ChevronDown, Upload } from "lucide-react";
 // import { Search } from "lucide-react"; // used by the commented-out search box below
 import { CiMenuBurger } from "react-icons/ci";
 
 import { useAuthStore } from "../../../store/auth.store";
 import NotificationDropdown from "../../notification/components/NotificationDropdown";
+import ProfileModal from "./ProfileModal";
 import type { QuickActions } from "../hooks/useQuickActions";
 
 interface NavbarProps {
@@ -25,6 +27,7 @@ export default function Navbar({
   forceCollapsed = false,
 }: NavbarProps) {
   const user = useAuthStore((state) => state.user);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   const {
     handleCreateResume,
@@ -50,9 +53,14 @@ export default function Navbar({
         <div className="flex items-center gap-2">
           <NotificationDropdown />
 
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-btn text-15 font-bold text-btn-text">
+          <button
+            type="button"
+            onClick={() => user && setIsProfileOpen(true)}
+            aria-label="Open profile"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-btn text-15 font-bold text-btn-text"
+          >
             {initial}
-          </div>
+          </button>
 
           <button
             type="button"
@@ -137,7 +145,12 @@ export default function Navbar({
 
           {/* User */}
 
-          <button className="flex items-center gap-2 rounded-xl px-2.5 py-2 transition hover:bg-navbar-hover">
+          <button
+            type="button"
+            onClick={() => user && setIsProfileOpen(true)}
+            aria-label="Open profile"
+            className="flex items-center gap-2 rounded-xl px-2.5 py-2 transition hover:bg-navbar-hover"
+          >
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-btn text-15 font-bold text-btn-text">
               {initial}
             </div>
@@ -159,6 +172,13 @@ export default function Navbar({
           </button>
         </div>
       </div>
+
+      {/* ================= PROFILE POPUP ================= */}
+
+      <ProfileModal
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+      />
     </header>
   );
 }
