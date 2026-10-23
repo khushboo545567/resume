@@ -215,7 +215,7 @@ export default function ExperienceForm({
         {editIndex !== undefined ? "Edit Experience" : "Add Experience"}
       </h2>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
         <div>
           <label className="font-medium text-heading">Company</label>
           <input
@@ -339,7 +339,7 @@ export default function ExperienceForm({
 
         <div className="space-y-3 mt-3">
           {responsibilityFields.map((field, index) => (
-            <div key={field.id} className="flex items-start gap-3">
+            <div key={field.id} className="flex flex-wrap items-start gap-3 sm:flex-nowrap">
               {/* <input
                 {...register(`responsibilities.${index}.value`)}
                 placeholder="Built Resume Builder used by 5000+ students"

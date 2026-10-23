@@ -86,8 +86,8 @@ export default function ProjectsSection() {
               /* ============================= */
               /* PROJECT CARD */
               /* ============================= */
-              <div className="rounded-2xl border border-border bg-popup p-6 shadow-sm">
-                <div className="flex items-start justify-between gap-6">
+              <div className="rounded-2xl border border-border bg-popup p-4 shadow-sm sm:p-6">
+                <div className="flex items-start justify-between gap-3 sm:gap-6">
                   {/* Project Information */}
                   <div className="min-w-0 flex-1 space-y-2">
                     {/* Project Title */}

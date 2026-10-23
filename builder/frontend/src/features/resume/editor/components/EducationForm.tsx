@@ -109,7 +109,7 @@ export default function EducationForm({
         {editIndex !== undefined ? "Edit Education" : "Add Education"}
       </h2>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
         <input
           {...register("institution")}
           placeholder="College / University"
@@ -138,7 +138,7 @@ export default function EducationForm({
         <div className="flex gap-2">
           <select
             {...register("startMonth")}
-            className="h-12 w-1/2 rounded-lg border border-border bg-navbar px-2 text-heading outline-none focus:border-border-strong"
+            className="h-12 w-1/2 min-w-0 rounded-lg border border-border bg-navbar px-2 text-heading outline-none focus:border-border-strong"
           >
             {MONTHS.map((m) => (
               <option key={m} value={m}>
@@ -151,7 +151,7 @@ export default function EducationForm({
             type="number"
             {...register("startYear", { valueAsNumber: true })}
             placeholder="Start Year"
-            className="h-12 w-1/2 rounded-lg border border-border bg-navbar px-2 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
+            className="h-12 w-1/2 min-w-0 rounded-lg border border-border bg-navbar px-2 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
           />
         </div>
 
@@ -160,7 +160,7 @@ export default function EducationForm({
           <select
             {...register("endMonth")}
             disabled={isCurrent}
-            className="h-12 w-1/2 rounded-lg border border-border bg-navbar px-2 text-heading outline-none focus:border-border-strong disabled:bg-navbar-hover"
+            className="h-12 w-1/2 min-w-0 rounded-lg border border-border bg-navbar px-2 text-heading outline-none focus:border-border-strong disabled:bg-navbar-hover"
           >
             {MONTHS.map((m) => (
               <option key={m} value={m}>
@@ -174,7 +174,7 @@ export default function EducationForm({
             {...register("endYear", { valueAsNumber: true })}
             disabled={isCurrent}
             placeholder="End Year"
-            className="h-12 w-1/2 rounded-lg border border-border bg-navbar px-2 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring disabled:bg-navbar-hover"
+            className="h-12 w-1/2 min-w-0 rounded-lg border border-border bg-navbar px-2 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring disabled:bg-navbar-hover"
           />
         </div>
 

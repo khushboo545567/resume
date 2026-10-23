@@ -166,13 +166,13 @@ export default function InternshipForm({
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-6 rounded-2xl border border-border bg-popup p-8"
+      className="space-y-6 rounded-2xl border border-border bg-popup p-4 sm:p-8"
     >
       <h2 className="text-2xl font-bold text-heading">
         {editIndex !== undefined ? "Edit Internship" : "Add Internship"}
       </h2>
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
         <div>
           <label className="font-medium text-heading">Company</label>
           <input

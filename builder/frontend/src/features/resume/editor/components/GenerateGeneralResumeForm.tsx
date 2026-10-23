@@ -192,7 +192,7 @@ export default function QuickGenerateForm({
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto max-w-5xl space-y-8 rounded-2xl border border-border bg-popup p-8"
+      className="mx-auto max-w-5xl space-y-8 rounded-2xl border border-border bg-popup p-4 sm:p-8"
     >
       <div>
         <h2 className="text-2xl font-bold text-heading">
@@ -345,7 +345,7 @@ export default function QuickGenerateForm({
           {skills.fields.map((field, index) => (
             <div
               key={field.id}
-              className="relative grid grid-cols-[200px_1fr] items-start gap-3 rounded-xl border border-border bg-navbar p-4"
+              className="relative grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-3 rounded-xl border border-border bg-navbar p-4"
             >
               <RemoveRowButton onClick={() => skills.remove(index)} />
               <div>

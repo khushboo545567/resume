@@ -45,7 +45,7 @@ export default function AwardsSection() {
       </div>
 
       {/* Award Input + Add Button */}
-      <div className="flex gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row">
         <input
           value={value}
           onChange={(e) => setValue(e.target.value)}

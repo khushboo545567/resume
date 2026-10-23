@@ -45,7 +45,7 @@ export default function LanguagesSection() {
         </p>
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row">
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}

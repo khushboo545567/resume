@@ -80,7 +80,7 @@ export default function CertificationsSection() {
 
       {/* Certification Name + Link Inputs + Add Button */}
       <div className="space-y-3">
-        <div className="flex gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row">
           <input
             value={value}
             onChange={(e) => setValue(e.target.value)}
