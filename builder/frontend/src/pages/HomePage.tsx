@@ -153,9 +153,9 @@ export default function HomePage() {
     <div className="bg-background">
       <div className="flex flex-col justify-center px-4 py-8 sm:px-6 lg:h-screen lg:py-0">
         <div className="text-center mb-6">
-          <h1 className="text-2xl sm:text-44 lg:text-54 xl:text-58 font-extrabold text-heading">
+          <h1 className="text-2xl sm:text-44 lg:text-54 xl:text-58 font-extrabold text-display">
             Build Your Resume with{" "}
-            <span className="text-subheading">ResumeAI</span>
+            <span className="text-accent">ResumeAI</span>
           </h1>
           <p className="text-15 text-subheading mt-2 max-w-xl mx-auto">
             Choose an ATS-friendly template matched to your experience level and

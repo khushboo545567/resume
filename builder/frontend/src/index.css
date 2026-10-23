@@ -1,37 +1,45 @@
 @import "tailwindcss";
 
+/*
+ * Theme colours copied from the Throne8 mentorship page
+ * (throne8_client_main: src/app/mentorship/[userid]/page.tsx and
+ * src/features/mentorship/components/{layout/Navigation,sections/HeroSection,sections/ActionCardsSection}.tsx).
+ * Dark sidebar, light page - same hex codes as Throne8.
+ */
 @theme {
   /* Base surfaces */
-  --color-sidebar: #6b5643;
-  --color-navbar: #f6ede8;
-  --color-background: #d4c9bc;
+  --color-sidebar: #4a3020; /* Throne8 hero card gradient start */
+  --color-navbar: #f6ede8; /* Throne8 navbar bg */
+  --color-background: #f7f1e6; /* Throne8 mentorship page bg */
   --color-popup: #ffffff;
-  --color-section-panel: #bfae9a; /* editor "Sections" list - a little darker than the page background */
+  --color-section-panel: #f0e8de; /* Throne8 hero chip bg - editor "Sections" list */
 
   /* Text */
-  --color-heading: #4a3728;
-  --color-subheading: #6b5643;
-  --color-nav-text: rgb(74 55 40 / 0.7);
-  --color-sidebar-text: #f6ede8;
+  --color-heading: #4a3728; /* Throne8 base text colour */
+  --color-display: #231815; /* Throne8 hero headline ("Level up") */
+  --color-accent: #9c7a59; /* Throne8 hero accent word ("Faster.") */
+  --color-subheading: #705d4f; /* Throne8 hero body text */
+  --color-nav-text: rgb(74 55 40 / 0.7); /* Throne8 inactive nav item */
+  --color-sidebar-text: #f6ede8; /* Throne8 active nav pill text */
 
   /* Buttons */
-  --color-btn: #4a3728;
+  --color-btn: #38281e; /* Throne8 primary CTA ("Explore Mentors") */
   --color-btn-text: #f6ede8;
-  --color-btn-hover: #5e4633; /* primary button hover (slightly lighter) */
-  --color-btn-hover-bg: #efe3d8; /* your hover BG for ghost/nav buttons */
+  --color-btn-hover: #2a1e16; /* Throne8 primary CTA hover */
+  --color-btn-hover-bg: #efe3d8; /* Throne8 nav item hover */
 
   /* Hover states */
-  --color-sidebar-hover: #7d6650; /* sidebar item hover */
-  --color-sidebar-active: #4a3728; /* sidebar active item */
-  --color-navbar-hover: #efe3d8; /* nav item hover */
-  --color-row-hover: #cdc0b1; /* table rows / list items on background */
+  --color-sidebar-hover: #563824; /* Throne8 hero card gradient middle */
+  --color-sidebar-active: #2a1e16; /* darker than the sidebar so the active item stands out */
+  --color-navbar-hover: #efe3d8; /* Throne8 nav item hover */
+  --color-row-hover: #e5d9ce; /* table rows / list items on background */
 
   /* Borders */
-  --color-border: #bfb1a2; /* default, on background */
-  --color-border-navbar: #e3d5c8; /* navbar bottom border */
-  --color-border-popup: #e8dccf; /* popups, cards, dropdowns */
-  --color-border-sidebar: #5a4635; /* dividers inside sidebar */
-  --color-border-strong: #6b5643; /* inputs on focus, emphasized outlines */
+  --color-border: #e5d9ce; /* Throne8 input / pill border */
+  --color-border-navbar: #e5d9ce; /* Throne8 navbar bottom border */
+  --color-border-popup: #e8ddd4; /* Throne8 action card border */
+  --color-border-sidebar: #3b2619; /* Throne8 hero card gradient end - dividers inside sidebar */
+  --color-border-strong: #4a3728; /* Throne8 input focus border */
 
   /* Focus ring */
   --color-ring: rgb(74 55 40 / 0.4);
