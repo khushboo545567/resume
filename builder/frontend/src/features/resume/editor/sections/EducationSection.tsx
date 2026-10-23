@@ -61,7 +61,7 @@ export default function EducationSection() {
 
       <div className="space-y-4">
         {resume?.education.map((item, index) => (
-          <div key={index} className="rounded-xl border border-border bg-popup p-6 shadow-sm">
+          <div key={index} className="rounded-xl border border-border bg-popup p-4 shadow-sm sm:p-6">
             <div className="flex items-start justify-between">
               <div>
                 <h3 className="text-lg font-bold">{item.degree}</h3>
