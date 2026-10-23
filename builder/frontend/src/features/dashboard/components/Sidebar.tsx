@@ -192,7 +192,7 @@ export default function Sidebar({
       )}
 
       <aside
-        className={`fixed left-0 top-0 z-50 flex h-screen w-64 flex-col border-r border-border-sidebar bg-sidebar text-sidebar-text transition-transform duration-300 ease-in-out ${
+        className={`fixed left-0 top-0 z-50 flex h-dvh w-64 flex-col border-r border-border-sidebar bg-sidebar text-sidebar-text transition-transform duration-300 ease-in-out ${
           forceCollapsed ? "" : "[@media(min-width:1400px)]:translate-x-0"
         } ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
@@ -217,103 +217,109 @@ export default function Sidebar({
           </button>
         </div>
 
-        {/* ================= MOBILE QUICK ACTIONS ================= */}
+        {/* ================= SCROLLABLE BODY ================= */}
 
-        <div
-          className={`space-y-2 border-b border-border-sidebar p-4 ${
-            forceCollapsed ? "" : "[@media(min-width:1400px)]:hidden"
-          }`}
-        >
-          <button
-            type="button"
-            onClick={runAndClose(handleCreateResume)}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-btn px-4 py-2.5 text-15 font-semibold text-btn-text transition hover:bg-btn-hover"
+        {/* Everything below the logo scrolls together, so nothing gets
+            squeezed out of view on short screens. */}
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
+          {/* ================= MOBILE QUICK ACTIONS ================= */}
+
+          <div
+            className={`space-y-2 border-b border-border-sidebar p-4 ${
+              forceCollapsed ? "" : "[@media(min-width:1400px)]:hidden"
+            }`}
           >
-            <Plus size={16} />
-            Create Resume
-          </button>
-
-          <button
-            type="button"
-            onClick={runAndClose(handleCheckATSScore)}
-            disabled={isCreatingAtsResume}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-btn px-4 py-2.5 text-15 font-semibold text-btn-text transition hover:bg-btn-hover disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isCreatingAtsResume ? "Preparing..." : "Check ATS Score"}
-          </button>
-
-          <button
-            type="button"
-            onClick={runAndClose(handleOpenUploadResume)}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-border-sidebar px-4 py-2.5 text-15 font-semibold text-sidebar-text transition hover:bg-sidebar-hover"
-          >
-            <Upload size={16} />
-            Upload Resume
-          </button>
-        </div>
-
-        {/* ================= MENU ================= */}
-
-        <nav className="flex-1 space-y-1 overflow-y-auto p-4">
-          {visibleMenus.map((menu) => {
-            const Icon = menu.icon;
-
-            return (
-              <NavLink
-                key={menu.title}
-                to={menu.path}
-                onClick={onClose}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-xl px-4 py-2.5 text-15 font-medium transition ${
-                    isActive
-                      ? "bg-sidebar-active text-sidebar-text shadow-lg"
-                      : "text-sidebar-text/80 hover:bg-sidebar-hover hover:text-sidebar-text"
-                  }`
-                }
-              >
-                <Icon size={18} />
-
-                <span>{menu.title}</span>
-              </NavLink>
-            );
-          })}
-        </nav>
-
-        {/* ================= LOG OUT ================= */}
-
-        {/* Ends the shared Throne8 session, so the user is logged out of both apps. */}
-        {user && (
-          <div className="shrink-0 border-t border-border-sidebar px-4 py-3">
             <button
               type="button"
-              onClick={() => void signOut()}
-              className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-15 font-medium text-sidebar-text/80 transition hover:bg-sidebar-hover hover:text-sidebar-text"
+              onClick={runAndClose(handleCreateResume)}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-btn px-4 py-2.5 text-15 font-semibold text-btn-text transition hover:bg-btn-hover"
             >
-              <LogOut size={18} />
-              <span>Log out</span>
+              <Plus size={16} />
+              Create Resume
+            </button>
+
+            <button
+              type="button"
+              onClick={runAndClose(handleCheckATSScore)}
+              disabled={isCreatingAtsResume}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-btn px-4 py-2.5 text-15 font-semibold text-btn-text transition hover:bg-btn-hover disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isCreatingAtsResume ? "Preparing..." : "Check ATS Score"}
+            </button>
+
+            <button
+              type="button"
+              onClick={runAndClose(handleOpenUploadResume)}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-border-sidebar px-4 py-2.5 text-15 font-semibold text-sidebar-text transition hover:bg-sidebar-hover"
+            >
+              <Upload size={16} />
+              Upload Resume
             </button>
           </div>
-        )}
 
-        {/* ================= UPGRADE CARD ================= */}
+          {/* ================= MENU ================= */}
 
-        {/* You can show this only for logged-in users if you want */}
-        {user && (
-          <div className="m-4 shrink-0 rounded-2xl bg-btn p-4 text-btn-text">
-            <Sparkles className="mb-2 text-btn-hover-bg" size={20} />
+          <nav className="flex-1 space-y-1 p-4">
+            {visibleMenus.map((menu) => {
+              const Icon = menu.icon;
 
-            <h3 className="text-15 font-bold">Upgrade to Pro</h3>
+              return (
+                <NavLink
+                  key={menu.title}
+                  to={menu.path}
+                  onClick={onClose}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 rounded-xl px-4 py-2.5 text-15 font-medium transition ${
+                      isActive
+                        ? "bg-sidebar-active text-sidebar-text shadow-lg"
+                        : "text-sidebar-text/80 hover:bg-sidebar-hover hover:text-sidebar-text"
+                    }`
+                  }
+                >
+                  <Icon size={18} />
 
-            <p className="mt-1.5 text-13 opacity-90">
-              Unlock AI Resume Builder, ATS Pro, Unlimited Resume Downloads and
-              Premium Templates.
-            </p>
+                  <span>{menu.title}</span>
+                </NavLink>
+              );
+            })}
+          </nav>
 
-            <button className="mt-3 w-full rounded-xl bg-navbar py-2 text-15 font-semibold text-heading transition hover:bg-btn-hover-bg">
-              Upgrade
-            </button>
-          </div>
-        )}
+          {/* ================= LOG OUT ================= */}
+
+          {/* Ends the shared Throne8 session, so the user is logged out of both apps. */}
+          {user && (
+            <div className="shrink-0 border-t border-border-sidebar px-4 py-3">
+              <button
+                type="button"
+                onClick={() => void signOut()}
+                className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-15 font-medium text-sidebar-text/80 transition hover:bg-sidebar-hover hover:text-sidebar-text"
+              >
+                <LogOut size={18} />
+                <span>Log out</span>
+              </button>
+            </div>
+          )}
+
+          {/* ================= UPGRADE CARD ================= */}
+
+          {/* You can show this only for logged-in users if you want */}
+          {user && (
+            <div className="m-4 shrink-0 rounded-2xl bg-btn p-4 text-btn-text">
+              <Sparkles className="mb-2 text-btn-hover-bg" size={20} />
+
+              <h3 className="text-15 font-bold">Upgrade to Pro</h3>
+
+              <p className="mt-1.5 text-13 opacity-90">
+                Unlock AI Resume Builder, ATS Pro, Unlimited Resume Downloads
+                and Premium Templates.
+              </p>
+
+              <button className="mt-3 w-full rounded-xl bg-navbar py-2 text-15 font-semibold text-heading transition hover:bg-btn-hover-bg">
+                Upgrade
+              </button>
+            </div>
+          )}
+        </div>
       </aside>
     </>
   );
