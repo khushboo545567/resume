@@ -1,4 +1,5 @@
-import { Search, Plus, ChevronDown, Upload } from "lucide-react";
+import { Plus, ChevronDown, Upload } from "lucide-react";
+// import { Search } from "lucide-react"; // used by the commented-out search box below
 import { CiMenuBurger } from "react-icons/ci";
 
 import { useAuthStore } from "../../../store/auth.store";
@@ -75,6 +76,7 @@ export default function Navbar({
       >
         {/* Left */}
 
+        {/* Search resumes (temporarily disabled)
         <div className="relative">
           <Search
             size={18}
@@ -86,10 +88,12 @@ export default function Navbar({
             className="h-11 w-40 rounded-xl border border-border pl-11 pr-4 text-15 text-heading outline-none transition focus:border-border-strong focus:ring-2 focus:ring-ring xl:w-80"
           />
         </div>
+        */}
 
         {/* Right */}
 
-        <div className="flex items-center gap-2 xl:gap-3">
+        {/* ml-auto keeps this group on the right now that the search box is gone */}
+        <div className="ml-auto flex items-center gap-2 xl:gap-3">
           {/* Create Resume */}
 
           <button
