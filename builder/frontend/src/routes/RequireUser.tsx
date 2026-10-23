@@ -10,7 +10,7 @@ import {
 export function FullPageSpinner() {
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600" />
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-border border-t-btn" />
     </div>
   );
 }
@@ -56,15 +56,15 @@ function SessionGate({ children }: Props) {
   if (authError) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
-        <p className="text-lg font-semibold">We couldn't check your session</p>
-        <p className="max-w-md text-sm text-slate-500">
+        <p className="text-lg font-semibold text-heading">We couldn't check your session</p>
+        <p className="max-w-md text-sm text-subheading">
           There was a connection problem. You are not logged out. Please try
           again.
         </p>
         <button
           type="button"
           onClick={() => void initializeAuth()}
-          className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white"
+          className="rounded-lg bg-btn px-5 py-2 text-sm font-medium text-btn-text transition hover:bg-btn-hover"
         >
           Try again
         </button>
@@ -75,13 +75,13 @@ function SessionGate({ children }: Props) {
   if (loopBlocked) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
-        <p className="text-lg font-semibold">We couldn't find your session</p>
-        <p className="max-w-md text-sm text-slate-500">
+        <p className="text-lg font-semibold text-heading">We couldn't find your session</p>
+        <p className="max-w-md text-sm text-subheading">
           Please log in on Throne8 and open the resume builder again.
         </p>
         <a
           href={`${THRONE8_URL}/login`}
-          className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white"
+          className="rounded-lg bg-btn px-5 py-2 text-sm font-medium text-btn-text transition hover:bg-btn-hover"
         >
           Go to Throne8 login
         </a>

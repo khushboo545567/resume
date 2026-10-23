@@ -39,19 +39,24 @@ interface RowProps {
   icon: ElementType;
   label: string;
   value?: ReactNode;
+  wide?: boolean;
 }
 
 // Rows with no value are skipped, so empty profiles don't show a wall of dashes.
-function Row({ icon: Icon, label, value }: RowProps) {
+function Row({ icon: Icon, label, value, wide }: RowProps) {
   if (value === null || value === undefined || value === "") return null;
 
   return (
-    <div className="flex items-start gap-3 py-2">
-      <Icon size={18} className="mt-0.5 shrink-0 text-nav-text" />
+    <div
+      className={`flex items-center gap-3 py-2 ${wide ? "sm:col-span-2" : ""}`}
+    >
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-navbar text-accent">
+        <Icon size={18} />
+      </span>
 
       <div className="min-w-0">
         <p className="text-xs text-nav-text">{label}</p>
-        <p className="wrap-break-word text-sm font-medium text-heading">
+        <p className="break-words text-sm font-semibold text-heading">
           {value}
         </p>
       </div>
@@ -61,14 +66,19 @@ function Row({ icon: Icon, label, value }: RowProps) {
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="border-t border-border-popup px-6 py-4">
-      <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-subheading">
+    <section className="border-b border-border-popup px-5 py-4 last:border-b-0 sm:px-6">
+      <h3 className="mb-1 text-xs font-bold uppercase tracking-wide text-accent">
         {title}
       </h3>
-      {children}
+
+      {/* One column on phones, two on wider screens to keep the popup short */}
+      <div className="grid sm:grid-cols-2 sm:gap-x-6">{children}</div>
     </section>
   );
 }
+
+const chipClass =
+  "inline-flex items-center gap-1 rounded-full border border-gold/40 bg-gold/20 px-2.5 py-0.5 text-xs font-bold text-gold-soft";
 
 export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const user = useAuthStore((state) => state.user);
@@ -113,8 +123,9 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   // Portal to <body>: the navbar is a sticky z-30 stacking context, which would
   // otherwise keep this popup underneath the z-50 sidebar.
   return createPortal(
+    // Bottom sheet on phones, centred dialog from the sm breakpoint up.
     <div
-      className="fixed inset-0 z-60 flex items-center justify-center bg-heading/50 p-4"
+      className="fixed inset-0 z-60 flex items-end justify-center bg-heading/50 sm:items-center sm:p-4"
       onClick={onClose}
     >
       <div
@@ -122,45 +133,46 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
         aria-modal="true"
         aria-label="Profile details"
         onClick={(event) => event.stopPropagation()}
-        className="max-h-[90dvh] w-full max-w-md overflow-y-auto overscroll-contain rounded-2xl border border-border-popup bg-popup shadow-xl"
+        className="flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-2xl border border-border-popup bg-popup shadow-xl sm:max-w-lg sm:rounded-2xl"
       >
-        {/* ================= HEADER ================= */}
+        {/* ================= HEADER (pinned) ================= */}
 
-        <div className="relative flex flex-col items-center px-6 pb-5 pt-8 text-center">
+        {/* Same dark gradient as Throne8's mentor card */}
+        <div className="relative shrink-0 bg-linear-to-br from-sidebar via-sidebar-hover to-border-sidebar px-5 py-5 pr-12 sm:px-6">
           <button
             type="button"
             onClick={onClose}
             aria-label="Close profile"
-            className="absolute right-3 top-3 rounded-lg p-1.5 text-nav-text transition hover:bg-navbar-hover"
+            className="absolute right-3 top-3 rounded-lg p-1.5 text-sidebar-text/70 transition hover:bg-sidebar-text/10 hover:text-sidebar-text"
           >
             <X size={20} />
           </button>
 
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-btn text-3xl font-bold text-btn-text">
-            {initial}
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-gold bg-btn-hover-bg text-2xl font-extrabold text-btn sm:h-16 sm:w-16">
+              {initial}
+            </div>
+
+            <div className="min-w-0">
+              <h2 className="break-words text-lg font-bold text-sidebar-text sm:text-xl">
+                {user.fullName}
+              </h2>
+
+              <p className="break-all text-xs text-sidebar-text/70 sm:text-sm">
+                {user.email}
+              </p>
+            </div>
           </div>
 
-          <h2 className="mt-3 text-xl font-bold text-heading">
-            {user.fullName}
-          </h2>
-
-          <p className="max-w-full truncate text-sm text-nav-text">
-            {user.email}
-          </p>
-
-          <div className="mt-3 flex flex-wrap justify-center gap-2">
-            <span className="rounded-full bg-navbar px-3 py-1 text-xs font-semibold text-subheading">
-              {capitalize(user.role)}
-            </span>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <span className={chipClass}>{capitalize(user.role)}</span>
 
             {profile.userType && profile.userType !== "unknown" && (
-              <span className="rounded-full bg-navbar px-3 py-1 text-xs font-semibold text-subheading">
-                {capitalize(profile.userType)}
-              </span>
+              <span className={chipClass}>{capitalize(profile.userType)}</span>
             )}
 
             {profile.emailVerified && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-navbar px-3 py-1 text-xs font-semibold text-subheading">
+              <span className={chipClass}>
                 <BadgeCheck size={14} />
                 Email verified
               </span>
@@ -168,98 +180,106 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
           </div>
         </div>
 
-        {/* ================= CONTACT ================= */}
+        {/* ================= DETAILS (scrolls) ================= */}
 
-        <Section title="Contact">
-          <Row icon={Mail} label="Email" value={user.email} />
-          <Row icon={Phone} label="Phone" value={profile.phoneNumber} />
-          <Row icon={MapPin} label="Location" value={profile.location} />
-        </Section>
-
-        {/* ================= EDUCATION / WORK ================= */}
-
-        {hasEducationOrWork && (
-          <Section
-            title={profile.userType === "working" ? "Work" : "Education"}
-          >
-            {profile.userType === "student" && (
-              <>
-                <Row
-                  icon={GraduationCap}
-                  label="College"
-                  value={student?.collegeName}
-                />
-                <Row
-                  icon={GraduationCap}
-                  label="Degree"
-                  value={[student?.degree, student?.fieldOfStudy]
-                    .filter(Boolean)
-                    .join(" · ")}
-                />
-                <Row
-                  icon={CalendarDays}
-                  label="Graduation year"
-                  value={student?.graduationYear}
-                />
-              </>
-            )}
-
-            {profile.userType === "working" && (
-              <>
-                <Row
-                  icon={BriefcaseBusiness}
-                  label="Job title"
-                  value={working?.jobTitle}
-                />
-                <Row
-                  icon={BriefcaseBusiness}
-                  label="Company"
-                  value={working?.companyName}
-                />
-                <Row icon={CalendarDays} label="Period" value={workPeriod} />
-              </>
-            )}
-
-            {profile.userType === "fresher" && (
-              <>
-                <Row
-                  icon={GraduationCap}
-                  label="Highest education"
-                  value={fresher?.highestEducation}
-                />
-                <Row
-                  icon={BriefcaseBusiness}
-                  label="Preferred role"
-                  value={fresher?.preferredRole}
-                />
-                <Row icon={GraduationCap} label="CGPA" value={fresher?.cgpa} />
-              </>
-            )}
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+          <Section title="Contact">
+            <Row icon={Mail} label="Email" value={user.email} wide />
+            <Row icon={Phone} label="Phone" value={profile.phoneNumber} />
+            <Row icon={MapPin} label="Location" value={profile.location} />
           </Section>
-        )}
 
-        {/* ================= ACCOUNT ================= */}
+          {hasEducationOrWork && (
+            <Section
+              title={profile.userType === "working" ? "Work" : "Education"}
+            >
+              {profile.userType === "student" && (
+                <>
+                  <Row
+                    icon={GraduationCap}
+                    label="College"
+                    value={student?.collegeName}
+                    wide
+                  />
+                  <Row
+                    icon={GraduationCap}
+                    label="Degree"
+                    value={[student?.degree, student?.fieldOfStudy]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  />
+                  <Row
+                    icon={CalendarDays}
+                    label="Graduation year"
+                    value={student?.graduationYear}
+                  />
+                </>
+              )}
 
-        <Section title="Account">
-          <Row
-            icon={CalendarDays}
-            label="Member since"
-            value={formatDate(profile.createdAt)}
-          />
-          <Row
-            icon={Clock}
-            label="Last login"
-            value={formatDate(profile.lastLoginAt)}
-          />
-        </Section>
+              {profile.userType === "working" && (
+                <>
+                  <Row
+                    icon={BriefcaseBusiness}
+                    label="Job title"
+                    value={working?.jobTitle}
+                  />
+                  <Row
+                    icon={BriefcaseBusiness}
+                    label="Company"
+                    value={working?.companyName}
+                  />
+                  <Row
+                    icon={CalendarDays}
+                    label="Period"
+                    value={workPeriod}
+                    wide
+                  />
+                </>
+              )}
 
-        {/* ================= FOOTER ================= */}
+              {profile.userType === "fresher" && (
+                <>
+                  <Row
+                    icon={GraduationCap}
+                    label="Highest education"
+                    value={fresher?.highestEducation}
+                  />
+                  <Row
+                    icon={BriefcaseBusiness}
+                    label="Preferred role"
+                    value={fresher?.preferredRole}
+                  />
+                  <Row
+                    icon={GraduationCap}
+                    label="CGPA"
+                    value={fresher?.cgpa}
+                  />
+                </>
+              )}
+            </Section>
+          )}
 
-        <div className="border-t border-border-popup px-6 py-4">
+          <Section title="Account">
+            <Row
+              icon={CalendarDays}
+              label="Member since"
+              value={formatDate(profile.createdAt)}
+            />
+            <Row
+              icon={Clock}
+              label="Last login"
+              value={formatDate(profile.lastLoginAt)}
+            />
+          </Section>
+        </div>
+
+        {/* ================= FOOTER (pinned) ================= */}
+
+        <div className="shrink-0 border-t border-border-popup px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6">
           <button
             type="button"
             onClick={() => void signOut()}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-semibold text-heading transition hover:bg-btn-hover-bg"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-btn px-4 py-2.5 text-sm font-semibold text-btn-text transition hover:bg-btn-hover"
           >
             <LogOut size={18} />
             Log out
