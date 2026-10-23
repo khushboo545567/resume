@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { Plus, Search, FileText } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 
 import ResumeGrid from "../features/resume/components/ResumeGrid";
 import CreateResumeModal from "../features/resume/components/CreateResumeModal";
@@ -167,6 +167,18 @@ export default function MyResumePage() {
   }
 
   // ==========================================
+  // COUNT LABEL (shown under the page title)
+  // ==========================================
+
+  const totalResumes = pagination?.totalResumes ?? resumes.length;
+
+  const countLabel = loading
+    ? "Loading your resumes..."
+    : sortedResumes.length === totalResumes
+      ? `${totalResumes} ${totalResumes === 1 ? "resume" : "resumes"}`
+      : `Showing ${sortedResumes.length} of ${totalResumes} resumes`;
+
+  // ==========================================
   // UI
   // ==========================================
 
@@ -176,27 +188,21 @@ export default function MyResumePage() {
           HEADER
       ====================================== */}
 
-      <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-btn-hover-bg">
-            <FileText size={22} className="text-subheading" />
-          </div>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-bold text-heading sm:text-2xl">
+            My Resumes
+          </h1>
 
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-heading">
-              My Resumes
-            </h1>
-
-            <p className="mt-1 text-sm text-nav-text">
-              Create, edit and manage all your resumes
-            </p>
-          </div>
+          <p className="mt-1 text-sm text-nav-text">{countLabel}</p>
         </div>
 
+        {/* The navbar already has Create Resume from 1400px up, so this button
+            only shows where the navbar's one is tucked into the side menu. */}
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-btn px-5 text-sm font-semibold text-btn-text transition hover:bg-btn-hover"
+          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-btn px-5 text-sm font-semibold text-btn-text transition hover:bg-btn-hover [@media(min-width:1400px)]:hidden"
         >
           <Plus size={18} />
           Create Resume
@@ -266,19 +272,6 @@ export default function MyResumePage() {
             </select>
           </div>
         </div>
-      </div>
-
-      {/* ======================================
-          RESUME COUNT
-      ====================================== */}
-
-      <div>
-        <h2 className="text-lg font-semibold text-heading">Your Resumes</h2>
-
-        <p className="mt-1 text-sm text-nav-text">
-          Showing {sortedResumes.length} of{" "}
-          {pagination?.totalResumes ?? resumes.length} resumes
-        </p>
       </div>
 
       {/* ======================================
