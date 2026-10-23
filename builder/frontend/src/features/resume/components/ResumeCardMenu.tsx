@@ -50,8 +50,10 @@ export default function ResumeCardMenu({
         <MoreVertical size={18} />
       </button>
 
+      {/* z-20 keeps the menu above the cards but under the sticky navbar (z-30),
+          the side-menu overlay (z-40) and the sidebar (z-50) when scrolling */}
       {open && (
-        <div className="absolute right-0 top-11 z-50 w-56 overflow-hidden rounded-2xl border border-border-popup bg-popup shadow-xl">
+        <div className="absolute right-0 top-11 z-20 w-56 overflow-hidden rounded-2xl border border-border-popup bg-popup shadow-xl">
           <button
             onClick={() => {
               onRename();
