@@ -50,8 +50,8 @@ function Row({ icon: Icon, label, value }: RowProps) {
       <Icon size={18} className="mt-0.5 shrink-0 text-nav-text" />
 
       <div className="min-w-0">
-        <p className="text-13 text-nav-text">{label}</p>
-        <p className="wrap-break-word text-15 font-medium text-heading">
+        <p className="text-xs text-nav-text">{label}</p>
+        <p className="wrap-break-word text-sm font-medium text-heading">
           {value}
         </p>
       </div>
@@ -62,7 +62,7 @@ function Row({ icon: Icon, label, value }: RowProps) {
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="border-t border-border-popup px-6 py-4">
-      <h3 className="mb-1 text-13 font-semibold uppercase tracking-wide text-subheading">
+      <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-subheading">
         {title}
       </h3>
       {children}
@@ -144,23 +144,23 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
             {user.fullName}
           </h2>
 
-          <p className="max-w-full truncate text-15 text-nav-text">
+          <p className="max-w-full truncate text-sm text-nav-text">
             {user.email}
           </p>
 
           <div className="mt-3 flex flex-wrap justify-center gap-2">
-            <span className="rounded-full bg-navbar px-3 py-1 text-13 font-semibold text-subheading">
+            <span className="rounded-full bg-navbar px-3 py-1 text-xs font-semibold text-subheading">
               {capitalize(user.role)}
             </span>
 
             {profile.userType && profile.userType !== "unknown" && (
-              <span className="rounded-full bg-navbar px-3 py-1 text-13 font-semibold text-subheading">
+              <span className="rounded-full bg-navbar px-3 py-1 text-xs font-semibold text-subheading">
                 {capitalize(profile.userType)}
               </span>
             )}
 
             {profile.emailVerified && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-navbar px-3 py-1 text-13 font-semibold text-subheading">
+              <span className="inline-flex items-center gap-1 rounded-full bg-navbar px-3 py-1 text-xs font-semibold text-subheading">
                 <BadgeCheck size={14} />
                 Email verified
               </span>
@@ -259,7 +259,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
           <button
             type="button"
             onClick={() => void signOut()}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-border px-4 py-2.5 text-15 font-semibold text-heading transition hover:bg-btn-hover-bg"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-semibold text-heading transition hover:bg-btn-hover-bg"
           >
             <LogOut size={18} />
             Log out

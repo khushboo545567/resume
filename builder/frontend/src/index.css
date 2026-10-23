@@ -44,3 +44,20 @@
   /* Focus ring */
   --color-ring: rgb(74 55 40 / 0.4);
 }
+
+/*
+ * Typography - matches Throne8 (throne8_client_main: src/app/globals.css + layout.tsx).
+ * Throne8 renders in Arial/Helvetica with antialiased text; the Tailwind default
+ * (system-ui) made this app look different. Resume DOCUMENTS (preview / PDF export /
+ * public page) are pinned back to `font-sans` below so exported resumes do not change.
+ */
+@layer base {
+  html,
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}

@@ -57,7 +57,7 @@ export default function Navbar({
             type="button"
             onClick={() => user && setIsProfileOpen(true)}
             aria-label="Open profile"
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-btn text-15 font-bold text-btn-text"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-btn text-sm font-bold text-btn-text"
           >
             {initial}
           </button>
@@ -93,7 +93,7 @@ export default function Navbar({
 
           <input
             placeholder="Search resumes..."
-            className="h-11 w-40 rounded-xl border border-border pl-11 pr-4 text-15 text-heading outline-none transition focus:border-border-strong focus:ring-2 focus:ring-ring xl:w-80"
+            className="h-11 w-40 rounded-xl border border-border pl-11 pr-4 text-sm text-heading outline-none transition focus:border-border-strong focus:ring-2 focus:ring-ring xl:w-80"
           />
         </div>
         */}
@@ -106,7 +106,7 @@ export default function Navbar({
 
           <button
             onClick={handleCreateResume}
-            className="flex items-center gap-2 whitespace-nowrap rounded-xl bg-btn px-3 py-2.5 text-15 font-semibold text-btn-text transition hover:bg-btn-hover xl:px-4"
+            className="flex items-center gap-2 whitespace-nowrap rounded-xl bg-btn px-3 py-2.5 text-sm font-semibold text-btn-text transition hover:bg-btn-hover xl:px-4"
           >
             <Plus size={18} />
             <span>Create Resume</span>
@@ -116,7 +116,7 @@ export default function Navbar({
             type="button"
             onClick={handleCheckATSScore}
             disabled={isCreatingAtsResume}
-            className="inline-flex items-center gap-2 whitespace-nowrap rounded-xl bg-btn px-3 py-2.5 text-15 font-semibold text-btn-text transition hover:bg-btn-hover disabled:cursor-not-allowed disabled:opacity-50 xl:px-4"
+            className="inline-flex items-center gap-2 whitespace-nowrap rounded-xl bg-btn px-3 py-2.5 text-sm font-semibold text-btn-text transition hover:bg-btn-hover disabled:cursor-not-allowed disabled:opacity-50 xl:px-4"
           >
             {isCreatingAtsResume ? (
               "Preparing..."
@@ -133,7 +133,7 @@ export default function Navbar({
           <button
             type="button"
             onClick={handleOpenUploadResume}
-            className="inline-flex items-center gap-2 whitespace-nowrap rounded-xl border border-border px-3 py-2.5 text-15 font-semibold text-heading transition hover:bg-btn-hover-bg xl:px-4"
+            className="inline-flex items-center gap-2 whitespace-nowrap rounded-xl border border-border px-3 py-2.5 text-sm font-semibold text-heading transition hover:bg-btn-hover-bg xl:px-4"
           >
             <Upload size={18} />
             <span>Upload Resume</span>
@@ -151,16 +151,16 @@ export default function Navbar({
             aria-label="Open profile"
             className="flex items-center gap-2 rounded-xl px-2.5 py-2 transition hover:bg-navbar-hover"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-btn text-15 font-bold text-btn-text">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-btn text-sm font-bold text-btn-text">
               {initial}
             </div>
 
             <div className="hidden text-left xl:block">
-              <p className="text-15 font-semibold text-heading">
+              <p className="text-sm font-semibold text-heading">
                 {user?.fullName ?? "Guest"}
               </p>
 
-              <p className="max-w-40 truncate text-13 text-nav-text">
+              <p className="max-w-40 truncate text-xs text-nav-text">
                 {user ? user.email : "Not logged in"}
               </p>
             </div>

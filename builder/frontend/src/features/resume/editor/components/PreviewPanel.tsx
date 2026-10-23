@@ -145,7 +145,7 @@ const PreviewPanel = forwardRef<HTMLElement, Props>(
                * #resume-export below.
                */}
               <div
-                className="relative overflow-hidden bg-popup shadow-xl"
+                className="relative overflow-hidden bg-popup shadow-xl font-sans"
                 style={{
                   width: `${A4_WIDTH_PX}px`,
                   height: `${A4_HEIGHT_PX}px`,
@@ -190,7 +190,7 @@ const PreviewPanel = forwardRef<HTMLElement, Props>(
       >
         <div
           id="resume-export"
-          className="relative overflow-hidden bg-popup"
+          className="relative overflow-hidden bg-popup font-sans"
           style={{
             width: `${A4_WIDTH_PX}px`,
             height: `${A4_HEIGHT_PX}px`,

@@ -47,7 +47,7 @@ export default function PublicResumePage() {
         </div>
       </div>
 
-      <div className="mx-auto w-[850px] bg-white shadow-2xl">
+      <div className="mx-auto w-[850px] bg-white shadow-2xl font-sans">
         <TemplateRenderer />
       </div>
       <div className="border-t border-border p-6 text-center text-sm text-nav-text">

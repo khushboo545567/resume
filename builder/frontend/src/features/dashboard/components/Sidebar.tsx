@@ -232,7 +232,7 @@ export default function Sidebar({
             <button
               type="button"
               onClick={runAndClose(handleCreateResume)}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-btn px-4 py-2.5 text-15 font-semibold text-btn-text transition hover:bg-btn-hover"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-btn px-4 py-2.5 text-sm font-semibold text-btn-text transition hover:bg-btn-hover"
             >
               <Plus size={16} />
               Create Resume
@@ -242,7 +242,7 @@ export default function Sidebar({
               type="button"
               onClick={runAndClose(handleCheckATSScore)}
               disabled={isCreatingAtsResume}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-btn px-4 py-2.5 text-15 font-semibold text-btn-text transition hover:bg-btn-hover disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-btn px-4 py-2.5 text-sm font-semibold text-btn-text transition hover:bg-btn-hover disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isCreatingAtsResume ? "Preparing..." : "Check ATS Score"}
             </button>
@@ -250,7 +250,7 @@ export default function Sidebar({
             <button
               type="button"
               onClick={runAndClose(handleOpenUploadResume)}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-border-sidebar px-4 py-2.5 text-15 font-semibold text-sidebar-text transition hover:bg-sidebar-hover"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-border-sidebar px-4 py-2.5 text-sm font-semibold text-sidebar-text transition hover:bg-sidebar-hover"
             >
               <Upload size={16} />
               Upload Resume
@@ -269,7 +269,7 @@ export default function Sidebar({
                   to={menu.path}
                   onClick={onClose}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 rounded-xl px-4 py-2.5 text-15 font-medium transition ${
+                    `flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition ${
                       isActive
                         ? "bg-sidebar-active text-sidebar-text shadow-lg"
                         : "text-sidebar-text/80 hover:bg-sidebar-hover hover:text-sidebar-text"
@@ -292,7 +292,7 @@ export default function Sidebar({
               <button
                 type="button"
                 onClick={() => void signOut()}
-                className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-15 font-medium text-sidebar-text/80 transition hover:bg-sidebar-hover hover:text-sidebar-text"
+                className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium text-sidebar-text/80 transition hover:bg-sidebar-hover hover:text-sidebar-text"
               >
                 <LogOut size={18} />
                 <span>Log out</span>
@@ -307,14 +307,14 @@ export default function Sidebar({
             <div className="m-4 shrink-0 rounded-2xl bg-btn p-4 text-btn-text">
               <Sparkles className="mb-2 text-btn-hover-bg" size={20} />
 
-              <h3 className="text-15 font-bold">Upgrade to Pro</h3>
+              <h3 className="text-sm font-bold">Upgrade to Pro</h3>
 
-              <p className="mt-1.5 text-13 opacity-90">
+              <p className="mt-1.5 text-xs opacity-90">
                 Unlock AI Resume Builder, ATS Pro, Unlimited Resume Downloads
                 and Premium Templates.
               </p>
 
-              <button className="mt-3 w-full rounded-xl bg-navbar py-2 text-15 font-semibold text-heading transition hover:bg-btn-hover-bg">
+              <button className="mt-3 w-full rounded-xl bg-navbar py-2 text-sm font-semibold text-heading transition hover:bg-btn-hover-bg">
                 Upgrade
               </button>
             </div>
