@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 
 import Button from "../../../../components/ui/Button";
 import { useResumeStore } from "../../../../store/resume.store";
+import { editorTemplates } from "../../config/editorTemplates";
 
 interface SettingsFormData {
   title: string;
@@ -89,21 +90,18 @@ export default function SettingsSection() {
             {...register("templateId")}
             className="mt-2 h-12 w-full rounded-lg border border-border px-4"
           >
-            <option value="technical-developer">
-              Technical Developer
-            </option>
+            {editorTemplates.map((template) => (
+              <option key={template.id} value={template.id}>
+                {template.name}
+              </option>
+            ))}
 
-            <option value="modern">
-              Modern
-            </option>
-
-            <option value="minimal">
-              Minimal
-            </option>
-
-            <option value="executive">
-              Executive
-            </option>
+            {/* Older resumes may use a layout that is not in the picker; keep it
+                selectable so saving settings does not silently change it. */}
+            {resume &&
+              !editorTemplates.some((t) => t.id === resume.templateId) && (
+                <option value={resume.templateId}>{resume.templateId}</option>
+              )}
           </select>
         </div>
 
