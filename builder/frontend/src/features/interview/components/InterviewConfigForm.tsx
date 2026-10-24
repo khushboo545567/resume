@@ -1,5 +1,13 @@
 import { useRef, useState } from "react";
-import { Loader2, UploadCloud } from "lucide-react";
+import type { ReactNode } from "react";
+import {
+  Briefcase,
+  CheckCircle2,
+  FileText,
+  Loader2,
+  Sparkles,
+  UploadCloud,
+} from "lucide-react";
 
 import { useResumes } from "../../resume/hooks/useResumes";
 import { useUploadAndParseResume } from "../../resume/hooks/useUploadAndParseResume";
@@ -16,11 +24,15 @@ interface InterviewConfigFormProps {
   submitting: boolean;
 }
 
-const QUESTION_TYPES: { value: QuestionType; label: string }[] = [
-  { value: "mixed", label: "Mixed" },
-  { value: "technical", label: "Technical" },
-  { value: "hr", label: "HR" },
-  { value: "behavioral", label: "Behavioral" },
+const QUESTION_TYPES: {
+  value: QuestionType;
+  label: string;
+  hint: string;
+}[] = [
+  { value: "mixed", label: "Mixed", hint: "A bit of everything" },
+  { value: "technical", label: "Technical", hint: "Skills & problem solving" },
+  { value: "hr", label: "HR", hint: "Fit, goals & expectations" },
+  { value: "behavioral", label: "Behavioral", hint: "Past experience stories" },
 ];
 
 const DIFFICULTIES: { value: Difficulty; label: string }[] = [
@@ -30,6 +42,113 @@ const DIFFICULTIES: { value: Difficulty; label: string }[] = [
 ];
 
 const QUESTION_COUNTS: QuestionCount[] = [5, 10, 15];
+
+const fieldClass =
+  "w-full rounded-xl border border-border bg-navbar px-4 py-3 text-sm text-heading placeholder:text-heading/40 transition focus:border-border-strong focus:outline-none focus:ring-2 focus:ring-ring";
+
+/* ---------- small layout helpers ---------- */
+
+function Section({
+  step,
+  icon,
+  title,
+  description,
+  children,
+}: {
+  step: number;
+  icon: ReactNode;
+  title: string;
+  description: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="rounded-2xl border border-border-popup bg-popup p-5 shadow-sm sm:p-6">
+      <div className="mb-5 flex items-start gap-3">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-btn-hover-bg text-subheading">
+          {icon}
+        </div>
+
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-accent">
+            Step {step}
+          </p>
+          <h2 className="text-lg font-semibold text-heading">{title}</h2>
+          <p className="text-sm text-nav-text">{description}</p>
+        </div>
+      </div>
+
+      <div className="space-y-5">{children}</div>
+    </div>
+  );
+}
+
+function Field({
+  label,
+  required,
+  optional,
+  hint,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  optional?: boolean;
+  hint?: string;
+  children: ReactNode;
+}) {
+  return (
+    <div>
+      <label className="mb-1.5 flex items-center gap-1.5 text-sm font-semibold text-heading">
+        {label}
+        {required && <span className="text-red-600">*</span>}
+        {optional && (
+          <span className="text-xs font-normal text-heading/50">Optional</span>
+        )}
+      </label>
+
+      {children}
+
+      {hint && <p className="mt-1.5 text-xs text-heading/50">{hint}</p>}
+    </div>
+  );
+}
+
+function Segmented<T extends string | number>({
+  options,
+  value,
+  onChange,
+  format,
+}: {
+  options: T[];
+  value: T;
+  onChange: (value: T) => void;
+  format?: (value: T) => string;
+}) {
+  return (
+    <div className="inline-flex w-full rounded-xl border border-border bg-navbar p-1 sm:w-auto">
+      {options.map((option) => {
+        const active = option === value;
+
+        return (
+          <button
+            key={String(option)}
+            type="button"
+            onClick={() => onChange(option)}
+            aria-pressed={active}
+            className={`flex-1 rounded-lg px-5 py-2 text-sm font-medium transition sm:flex-none ${
+              active
+                ? "bg-btn text-btn-text shadow-sm"
+                : "text-nav-text hover:bg-btn-hover-bg hover:text-heading"
+            }`}
+          >
+            {format ? format(option) : String(option)}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ---------- form ---------- */
 
 export default function InterviewConfigForm({
   onSubmit,
@@ -41,6 +160,7 @@ export default function InterviewConfigForm({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [resumeId, setResumeId] = useState("");
+  const [uploadedName, setUploadedName] = useState("");
   const [targetRole, setTargetRole] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [preparationNotes, setPreparationNotes] = useState("");
@@ -48,9 +168,7 @@ export default function InterviewConfigForm({
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [totalQuestions, setTotalQuestions] = useState<QuestionCount>(5);
 
-  const handleFileChange = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
 
     if (!file) return;
@@ -59,6 +177,10 @@ export default function InterviewConfigForm({
 
     // Newly uploaded resume is saved to the user's resumes and selected.
     setResumeId(resume._id);
+    setUploadedName(file.name);
+
+    // Allow re-selecting the same file later.
+    e.target.value = "";
   };
 
   const canSubmit =
@@ -83,20 +205,30 @@ export default function InterviewConfigForm({
     });
   };
 
-  return (
-    <form onSubmit={handleSubmit} className="space-y-8">
-      {/* Resume */}
-      <div>
-        <label className="mb-2 block text-sm font-semibold text-heading">
-          Resume
-        </label>
+  const missing = !resumeId
+    ? "Select or upload a resume to continue"
+    : !targetRole.trim()
+      ? "Enter your target role to continue"
+      : "";
 
-        <div className="flex flex-wrap items-center gap-3">
+  return (
+    <form onSubmit={handleSubmit} className="space-y-5">
+      {/* Step 1: Resume */}
+      <Section
+        step={1}
+        icon={<FileText size={20} />}
+        title="Your resume"
+        description="Questions are built from your experience, so pick the resume you'll actually send."
+      >
+        <Field label="Saved resume" required>
           <select
             value={resumeId}
-            onChange={(e) => setResumeId(e.target.value)}
+            onChange={(e) => {
+              setResumeId(e.target.value);
+              setUploadedName("");
+            }}
             disabled={loadingResumes}
-            className="min-w-[220px] flex-1 rounded-xl border border-border bg-navbar px-4 py-2.5 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-ring"
+            className={fieldClass}
           >
             <option value="">
               {loadingResumes ? "Loading resumes..." : "Select a saved resume"}
@@ -108,171 +240,178 @@ export default function InterviewConfigForm({
               </option>
             ))}
           </select>
+        </Field>
 
-          <span className="text-xs text-heading/50">or</span>
-
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploadAndParse.isPending}
-            className="flex items-center gap-2 rounded-xl border border-dashed border-border px-4 py-2.5 text-sm font-medium text-subheading transition hover:border-border-strong hover:text-heading disabled:opacity-60"
-          >
-            {uploadAndParse.isPending ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : (
-              <UploadCloud size={16} />
-            )}
-            Upload new resume
-          </button>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".pdf,.doc,.docx"
-            className="hidden"
-            onChange={handleFileChange}
-          />
+        <div className="flex items-center gap-3 text-xs text-heading/40">
+          <span className="h-px flex-1 bg-border" />
+          or
+          <span className="h-px flex-1 bg-border" />
         </div>
 
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploadAndParse.isPending}
+          className="flex w-full flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-border bg-navbar/60 px-4 py-6 text-center transition hover:border-border-strong hover:bg-btn-hover-bg disabled:opacity-60"
+        >
+          {uploadAndParse.isPending ? (
+            <Loader2 size={22} className="animate-spin text-subheading" />
+          ) : uploadedName ? (
+            <CheckCircle2 size={22} className="text-green-600" />
+          ) : (
+            <UploadCloud size={22} className="text-subheading" />
+          )}
+
+          <span className="text-sm font-medium text-heading">
+            {uploadAndParse.isPending
+              ? "Reading your resume..."
+              : uploadedName
+                ? `${uploadedName} added and selected`
+                : "Upload a new resume"}
+          </span>
+
+          <span className="text-xs text-heading/50">
+            PDF, DOC or DOCX. It will be saved to your resumes.
+          </span>
+        </button>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf,.doc,.docx"
+          className="hidden"
+          onChange={handleFileChange}
+        />
+
         {uploadAndParse.isError && (
-          <p className="mt-2 text-xs text-red-500">
+          <p className="text-xs text-red-500">
             Couldn't upload that file. Please try again.
           </p>
         )}
-      </div>
+      </Section>
 
-      {/* Target role */}
-      <div>
-        <label className="mb-2 block text-sm font-semibold text-heading">
-          Target role
-        </label>
-
-        <input
-          type="text"
-          value={targetRole}
-          onChange={(e) => setTargetRole(e.target.value)}
-          placeholder="e.g. Frontend Developer, Data Analyst"
-          className="w-full rounded-xl border border-border bg-navbar px-4 py-2.5 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-ring"
-        />
-      </div>
-
-      {/* Job description (optional) */}
-      <div>
-        <label className="mb-2 block text-sm font-semibold text-heading">
-          Job description{" "}
-          <span className="font-normal text-heading/50">(optional)</span>
-        </label>
-
-        <textarea
-          value={jobDescription}
-          onChange={(e) => setJobDescription(e.target.value)}
-          rows={4}
-          placeholder="Paste the job description here for more relevant questions"
-          className="w-full resize-none rounded-xl border border-border bg-navbar px-4 py-2.5 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-ring"
-        />
-      </div>
-
-      {/* Preparation notes */}
-      <div>
-        <label className="mb-2 block text-sm font-semibold text-heading">
-          What are you preparing for?
-        </label>
-
-        <textarea
-          value={preparationNotes}
-          onChange={(e) => setPreparationNotes(e.target.value)}
-          rows={3}
-          placeholder="e.g. I want more system design questions, I'm weak in SQL..."
-          className="w-full resize-none rounded-xl border border-border bg-navbar px-4 py-2.5 text-sm text-heading focus:outline-none focus:ring-2 focus:ring-ring"
-        />
-      </div>
-
-      {/* Question type */}
-      <div>
-        <label className="mb-2 block text-sm font-semibold text-heading">
-          Question type
-        </label>
-
-        <div className="flex flex-wrap gap-2">
-          {QUESTION_TYPES.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => setQuestionType(option.value)}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-                questionType === option.value
-                  ? "bg-btn text-btn-text"
-                  : "border border-border text-nav-text hover:border-border-strong"
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Difficulty */}
-      <div>
-        <label className="mb-2 block text-sm font-semibold text-heading">
-          Difficulty
-        </label>
-
-        <div className="flex flex-wrap gap-2">
-          {DIFFICULTIES.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => setDifficulty(option.value)}
-              className={`rounded-full px-4 py-2 text-sm font-medium capitalize transition ${
-                difficulty === option.value
-                  ? "bg-btn text-btn-text"
-                  : "border border-border text-nav-text hover:border-border-strong"
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Question count */}
-      <div>
-        <label className="mb-2 block text-sm font-semibold text-heading">
-          Number of questions
-        </label>
-
-        <div className="flex flex-wrap gap-2">
-          {QUESTION_COUNTS.map((count) => (
-            <button
-              key={count}
-              type="button"
-              onClick={() => setTotalQuestions(count)}
-              className={`h-11 w-11 rounded-full text-sm font-semibold transition ${
-                totalQuestions === count
-                  ? "bg-btn text-btn-text"
-                  : "border border-border text-nav-text hover:border-border-strong"
-              }`}
-            >
-              {count}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <button
-        type="submit"
-        disabled={!canSubmit}
-        className="flex w-full items-center justify-center gap-2 rounded-xl bg-btn px-6 py-3 font-semibold text-btn-text transition hover:bg-btn-hover disabled:cursor-not-allowed disabled:opacity-50"
+      {/* Step 2: Role */}
+      <Section
+        step={2}
+        icon={<Briefcase size={20} />}
+        title="The role"
+        description="The more context you give, the more relevant the questions."
       >
-        {submitting ? (
-          <>
-            <Loader2 size={18} className="animate-spin" />
-            Generating your first question...
-          </>
-        ) : (
-          "Generate"
+        <Field label="Target role" required>
+          <input
+            type="text"
+            value={targetRole}
+            onChange={(e) => setTargetRole(e.target.value)}
+            placeholder="e.g. Frontend Developer, Data Analyst"
+            className={fieldClass}
+          />
+        </Field>
+
+        <Field
+          label="Job description"
+          optional
+          hint="Paste it from the job post for questions that match the role."
+        >
+          <textarea
+            value={jobDescription}
+            onChange={(e) => setJobDescription(e.target.value)}
+            rows={4}
+            placeholder="Paste the job description here"
+            className={`${fieldClass} resize-none`}
+          />
+        </Field>
+
+        <Field label="What do you want to focus on?" optional>
+          <textarea
+            value={preparationNotes}
+            onChange={(e) => setPreparationNotes(e.target.value)}
+            rows={3}
+            placeholder="e.g. More system design, I'm weak in SQL"
+            className={`${fieldClass} resize-none`}
+          />
+        </Field>
+      </Section>
+
+      {/* Step 3: Settings */}
+      <Section
+        step={3}
+        icon={<Sparkles size={20} />}
+        title="Interview settings"
+        description="Choose the style and length of your mock interview."
+      >
+        <Field label="Question type">
+          <div className="grid grid-cols-2 gap-3">
+            {QUESTION_TYPES.map((option) => {
+              const active = questionType === option.value;
+
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setQuestionType(option.value)}
+                  aria-pressed={active}
+                  className={`rounded-xl border px-4 py-3 text-left transition ${
+                    active
+                      ? "border-border-strong bg-btn-hover-bg ring-1 ring-border-strong"
+                      : "border-border bg-navbar hover:border-border-strong"
+                  }`}
+                >
+                  <span className="block text-sm font-semibold text-heading">
+                    {option.label}
+                  </span>
+                  <span className="block text-xs text-nav-text">
+                    {option.hint}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </Field>
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field label="Difficulty">
+            <Segmented
+              options={DIFFICULTIES.map((d) => d.value)}
+              value={difficulty}
+              onChange={setDifficulty}
+              format={(v) => DIFFICULTIES.find((d) => d.value === v)!.label}
+            />
+          </Field>
+
+          <Field label="Number of questions">
+            <Segmented
+              options={QUESTION_COUNTS}
+              value={totalQuestions}
+              onChange={setTotalQuestions}
+            />
+          </Field>
+        </div>
+      </Section>
+
+      {/* Submit */}
+      <div>
+        <button
+          type="submit"
+          disabled={!canSubmit}
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-btn px-6 font-semibold text-btn-text transition hover:bg-btn-hover disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {submitting ? (
+            <>
+              <Loader2 size={18} className="animate-spin" />
+              Generating your first question...
+            </>
+          ) : (
+            <>
+              <Sparkles size={18} />
+              Start interview
+            </>
+          )}
+        </button>
+
+        {missing && !submitting && (
+          <p className="mt-2 text-center text-xs text-heading/50">{missing}</p>
         )}
-      </button>
+      </div>
     </form>
   );
 }

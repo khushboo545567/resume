@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { Bot } from "lucide-react";
 
 import InterviewConfigForm from "../../features/interview/components/InterviewConfigForm";
 import { useStartInterview } from "../../features/interview/hooks/useStartInterview";
@@ -20,13 +21,21 @@ export default function GenerateInterviewPage() {
   };
 
   return (
-    <section className="mx-auto max-w-2xl px-4 py-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-heading">Generate Questions</h1>
-        <p className="mt-2 text-nav-text">
-          Tell us what you're preparing for and we'll build a mock interview
-          around it.
-        </p>
+    <section className="mx-auto max-w-3xl px-4 py-8 sm:py-10">
+      <div className="mb-8 flex items-start gap-4">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-sidebar text-sidebar-text">
+          <Bot size={24} />
+        </div>
+
+        <div>
+          <h1 className="text-3xl font-bold text-heading">
+            Interview with AI
+          </h1>
+          <p className="mt-1 text-nav-text">
+            Tell us what you're preparing for and we'll build a mock interview
+            around your resume.
+          </p>
+        </div>
       </div>
 
       <InterviewConfigForm
