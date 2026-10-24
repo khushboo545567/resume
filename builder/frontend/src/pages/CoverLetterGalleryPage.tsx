@@ -6,34 +6,6 @@ import CreateCoverLetterModal from "../features/coverLetter/components/CreateCov
 import GenerateCoverLetterWithAiModal from "../features/coverLetter/components/GenerateCoverLetterWithAiModal";
 import type { CoverLetterTemplate } from "../features/coverLetter/types/coverLetter.types";
 
-/**
- * A lightweight CSS mockup of the letter layout, used as the template
- * card's thumbnail until a real screenshot asset is added (the same
- * way resume templates use a PNG under assets/templates).
- */
-function CoverLetterThumbnail() {
-  return (
-    <div className="flex h-56 w-40 flex-col gap-2 bg-white p-4 shadow-md">
-      <div className="h-3 w-24 rounded bg-slate-800" />
-      <div className="h-1.5 w-32 rounded bg-slate-300" />
-      <div className="mt-1 h-[2px] w-full bg-[#1F4E79]" />
-      <div className="mt-2 flex justify-between">
-        <div className="h-1.5 w-14 rounded bg-slate-300" />
-        <div className="h-1.5 w-10 rounded bg-slate-300" />
-      </div>
-      <div className="mt-2 space-y-1.5">
-        <div className="h-1.5 w-full rounded bg-slate-200" />
-        <div className="h-1.5 w-full rounded bg-slate-200" />
-        <div className="h-1.5 w-3/4 rounded bg-slate-200" />
-        <div className="h-1.5 w-full rounded bg-slate-200" />
-        <div className="h-1.5 w-full rounded bg-slate-200" />
-        <div className="h-1.5 w-2/3 rounded bg-slate-200" />
-      </div>
-      <div className="mt-auto h-1.5 w-16 rounded bg-slate-300" />
-    </div>
-  );
-}
-
 export default function CoverLetterGalleryPage() {
   const [selectedTemplateId, setSelectedTemplateId] =
     useState<CoverLetterTemplate | null>(null);
@@ -70,8 +42,15 @@ export default function CoverLetterGalleryPage() {
             className={`relative text-left border border-border-popup rounded-xl p-5 transition hover:shadow-lg hover:-translate-y-0.5 ${template.color}`}
           >
             <div className="mb-4 flex justify-center">
-              <div className="overflow-hidden rounded-lg bg-white shadow-md">
-                <CoverLetterThumbnail />
+              <div className="overflow-hidden rounded-lg border border-border-popup bg-white shadow-md">
+                <img
+                  src={template.thumbnail}
+                  alt={`${template.name} cover letter preview`}
+                  width={700}
+                  height={990}
+                  loading="lazy"
+                  className="block h-auto w-48"
+                />
               </div>
             </div>
             <h3 className="font-semibold text-lg">{template.name}</h3>
