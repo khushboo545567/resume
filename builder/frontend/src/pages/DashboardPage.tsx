@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PageSpinner from "../components/PageSpinner";
 
 import DashboardHeader from "../features/dashboard/components/DashboardHeader";
 import DashboardStats from "../features/dashboard/components/DashboardStats";
@@ -43,7 +44,7 @@ export default function DashboardPage() {
   const { data, isLoading, refetch } = useDashboard();
 
   if (isLoading || !data) {
-    return <div>Loading...</div>;
+    return <PageSpinner />;
   }
 
   const resumes = data.recentResumes;

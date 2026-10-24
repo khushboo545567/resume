@@ -1,4 +1,5 @@
 import type { ElementType } from "react";
+import BrandWordmark from "../../../components/BrandWordmark";
 
 import {
   LayoutDashboard,
@@ -207,7 +208,9 @@ export default function Sidebar({
             forceCollapsed ? "" : "[@media(min-width:1400px)]:justify-center"
           }`}
         >
-          <h1 className="text-xl font-extrabold text-sidebar-text">ResumeAI</h1>
+          <h1>
+            <BrandWordmark tone="light" className="text-2xl" />
+          </h1>
 
           <button
             type="button"

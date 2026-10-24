@@ -1,4 +1,5 @@
 import { useState } from "react";
+import BrandWordmark from "../../../components/BrandWordmark";
 import UserAvatar from "../../../components/UserAvatar";
 import { Plus, ChevronDown, Upload } from "lucide-react";
 // import { Search } from "lucide-react"; // used by the commented-out search box below
@@ -49,7 +50,9 @@ export default function Navbar({
           forceCollapsed ? "" : "[@media(min-width:1400px)]:hidden"
         }`}
       >
-        <h1 className="text-lg font-extrabold text-heading">ResumeAI</h1>
+        <h1>
+          <BrandWordmark tone="dark" className="text-xl" />
+        </h1>
 
         <div className="flex items-center gap-2">
           <NotificationDropdown />

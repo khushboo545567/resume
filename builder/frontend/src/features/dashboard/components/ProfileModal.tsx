@@ -124,9 +124,9 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   // Portal to <body>: the navbar is a sticky z-30 stacking context, which would
   // otherwise keep this popup underneath the z-50 sidebar.
   return createPortal(
-    // Bottom sheet on phones, centred dialog from the sm breakpoint up.
+    // Centred card with a margin on every side, so nothing is cut off on small phones.
     <div
-      className="fixed inset-0 z-60 flex items-end justify-center bg-heading/50 sm:items-center sm:p-4"
+      className="fixed inset-0 z-60 flex items-center justify-center bg-heading/50 p-4"
       onClick={onClose}
     >
       <div
@@ -134,7 +134,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
         aria-modal="true"
         aria-label="Profile details"
         onClick={(event) => event.stopPropagation()}
-        className="flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-2xl border border-border-popup bg-popup shadow-xl sm:max-w-lg sm:rounded-2xl"
+        className="flex max-h-[85dvh] w-full max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-border-popup bg-popup shadow-xl sm:max-w-lg"
       >
         {/* ================= HEADER (pinned) ================= */}
 
