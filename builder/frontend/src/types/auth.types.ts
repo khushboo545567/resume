@@ -38,6 +38,8 @@ export interface User {
   fullName: string;
   email: string;
   role: UserRole;
+  /** Cloudinary URL of the Throne8 profile photo, or null when none / not loadable. */
+  avatarUrl?: string | null;
   /** Optional, so anything that only needs id/name/email/role is unaffected. */
   profile?: UserProfile;
 }

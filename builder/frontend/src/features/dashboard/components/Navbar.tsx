@@ -1,4 +1,5 @@
 import { useState } from "react";
+import UserAvatar from "../../../components/UserAvatar";
 import { Plus, ChevronDown, Upload } from "lucide-react";
 // import { Search } from "lucide-react"; // used by the commented-out search box below
 import { CiMenuBurger } from "react-icons/ci";
@@ -57,9 +58,9 @@ export default function Navbar({
             type="button"
             onClick={() => user && setIsProfileOpen(true)}
             aria-label="Open profile"
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-btn text-sm font-bold text-btn-text"
+            className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-btn text-sm font-bold text-btn-text"
           >
-            {initial}
+            <UserAvatar src={user?.avatarUrl} initial={initial} className="flex h-full w-full items-center justify-center rounded-full" />
           </button>
 
           <button
@@ -151,8 +152,8 @@ export default function Navbar({
             aria-label="Open profile"
             className="flex items-center gap-2 rounded-xl px-2.5 py-2 transition hover:bg-navbar-hover"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-btn text-sm font-bold text-btn-text">
-              {initial}
+            <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-btn text-sm font-bold text-btn-text">
+              <UserAvatar src={user?.avatarUrl} initial={initial} className="flex h-full w-full items-center justify-center rounded-full" />
             </div>
 
             <div className="hidden text-left xl:block">

@@ -1,4 +1,5 @@
 import { useEffect, type ElementType, type ReactNode } from "react";
+import UserAvatar from "../../../components/UserAvatar";
 import { createPortal } from "react-dom";
 import {
   X,
@@ -149,8 +150,8 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
           </button>
 
           <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-gold bg-btn-hover-bg text-2xl font-extrabold text-btn sm:h-16 sm:w-16">
-              {initial}
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-gold bg-btn-hover-bg overflow-hidden text-2xl font-extrabold text-btn sm:h-16 sm:w-16">
+              <UserAvatar src={user.avatarUrl} initial={initial} className="flex h-full w-full items-center justify-center rounded-full" />
             </div>
 
             <div className="min-w-0">

@@ -4,6 +4,21 @@ import type { User, UserProfile } from "../types/auth.types";
 // Login / register / password flows live in Throne8 — this app only reads the shared session.
 
 /**
+ * /auth/profile only returns profilePhotoId (an ID, not an image). Throne8 turns it
+ * into a URL with GET /profile-photo/get-photo/:id, so we do the same here.
+ * Never throws: a missing photo must not break login, the UI falls back to initials.
+ */
+const getProfilePhotoUrl = async (photoId?: string | null): Promise<string | null> => {
+  if (!photoId) return null;
+  try {
+    const res = await authApi.get(`/profile-photo/get-photo/${photoId}`);
+    return res.data?.data?.photo?.cloudinarySecureUrl ?? null;
+  } catch {
+    return null;
+  }
+};
+
+/**
  * Current user from Throne8 (GET /api/v1/auth/profile), mapped to this app's User shape.
  * Throws a 401 when there is no valid session.
  */
@@ -16,12 +31,15 @@ export const getMe = async (): Promise<User> => {
     .join(" ")
     .trim();
 
+  const avatarUrl = await getProfilePhotoUrl(profile.profilePhotoId);
+
   return {
     _id: profile.userId,
     fullName: fullName || profile.email,
     email: profile.email,
     // Throne8 also has "moderator" / "mentor"; this app only distinguishes admins.
     role: profile.role === "admin" ? "admin" : "user",
+    avatarUrl,
     profile: mapProfileDetails(profile),
   };
 };
@@ -41,6 +59,8 @@ const formatLocation = (location: unknown): string | null => {
 
 // The parts of Throne8's profile response that this app reads.
 interface RawProfile {
+  userId?: string;
+  profilePhotoId?: string | null;
   firstName?: string;
   lastName?: string | null;
   phoneNumber?: string | null;
