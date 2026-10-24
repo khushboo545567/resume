@@ -41,8 +41,7 @@ export default function InternshipSection() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">Internships</h2>
+      <div className="flex items-center gap-3">
         <Button onClick={handleAdd}>+ Add Internship</Button>
       </div>
 
@@ -53,9 +52,9 @@ export default function InternshipSection() {
           {resume.internships.map((intern, index) => (
             <div
               key={index}
-              className="flex items-center justify-between rounded-xl border border-border p-4"
+              className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border p-4"
             >
-              <div>
+              <div className="min-w-0">
                 <p className="font-semibold">{intern.role}</p>
                 <p className="text-sm text-nav-text">{intern.company}</p>
                 {intern.location && (

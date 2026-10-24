@@ -217,7 +217,7 @@ export default function ExperienceForm({
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
         <div>
-          <label className="font-medium text-heading">Company</label>
+          <label className="text-sm font-semibold text-heading">Company</label>
           <input
             {...register("company", {
               required: "Company is required",
@@ -232,7 +232,7 @@ export default function ExperienceForm({
         </div>
 
         <div>
-          <label className="font-medium text-heading">Position</label>
+          <label className="text-sm font-semibold text-heading">Position</label>
           <input
             {...register("position", {
               required: "Position is required",
@@ -249,7 +249,7 @@ export default function ExperienceForm({
         </div>
 
         <div className="sm:col-span-2">
-          <label className="font-medium text-heading">Location</label>
+          <label className="text-sm font-semibold text-heading">Location</label>
           <input
             {...register("location")}
             placeholder="Berlin, Germany"
@@ -258,7 +258,7 @@ export default function ExperienceForm({
         </div>
 
         <div>
-          <label className="font-medium text-heading">Start Date</label>
+          <label className="text-sm font-semibold text-heading">Start Date</label>
 
           <Controller
             name="startDate"
@@ -275,7 +275,7 @@ export default function ExperienceForm({
         </div>
 
         <div>
-          <label className="font-medium text-heading">End Date</label>
+          <label className="text-sm font-semibold text-heading">End Date</label>
 
           <Controller
             name="endDate"

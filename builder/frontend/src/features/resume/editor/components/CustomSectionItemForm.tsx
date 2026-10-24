@@ -104,7 +104,7 @@ export default function CustomSectionItemForm({
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label className="font-medium text-heading">
+          <label className="text-sm font-semibold text-heading">
             {config.fields.startDate}
           </label>
           <MonthYearPicker
@@ -117,7 +117,7 @@ export default function CustomSectionItemForm({
         </div>
 
         <div>
-          <label className="font-medium text-heading">
+          <label className="text-sm font-semibold text-heading">
             {config.fields.endDate}
           </label>
           <MonthYearPicker

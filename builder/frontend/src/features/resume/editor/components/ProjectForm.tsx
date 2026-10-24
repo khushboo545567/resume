@@ -298,7 +298,7 @@ export default function ProjectForm({
       {/* PROJECT TITLE */}
 
       <div>
-        <label className="font-medium text-heading">Project Title</label>
+        <label className="text-sm font-semibold text-heading">Project Title</label>
 
         <input
           {...register("title", {
@@ -339,7 +339,7 @@ export default function ProjectForm({
 
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <label className="font-medium text-heading">Description</label>
+          <label className="text-sm font-semibold text-heading">Description</label>
 
           <button
             type="button"
@@ -458,7 +458,7 @@ export default function ProjectForm({
       {/* TECHNOLOGIES */}
 
       <div>
-        <label className="font-medium text-heading">Technologies</label>
+        <label className="text-sm font-semibold text-heading">Technologies</label>
 
         <div className="mt-2 flex gap-3">
           <input
@@ -499,7 +499,7 @@ export default function ProjectForm({
       {/* GITHUB */}
 
       <div>
-        <label className="font-medium text-heading">GitHub URL (Optional)</label>
+        <label className="text-sm font-semibold text-heading">GitHub URL (Optional)</label>
 
         <input
           type="text"
@@ -529,7 +529,7 @@ export default function ProjectForm({
       {/* LIVE DEMO */}
 
       <div>
-        <label className="font-medium text-heading">
+        <label className="text-sm font-semibold text-heading">
           Live Demo URL (Optional)
         </label>
 

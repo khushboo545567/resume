@@ -32,8 +32,8 @@ export default function ProjectsSection() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="space-y-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 flex-1 space-y-3">
           <Input
             label="Resume Heading"
             placeholder="College Projects"
@@ -47,6 +47,7 @@ export default function ProjectsSection() {
         </div>
 
         <Button
+          className="shrink-0 self-start whitespace-nowrap"
           leftIcon={<Plus size={18} />}
           onClick={() => {
             // Add mode

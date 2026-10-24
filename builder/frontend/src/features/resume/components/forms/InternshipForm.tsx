@@ -168,13 +168,13 @@ export default function InternshipForm({
       onSubmit={handleSubmit(onSubmit)}
       className="space-y-6 rounded-2xl border border-border bg-popup p-4 sm:p-8"
     >
-      <h2 className="text-2xl font-bold text-heading">
+      <h2 className="text-base font-bold text-heading sm:text-xl">
         {editIndex !== undefined ? "Edit Internship" : "Add Internship"}
       </h2>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
         <div>
-          <label className="font-medium text-heading">Company</label>
+          <label className="text-sm font-semibold text-heading">Company</label>
           <input
             {...register("company", {
               required: "Company is required",
@@ -189,7 +189,7 @@ export default function InternshipForm({
         </div>
 
         <div>
-          <label className="font-medium text-heading">Role</label>
+          <label className="text-sm font-semibold text-heading">Role</label>
           <input
             {...register("role", {
               required: "Role is required",
@@ -204,8 +204,8 @@ export default function InternshipForm({
         </div>
 
         {/* location added -------------*/}
-        <div className="col-span-2">
-          <label className="font-medium text-heading">Location</label>
+        <div className="sm:col-span-2">
+          <label className="text-sm font-semibold text-heading">Location</label>
 
           <input
             {...register("location", {
@@ -227,7 +227,7 @@ export default function InternshipForm({
         </div>
 
         {/* <div>
-          <label className="font-medium text-heading">Start Date</label>
+          <label className="text-sm font-semibold text-heading">Start Date</label>
           <input
             type="month"
             {...register("startDate")}
@@ -236,7 +236,7 @@ export default function InternshipForm({
         </div> */}
 
         <div>
-          <label className="font-medium text-heading">Start Date</label>
+          <label className="text-sm font-semibold text-heading">Start Date</label>
 
           <Controller
             name="startDate"
@@ -253,7 +253,7 @@ export default function InternshipForm({
         </div>
 
         {/* <div>
-          <label className="font-medium text-heading">End Date</label>
+          <label className="text-sm font-semibold text-heading">End Date</label>
           <input
             disabled={watch("currentlyInterning")}
             type="month"
@@ -268,7 +268,7 @@ export default function InternshipForm({
         </div> */}
 
         <div>
-          <label className="font-medium text-heading">End Date</label>
+          <label className="text-sm font-semibold text-heading">End Date</label>
 
           <Controller
             name="endDate"
@@ -307,7 +307,7 @@ export default function InternshipForm({
       </label>
 
       <div>
-        <div className="flex items-center justify-between mb-3">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <h3 className="font-semibold text-heading">Responsibilities</h3>
           <button
             type="button"
@@ -325,11 +325,12 @@ export default function InternshipForm({
               <input
                 {...register(`responsibilities.${index}.value`)}
                 placeholder="Assisted in building REST APIs for the resume builder"
-                className="flex-1 rounded-lg border border-border bg-navbar px-4 h-11 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
+                className="h-11 min-w-0 flex-1 rounded-lg border border-border bg-navbar px-4 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
               />
               <Button
                 type="button"
                 variant="outline"
+                className="shrink-0"
                 onClick={() => removeResponsibility(index)}
                 disabled={responsibilityFields.length === 1}
               >
@@ -356,11 +357,12 @@ export default function InternshipForm({
               <input
                 {...register(`achievements.${index}.value`)}
                 placeholder="Received a Letter of Recommendation for performance"
-                className="flex-1 rounded-lg border border-border bg-navbar px-4 h-11 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
+                className="h-11 min-w-0 flex-1 rounded-lg border border-border bg-navbar px-4 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
               />
               <Button
                 type="button"
                 variant="outline"
+                className="shrink-0"
                 onClick={() => removeAchievement(index)}
                 disabled={achievementFields.length === 1}
               >

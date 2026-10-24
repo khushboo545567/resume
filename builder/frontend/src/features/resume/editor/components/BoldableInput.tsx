@@ -60,7 +60,7 @@ export default function BoldableInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="flex-1 rounded-lg border border-border bg-navbar px-4 h-11 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
+        className="h-11 min-w-0 flex-1 rounded-lg border border-border bg-navbar px-4 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
       />
       <button
         type="button"
