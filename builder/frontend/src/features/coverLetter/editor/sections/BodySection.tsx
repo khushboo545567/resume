@@ -19,8 +19,8 @@ export default function BodySection() {
   return (
     <div className="space-y-8">
       <div>
-        <h3 className="text-lg font-bold text-heading">Opening Paragraph</h3>
-        <p className="mt-1 mb-3 text-sm text-heading/60">
+        <h3 className="text-base font-bold text-heading sm:text-lg">Opening Paragraph</h3>
+        <p className="mt-1 mb-3 text-xs text-heading/60 sm:text-sm">
           Who you are, the role you're applying for, and a hook.
         </p>
         <textarea
@@ -34,8 +34,8 @@ export default function BodySection() {
       <div>
         <div className="mb-3 flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-bold text-heading">Body Paragraphs</h3>
-            <p className="mt-1 text-sm text-heading/60">
+            <h3 className="text-base font-bold text-heading sm:text-lg">Body Paragraphs</h3>
+            <p className="mt-1 text-xs text-heading/60 sm:text-sm">
               Your relevant experience, projects, and why you're a fit.
             </p>
           </div>
@@ -79,8 +79,8 @@ export default function BodySection() {
       </div>
 
       <div>
-        <h3 className="text-lg font-bold text-heading">Closing Paragraph</h3>
-        <p className="mt-1 mb-3 text-sm text-heading/60">
+        <h3 className="text-base font-bold text-heading sm:text-lg">Closing Paragraph</h3>
+        <p className="mt-1 mb-3 text-xs text-heading/60 sm:text-sm">
           A call to action and thanks for their time.
         </p>
         <textarea

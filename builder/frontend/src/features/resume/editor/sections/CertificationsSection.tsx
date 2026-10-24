@@ -60,9 +60,7 @@ export default function CertificationsSection() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold">Certifications</h2>
-
-        <p className="mt-1 text-nav-text">
+        <p className="text-xs text-heading/60 sm:text-sm">
           Press Enter or click Add to add a certification. Add a link if you
           want it to show up as a clickable, underlined link on your resume.
         </p>

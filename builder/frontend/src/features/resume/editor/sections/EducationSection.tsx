@@ -25,13 +25,7 @@ export default function EducationSection() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-2xl font-bold">Education</h2>
-
-          <p className="text-nav-text">Add your education history.</p>
-        </div>
-
+      <div className="flex flex-wrap items-center gap-3">
         <Button
           leftIcon={<Plus size={18} />}
           onClick={() => {

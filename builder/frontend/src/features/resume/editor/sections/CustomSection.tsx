@@ -36,9 +36,7 @@ export default function CustomSection({ sectionId }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">{section.title}</h2>
-
-          <p className="text-nav-text">Add unlimited items.</p>
+          <p className="text-xs text-heading/60 sm:text-sm">Add unlimited items.</p>
         </div>
 
         <div className="flex gap-2">

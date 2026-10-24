@@ -291,7 +291,7 @@ export default function ProjectForm({
     >
       {/* TITLE */}
 
-      <h2 className="text-2xl font-bold text-heading">
+      <h2 className="text-base font-bold text-heading sm:text-xl">
         {editIndex !== undefined ? "Edit Project" : "Add Project"}
       </h2>
 

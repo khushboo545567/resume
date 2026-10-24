@@ -105,7 +105,7 @@ export default function EducationForm({
       onSubmit={handleSubmit(onSubmit)}
       className="space-y-6 rounded-2xl border border-border bg-popup p-4 sm:p-6"
     >
-      <h2 className="text-2xl font-bold text-heading">
+      <h2 className="text-base font-bold text-heading sm:text-xl">
         {editIndex !== undefined ? "Edit Education" : "Add Education"}
       </h2>
 

@@ -19,8 +19,8 @@ export default function HeaderSection() {
     <div className="space-y-10">
       {/* Your Details */}
       <div>
-        <h3 className="text-lg font-bold text-heading">Your Details</h3>
-        <p className="mt-1 mb-4 text-sm text-heading/60">
+        <h3 className="text-base font-bold text-heading sm:text-lg">Your Details</h3>
+        <p className="mt-1 mb-4 text-xs text-heading/60 sm:text-sm">
           Shown at the top of the letter, just like a resume header.
         </p>
 
@@ -72,10 +72,10 @@ export default function HeaderSection() {
 
       {/* Recipient & Letter Info */}
       <div>
-        <h3 className="text-lg font-bold text-heading">
+        <h3 className="text-base font-bold text-heading sm:text-lg">
           Recipient & Letter Info
         </h3>
-        <p className="mt-1 mb-4 text-sm text-heading/60">
+        <p className="mt-1 mb-4 text-xs text-heading/60 sm:text-sm">
           Who the letter is addressed to, and when.
         </p>
 

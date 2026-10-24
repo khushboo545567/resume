@@ -43,7 +43,7 @@ export default function ProjectsSection() {
             }
           />
 
-          <p className="text-nav-text">Showcase your best work.</p>
+          <p className="text-xs text-heading/60 sm:text-sm">Showcase your best work.</p>
         </div>
 
         <Button

@@ -195,10 +195,10 @@ export default function QuickGenerateForm({
       className="mx-auto max-w-5xl space-y-8 rounded-2xl border border-border bg-popup p-4 sm:p-8"
     >
       <div>
-        <h2 className="text-2xl font-bold text-heading">
+        <h2 className="text-xl font-bold text-heading sm:text-2xl">
           Generate Resume in 2 Minutes
         </h2>
-        <p className="mt-1 text-heading/60">
+        <p className="mt-1 text-sm text-heading/60 sm:text-base">
           Drop in your details below and AI will turn them into a polished,
           ATS-friendly resume. Don't worry about grammar or formatting.
         </p>

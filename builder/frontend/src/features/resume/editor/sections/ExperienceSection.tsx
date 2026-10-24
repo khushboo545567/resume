@@ -31,15 +31,7 @@ export default function ExperienceSection() {
           renameSectionDisplayTitle("experience", e.target.value)
         }
       />
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h3 className="text-xl font-bold">Work Experience</h3>
-
-          <p className="text-sm text-nav-text">
-            Add your professional experience.
-          </p>
-        </div>
-
+      <div className="flex flex-wrap items-center gap-3">
         <Button
           leftIcon={<Plus size={18} />}
           onClick={() => {

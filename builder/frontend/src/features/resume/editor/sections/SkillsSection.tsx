@@ -246,8 +246,7 @@ export default function SkillsSection() {
   return (
     <div className="space-y-6 sm:space-y-8">
       <div>
-        <h2 className="text-2xl font-bold text-heading">Skills</h2>
-        <p className="mt-1 text-sm text-heading/60">
+        <p className="text-xs text-heading/60 sm:text-sm">
           Pick a category below, or choose Other to create your own.
         </p>
       </div>

@@ -52,11 +52,7 @@ export default function SettingsSection() {
       className="space-y-8"
     >
       <div>
-        <h2 className="text-2xl font-bold">
-          Resume Settings
-        </h2>
-
-        <p className="text-nav-text">
+        <p className="text-xs text-heading/60 sm:text-sm">
           Manage your resume configuration.
         </p>
       </div>

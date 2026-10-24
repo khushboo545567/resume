@@ -38,9 +38,7 @@ export default function InterestsSection() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold">Interests</h2>
-
-        <p className="text-nav-text">
+        <p className="text-xs text-heading/60 sm:text-sm">
           Press Enter or click Add to add your interests.
         </p>
       </div>

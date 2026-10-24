@@ -38,8 +38,7 @@ export default function LanguagesSection() {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold text-heading">Languages</h2>
-        <p className="text-nav-text">
+        <p className="text-xs text-heading/60 sm:text-sm">
           Add a language name and proficiency level, then press Enter or click
           Add.
         </p>
