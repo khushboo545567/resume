@@ -18,9 +18,10 @@ import {
   X,
 } from "lucide-react";
 import { BriefcaseBusiness } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 import { useAuthStore } from "../../../store/auth.store";
+import { useNavProgress } from "../../../store/navProgress.store";
 import { isRouteDisabled } from "../../../config/disabledRoutes";
 import type { QuickActions } from "../hooks/useQuickActions";
 
@@ -147,6 +148,9 @@ export default function Sidebar({
 }: SidebarProps) {
   const user = useAuthStore((state) => state.user);
   const signOut = useAuthStore((state) => state.signOut);
+  const { pathname } = useLocation();
+  const pendingPath = useNavProgress((state) => state.pendingPath);
+  const startNavProgress = useNavProgress((state) => state.start);
 
   const {
     handleCreateResume,
@@ -267,10 +271,15 @@ export default function Sidebar({
                 <NavLink
                   key={menu.title}
                   to={menu.path}
-                  onClick={onClose}
+                  onClick={() => {
+                    // Show feedback right away: the page itself may take a moment to load.
+                    if (menu.path !== pathname) startNavProgress(menu.path);
+                    onClose();
+                  }}
                   className={({ isActive }) =>
                     `flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition ${
-                      isActive
+                      // While a page is loading, highlight the link that was clicked.
+                      (pendingPath ? pendingPath === menu.path : isActive)
                         ? "bg-sidebar-active text-sidebar-text shadow-lg"
                         : "text-sidebar-text/80 hover:bg-sidebar-hover hover:text-sidebar-text"
                     }`

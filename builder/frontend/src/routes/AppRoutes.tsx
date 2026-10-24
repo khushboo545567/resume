@@ -1,4 +1,5 @@
 import { lazy, Suspense } from "react";
+import NavigationProgress from "../components/NavigationProgress";
 import { Routes, Route } from "react-router-dom";
 
 import ProtectedRoute from "./ProtectedRoute";
@@ -58,6 +59,7 @@ function PageLoader() {
 export default function AppRoutes() {
   return (
     <Suspense fallback={<PageLoader />}>
+      <NavigationProgress />
       <Routes>
         {/* ============ AUTH LIVES IN THRONE8: old URLs just forward there ============ */}
 

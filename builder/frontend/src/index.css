@@ -73,3 +73,13 @@
     background-color: var(--color-background);
   }
 }
+
+/* Top loading bar shown after a sidebar click (see NavigationProgress). */
+@keyframes nav-progress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 92%;
+  }
+}
