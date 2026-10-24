@@ -151,6 +151,7 @@ export default function Sidebar({
   const signOut = useAuthStore((state) => state.signOut);
   const { pathname } = useLocation();
   const pendingPath = useNavProgress((state) => state.pendingPath);
+  const pendingIsMenu = menus.some((menu) => menu.path === pendingPath);
   const startNavProgress = useNavProgress((state) => state.start);
 
   const {
@@ -281,8 +282,9 @@ export default function Sidebar({
                   }}
                   className={({ isActive }) =>
                     `flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition ${
-                      // While a page is loading, highlight the link that was clicked.
-                      (pendingPath ? pendingPath === menu.path : isActive)
+                      // While a page is loading, highlight the link that was clicked
+                      // (only when the target is one of these links).
+                      (pendingIsMenu ? pendingPath === menu.path : isActive)
                         ? "bg-sidebar-active text-sidebar-text shadow-lg"
                         : "text-sidebar-text/80 hover:bg-sidebar-hover hover:text-sidebar-text"
                     }`

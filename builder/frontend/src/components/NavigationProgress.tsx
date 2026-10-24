@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 
 import { useNavProgress } from "../store/navProgress.store";
@@ -17,9 +17,37 @@ export default function NavigationProgress() {
   const clear = useNavProgress((s) => s.clear);
   const { pathname } = useLocation();
 
+  // The path React has actually rendered. While a lazy page is still downloading, the
+  // browser URL is already the new one but this still holds the old one.
+  const renderedPath = useRef(pathname);
+  renderedPath.current = pathname;
+
+  // Start the bar for EVERY navigation (sidebar, buttons, links, notifications, back
+  // button) instead of wiring each click: watch the browser history directly.
   useEffect(() => {
-    if (pendingPath && pathname === pendingPath) clear();
-  }, [pathname, pendingPath, clear]);
+    const startIfChanged = () => {
+      const next = window.location.pathname;
+      if (next !== renderedPath.current) useNavProgress.getState().start(next);
+    };
+
+    const originalPushState = window.history.pushState;
+    window.history.pushState = function (...args) {
+      const result = originalPushState.apply(this, args);
+      startIfChanged();
+      return result;
+    };
+    window.addEventListener("popstate", startIfChanged);
+
+    return () => {
+      window.history.pushState = originalPushState;
+      window.removeEventListener("popstate", startIfChanged);
+    };
+  }, []);
+
+  // A page switch finished (or a redirect landed somewhere else): hide the bar.
+  useEffect(() => {
+    clear();
+  }, [pathname, clear]);
 
   useEffect(() => {
     if (!pendingPath) return;

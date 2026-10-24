@@ -29,6 +29,7 @@ interface ResumeCardProps {
 
 export default function ResumeCard({ resume, onRefresh }: ResumeCardProps) {
   const navigate = useNavigate();
+  const [opening, setOpening] = useState(false);
 
   const [renameOpen, setRenameOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -178,9 +179,15 @@ export default function ResumeCard({ resume, onRefresh }: ResumeCardProps) {
             fullWidth
             className="h-11"
             leftIcon={<Edit3 size={18} />}
-            onClick={() => navigate(`/resume/${resume._id}/edit`)}
+            loading={opening}
+            onClick={() => {
+              // The editor page downloads on first use, so show we heard the click.
+              setOpening(true);
+              window.setTimeout(() => setOpening(false), 10_000);
+              navigate(`/resume/${resume._id}/edit`);
+            }}
           >
-            Edit Resume
+            {opening ? "Opening…" : "Edit Resume"}
           </Button>
         </div>
       </div>
