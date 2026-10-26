@@ -4,10 +4,8 @@ import {
   ArrowRight,
   Bot,
   CalendarCheck2,
-  FileText,
   FileUp,
   Mail,
-  PenLine,
   Plus,
   ScanSearch,
   Sparkles,
@@ -17,28 +15,12 @@ import {
 import type { ReactNode } from "react";
 
 import { templates } from "../features/resume/config/templates";
-import { useResumes } from "../features/resume/hooks/useResumes";
 import type { QuickActions } from "../features/dashboard/hooks/useQuickActions";
 
 import { useAuthStore } from "../store/auth.store";
 import { redirectToLogin } from "../config/auth.config";
 
 /* ---------- data ---------- */
-
-const STEPS = [
-  {
-    title: "Pick a template",
-    text: "Choose an ATS-friendly layout that fits your level and domain.",
-  },
-  {
-    title: "Fill it with AI help",
-    text: "Add your details, or let AI draft your summary, projects and skills.",
-  },
-  {
-    title: "Download and apply",
-    text: "Check your ATS score, export a PDF, and send it out.",
-  },
-];
 
 const FEATURES: { icon: ReactNode; title: string; text: string }[] = [
   {
@@ -94,52 +76,6 @@ function SectionHeading({
   );
 }
 
-function ContinueStrip() {
-  const navigate = useNavigate();
-  const { resumes, loading } = useResumes();
-
-  const latest = useMemo(() => {
-    if (resumes.length === 0) return null;
-    return [...resumes].sort(
-      (a, b) =>
-        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-    )[0];
-  }, [resumes]);
-
-  if (loading || !latest) return null;
-
-  return (
-    <div className="mx-auto mb-10 flex max-w-3xl flex-col items-start gap-3 rounded-2xl border border-border-popup bg-popup p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex min-w-0 items-center gap-3">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-btn-hover-bg text-subheading">
-          <FileText size={20} />
-        </div>
-
-        <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-wide text-accent">
-            Continue where you left off
-          </p>
-          <p className="truncate text-sm font-semibold text-heading">
-            {latest.title || "Untitled resume"}
-          </p>
-          <p className="text-xs text-nav-text">
-            Edited {new Date(latest.updatedAt).toLocaleDateString()}
-          </p>
-        </div>
-      </div>
-
-      <button
-        type="button"
-        onClick={() => navigate(`/resume/${latest._id}/edit`)}
-        className="flex h-10 shrink-0 items-center gap-2 rounded-xl bg-btn px-4 text-sm font-semibold text-btn-text transition hover:bg-btn-hover"
-      >
-        <PenLine size={16} />
-        Edit resume
-      </button>
-    </div>
-  );
-}
-
 /* ---------- page ---------- */
 
 export default function HomePage() {
@@ -148,9 +84,11 @@ export default function HomePage() {
   const isAuthLoading = useAuthStore((state) => state.isLoading);
   const {
     handleCreateResume,
+    handleCreateResumeWithAI,
     handleCheckATSScore,
     handleOpenUploadResume,
     isCreatingAtsResume,
+    isCreatingAiResume,
   } = useOutletContext<QuickActions>();
 
   const firstName = user?.fullName?.split(" ")[0];
@@ -203,8 +141,6 @@ export default function HomePage() {
     <div className="mx-auto w-full max-w-6xl space-y-16 pb-8 sm:space-y-20">
       {/* 1. Hero */}
       <section className="pt-4 text-center sm:pt-10">
-        {user && <ContinueStrip />}
-
         <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-display sm:text-5xl">
           {firstName ? (
             <>
@@ -226,8 +162,18 @@ export default function HomePage() {
         <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
           <button
             type="button"
+            onClick={handleCreateResumeWithAI}
+            disabled={isCreatingAiResume}
+            className="flex h-12 items-center gap-2 rounded-xl bg-btn px-6 text-sm font-semibold text-btn-text transition hover:bg-btn-hover disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Sparkles size={18} />
+            {isCreatingAiResume ? "Preparing..." : "Create Resume with AI"}
+          </button>
+
+          <button
+            type="button"
             onClick={handleCreateResume}
-            className="flex h-12 items-center gap-2 rounded-xl bg-btn px-6 text-sm font-semibold text-btn-text transition hover:bg-btn-hover"
+            className="flex h-12 items-center gap-2 rounded-xl border border-border bg-navbar px-6 text-sm font-semibold text-heading transition hover:bg-btn-hover-bg"
           >
             <Plus size={18} />
             Create Resume
@@ -267,29 +213,6 @@ export default function HomePage() {
               <h3 className="font-semibold text-heading">{action.title}</h3>
               <p className="mt-1 text-sm text-nav-text">{action.text}</p>
             </button>
-          ))}
-        </div>
-      </section>
-
-      {/* 3. How it works */}
-      <section>
-        <SectionHeading
-          title="How it works"
-          subtitle="From blank page to submitted application in three steps."
-        />
-
-        <div className="grid gap-4 md:grid-cols-3">
-          {STEPS.map((step, index) => (
-            <div
-              key={step.title}
-              className="rounded-2xl border border-border-popup bg-navbar p-5"
-            >
-              <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-sidebar text-sm font-bold text-sidebar-text">
-                {index + 1}
-              </div>
-              <h3 className="font-semibold text-heading">{step.title}</h3>
-              <p className="mt-1 text-sm text-nav-text">{step.text}</p>
-            </div>
           ))}
         </div>
       </section>
@@ -393,25 +316,6 @@ export default function HomePage() {
             <ArrowRight size={16} />
           </Link>
         </div>
-      </section>
-
-      {/* 7. Final CTA */}
-      <section className="rounded-3xl border border-border-popup bg-popup px-6 py-10 text-center shadow-sm">
-        <h2 className="text-2xl font-bold text-display sm:text-3xl">
-          Ready to land more interviews?
-        </h2>
-        <p className="mx-auto mt-2 max-w-md text-sm text-subheading">
-          Create your resume in minutes and check it against ATS before you
-          apply.
-        </p>
-        <button
-          type="button"
-          onClick={handleCreateResume}
-          className="mt-6 inline-flex h-12 items-center gap-2 rounded-xl bg-btn px-7 text-sm font-semibold text-btn-text transition hover:bg-btn-hover"
-        >
-          <Plus size={18} />
-          Create your resume
-        </button>
       </section>
     </div>
   );

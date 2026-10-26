@@ -18,12 +18,15 @@ import { mapGeneratedResumeToResume } from "../../features/resume/editor/utils/m
 import GenerateResumeLoader from "../../features/resume/editor/components/GenerateGeneralResumeLoader";
 import QuickGenerateForm from "../../features/resume/editor/components/GenerateGeneralResumeForm";
 import { mapResumeToQuickGenerateFormData } from "../../features/resume/editor/utils/mapResumeToGenerateForm";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ChevronRight, List, Loader2, PanelLeftOpen } from "lucide-react";
 
 type MobileTab = "edit" | "preview";
 
 export default function ResumeEditorPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [activeSection, setActiveSection] = useState("personal");
 
   const { loading, resume, resumeId } = useResume();
@@ -31,7 +34,9 @@ export default function ResumeEditorPage() {
   const setResume = useResumeStore((state) => state.setResume);
 
   const [isATSPanelOpen, setIsATSPanelOpen] = useState(false);
-  const [showQuickGenerate, setShowQuickGenerate] = useState(false);
+  const [showQuickGenerate, setShowQuickGenerate] = useState(
+    () => Boolean(location.state?.openGenerate),
+  );
   const [formInitialData, setFormInitialData] = useState<
     QuickGenerateFormData | undefined
   >(undefined);
@@ -88,13 +93,21 @@ export default function ResumeEditorPage() {
     }
   };
 
-  const location = useLocation();
 
   useEffect(() => {
     if (location.state?.openAts) {
       setIsATSPanelOpen(true);
     }
   }, [location.state]);
+
+  // Coming from "Create Resume with AI" on the home page: the AI form is
+  // already open (see the useState initialiser above). Clear the flag so a
+  // refresh doesn't reopen it.
+  useEffect(() => {
+    if (location.state?.openGenerate) {
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.state, location.pathname, navigate]);
 
   // Friendly label for the active section — used both as the form's
   // heading and as the mobile "Sections" trigger button's label.
