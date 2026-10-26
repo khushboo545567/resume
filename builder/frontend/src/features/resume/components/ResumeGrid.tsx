@@ -1,5 +1,6 @@
 import ResumeCard from "./ResumeCard";
 import EmptyState from "../../dashboard/components/EmptyState";
+import { dashboardCardGridClass } from "../../dashboard/components/DashboardSection";
 
 import type { Resume } from "../types/resume.types"; // ← Ye import zaroori hai
 
@@ -18,7 +19,7 @@ export default function ResumeGrid({
 }: Props) {
   if (loading) {
     return (
-      <div className="grid min-w-0 gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <div className={dashboardCardGridClass}>
         {Array.from({ length: 6 }).map((_, index) => (
           <div
             key={index}
@@ -34,7 +35,7 @@ export default function ResumeGrid({
   }
 
   return (
-    <div className="grid min-w-0 gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-3">
+    <div className={dashboardCardGridClass}>
       {resumes.map((resume) => (
         <div key={resume._id} className="min-w-0">
           <ResumeCard resume={resume} onRefresh={onRefresh} />

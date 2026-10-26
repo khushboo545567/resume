@@ -26,3 +26,13 @@ export default function DashboardSection({ title, action, children }: Props) {
 /** Shared style for the "View all" style links beside a section heading. */
 export const sectionActionClass =
   "flex shrink-0 items-center gap-1 text-sm font-semibold text-subheading transition hover:text-heading";
+
+/**
+ * Number of items every dashboard section previews. "View all" only appears
+ * when a section has more than this.
+ */
+export const DASHBOARD_PREVIEW_LIMIT = 3;
+
+/** Card grid shared by the Resumes and Cover Letters sections. */
+export const dashboardCardGridClass =
+  "grid min-w-0 gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-3";

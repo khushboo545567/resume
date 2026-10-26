@@ -6,6 +6,8 @@ import PageSpinner from "../components/PageSpinner";
 
 import DashboardStats from "../features/dashboard/components/DashboardStats";
 import DashboardSection, {
+  DASHBOARD_PREVIEW_LIMIT,
+  dashboardCardGridClass,
   sectionActionClass,
 } from "../features/dashboard/components/DashboardSection";
 import DashboardEmpty from "../features/dashboard/components/DashboardEmpty";
@@ -20,9 +22,9 @@ import { useInterviewHistory } from "../features/interview/hooks/useInterviewHis
 
 import { useAuthStore } from "../store/auth.store";
 
-const RESUME_LIMIT = 3;
-const COVER_LETTER_LIMIT = 4;
-const INTERVIEW_LIMIT = 3;
+const RESUME_LIMIT = DASHBOARD_PREVIEW_LIMIT;
+const COVER_LETTER_LIMIT = DASHBOARD_PREVIEW_LIMIT;
+const INTERVIEW_LIMIT = DASHBOARD_PREVIEW_LIMIT;
 
 export default function DashboardPage() {
   const navigate = useNavigate();
@@ -116,9 +118,9 @@ export default function DashboardPage() {
       <DashboardSection
         title="Resumes"
         action={
-          latestResumes.length > 0 && (
+          data.stats.totalResumes > RESUME_LIMIT && (
             <Link to="/myresume" className={sectionActionClass}>
-              View all
+              View all ({data.stats.totalResumes})
               <ArrowRight size={15} />
             </Link>
           )
@@ -174,7 +176,7 @@ export default function DashboardPage() {
             onClick={() => navigate("/cover-letters")}
           />
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
+          <div className={dashboardCardGridClass}>
             {visibleLetters.map((coverLetter) => (
               <CoverLetterCard
                 key={coverLetter._id}
@@ -189,9 +191,9 @@ export default function DashboardPage() {
       <DashboardSection
         title="Interviews"
         action={
-          latestSessions.length > 0 && (
+          sessions.length > INTERVIEW_LIMIT && (
             <Link to="/interview/history" className={sectionActionClass}>
-              View history
+              View all ({sessions.length})
               <ArrowRight size={15} />
             </Link>
           )
