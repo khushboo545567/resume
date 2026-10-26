@@ -1,29 +1,32 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import { Plus, Search } from "lucide-react";
+import { FilePlus2, Files, RotateCcw, Search, X } from "lucide-react";
 
 import ResumeGrid from "../features/resume/components/ResumeGrid";
 import CreateResumeModal from "../features/resume/components/CreateResumeModal";
 import EmptyResumeState from "../features/resume/components/EmptyResumeState";
+import DashboardSection from "../features/dashboard/components/DashboardSection";
 
 import { useResumes } from "../features/resume/hooks/useResumes";
 
 import type { Resume } from "../features/resume/types/resume.types";
 
+type StatusFilter = "all" | "draft" | "completed";
+type SortKey = "updated" | "newest" | "oldest" | "az";
+
+const STATUS_TABS: { value: StatusFilter; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "draft", label: "Drafts" },
+  { value: "completed", label: "Completed" },
+];
+
+const time = (date?: string) => new Date(date || 0).getTime();
+
 export default function MyResumePage() {
   const [open, setOpen] = useState(false);
-
   const [search, setSearch] = useState("");
-
-  const [filter, setFilter] = useState<"all" | "draft" | "completed">("all");
-
-  const [sort, setSort] = useState<"updated" | "newest" | "oldest" | "az">(
-    "updated",
-  );
-
-  // ==========================================
-  // GET RESUMES
-  // ==========================================
+  const [filter, setFilter] = useState<StatusFilter>("all");
+  const [sort, setSort] = useState<SortKey>("updated");
 
   const {
     resumes,
@@ -37,14 +40,10 @@ export default function MyResumePage() {
   } = useResumes();
 
   // ==========================================
-  // INFINITE SCROLL REF
+  // INFINITE SCROLL
   // ==========================================
 
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
-
-  // ==========================================
-  // INFINITE SCROLL
-  // ==========================================
 
   useEffect(() => {
     const element = loadMoreRef.current;
@@ -53,23 +52,74 @@ export default function MyResumePage() {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        const firstEntry = entries[0];
-
-        if (firstEntry.isIntersecting && hasNextPage && !loadingMore) {
+        if (entries[0].isIntersecting && hasNextPage && !loadingMore) {
           fetchNextPage();
         }
       },
-      {
-        threshold: 0.1,
-      },
+      { threshold: 0.1 },
     );
 
     observer.observe(element);
 
-    return () => {
-      observer.disconnect();
-    };
+    return () => observer.disconnect();
   }, [hasNextPage, loadingMore, fetchNextPage]);
+
+  // ==========================================
+  // SEARCH + FILTER + SORT
+  // ==========================================
+
+  const sortedResumes = useMemo(() => {
+    const keyword = search.toLowerCase().trim();
+
+    const result = resumes.filter((resume: Resume) => {
+      const title = resume.title?.toLowerCase() ?? "";
+      const targetRole = resume.targetRole?.toLowerCase() ?? "";
+
+      const matchesSearch =
+        title.includes(keyword) || targetRole.includes(keyword);
+      const matchesFilter = filter === "all" || resume.status === filter;
+
+      return matchesSearch && matchesFilter;
+    });
+
+    switch (sort) {
+      case "updated":
+        result.sort((a, b) => time(b.updatedAt) - time(a.updatedAt));
+        break;
+      case "newest":
+        result.sort((a, b) => time(b.createdAt) - time(a.createdAt));
+        break;
+      case "oldest":
+        result.sort((a, b) => time(a.createdAt) - time(b.createdAt));
+        break;
+      case "az":
+        result.sort((a, b) =>
+          (a.title?.toLowerCase() ?? "").localeCompare(
+            b.title?.toLowerCase() ?? "",
+          ),
+        );
+        break;
+    }
+
+    return result;
+  }, [resumes, search, filter, sort]);
+
+  // Per-status counts are only exact once every page has been loaded, so the
+  // pills show them only then (otherwise they would under-count).
+  const allLoaded = !hasNextPage;
+  const statusCounts: Record<StatusFilter, number> = {
+    all: pagination?.totalResumes ?? resumes.length,
+    draft: resumes.filter((r) => r.status === "draft").length,
+    completed: resumes.filter((r) => r.status === "completed").length,
+  };
+
+  const totalResumes = statusCounts.all;
+  const isFiltering = search.trim() !== "" || filter !== "all";
+
+  const clearFilters = () => {
+    setSearch("");
+    setFilter("all");
+  };
 
   // ==========================================
   // ERROR
@@ -77,7 +127,7 @@ export default function MyResumePage() {
 
   if (error) {
     return (
-      <div className="flex min-h-100 items-center bg-background justify-center">
+      <div className="flex min-h-100 items-center justify-center rounded-3xl border border-border-popup bg-popup p-8">
         <div className="text-center">
           <h2 className="text-lg font-semibold text-red-600">
             Failed to load resumes
@@ -90,8 +140,9 @@ export default function MyResumePage() {
           <button
             type="button"
             onClick={() => refetch()}
-            className="mt-4 rounded-lg bg-btn px-4 py-2 text-sm font-medium text-btn-text"
+            className="mt-4 inline-flex items-center gap-2 rounded-xl bg-btn px-5 py-2.5 text-sm font-semibold text-btn-text transition hover:bg-btn-hover"
           >
+            <RotateCcw size={16} />
             Try Again
           </button>
         </div>
@@ -100,245 +151,181 @@ export default function MyResumePage() {
   }
 
   // ==========================================
-  // SEARCH + FILTER
-  // ==========================================
-
-  const filteredResumes = resumes.filter((resume: Resume) => {
-    const keyword = search.toLowerCase().trim();
-
-    const title = resume.title?.toLowerCase() ?? "";
-
-    const targetRole = resume.targetRole?.toLowerCase() ?? "";
-
-    const matchesSearch =
-      title.includes(keyword) || targetRole.includes(keyword);
-
-    const matchesFilter = filter === "all" || resume.status === filter;
-
-    return matchesSearch && matchesFilter;
-  });
-
-  // ==========================================
-  // SORT
-  // ==========================================
-
-  const sortedResumes = [...filteredResumes];
-
-  switch (sort) {
-    case "updated":
-      sortedResumes.sort((a, b) => {
-        const dateA = new Date(a.updatedAt || 0).getTime();
-
-        const dateB = new Date(b.updatedAt || 0).getTime();
-
-        return dateB - dateA;
-      });
-      break;
-
-    case "newest":
-      sortedResumes.sort((a, b) => {
-        const dateA = new Date(a.createdAt || 0).getTime();
-
-        const dateB = new Date(b.createdAt || 0).getTime();
-
-        return dateB - dateA;
-      });
-      break;
-
-    case "oldest":
-      sortedResumes.sort((a, b) => {
-        const dateA = new Date(a.createdAt || 0).getTime();
-
-        const dateB = new Date(b.createdAt || 0).getTime();
-
-        return dateA - dateB;
-      });
-      break;
-
-    case "az":
-      sortedResumes.sort((a, b) => {
-        const titleA = a.title?.toLowerCase() ?? "";
-
-        const titleB = b.title?.toLowerCase() ?? "";
-
-        return titleA.localeCompare(titleB);
-      });
-      break;
-  }
-
-  // ==========================================
-  // COUNT LABEL (shown under the page title)
-  // ==========================================
-
-  const totalResumes = pagination?.totalResumes ?? resumes.length;
-
-  const countLabel = loading
-    ? "Loading your resumes..."
-    : sortedResumes.length === totalResumes
-      ? `${totalResumes} ${totalResumes === 1 ? "resume" : "resumes"}`
-      : `Showing ${sortedResumes.length} of ${totalResumes} resumes`;
-
-  // ==========================================
   // UI
   // ==========================================
 
   return (
-    <div className="space-y-8">
-      {/* ======================================
-          HEADER
-      ====================================== */}
+    <div className="min-w-0 space-y-8 sm:space-y-10">
+      {/* Banner (same look as the dashboard hero) */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sidebar via-sidebar-hover to-border-sidebar p-6 text-sidebar-text shadow-xl sm:p-8">
+        <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-gold/20 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 left-1/3 h-56 w-56 rounded-full bg-accent/25 blur-3xl" />
 
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-bold text-heading sm:text-2xl">
-            My Resumes
-          </h1>
+        <div className="relative flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <div className="max-w-xl">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-gold-soft">
+              <Files size={13} /> Resume library
+            </span>
 
-          <p className="mt-1 text-sm text-nav-text">{countLabel}</p>
+            <h1 className="mt-4 text-3xl font-bold leading-tight sm:text-4xl">
+              My <span className="text-gold-soft">Resumes</span>
+            </h1>
+
+            <p className="mt-2 text-sm text-sidebar-text/75 sm:text-base">
+              {loading
+                ? "Loading your resumes..."
+                : totalResumes === 0
+                  ? "Create your first ATS-friendly resume to get started."
+                  : `You have ${totalResumes} ${totalResumes === 1 ? "resume" : "resumes"}. Edit, share or download any of them.`}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-sidebar-text px-5 text-sm font-semibold text-display shadow-lg transition hover:-translate-y-0.5 hover:bg-popup"
+          >
+            <FilePlus2 size={17} /> New resume
+          </button>
         </div>
-
-        {/* The navbar already has Create Resume from 1400px up, so this button
-            only shows where the navbar's one is tucked into the side menu. */}
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-btn px-5 text-sm font-semibold text-btn-text transition hover:bg-btn-hover [@media(min-width:1400px)]:hidden"
-        >
-          <Plus size={18} />
-          Create Resume
-        </button>
       </div>
 
-      {/* ======================================
-          SEARCH + FILTER
-      ====================================== */}
-
-      <div className="rounded-2xl border border-border bg-popup p-4 shadow-sm">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          {/* SEARCH */}
-
+      {/* Toolbar */}
+      <div className="rounded-2xl border border-border-popup bg-popup p-3 shadow-sm sm:p-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="relative w-full lg:max-w-md">
             <Search
               size={18}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-nav-text"
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-nav-text"
             />
 
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search resumes or target roles..."
-              className="h-11 w-full rounded-xl border border-border bg-navbar pl-10 pr-4 text-sm outline-none transition focus:border-border-strong focus:ring-2 focus:ring-ring"
+              placeholder="Search by title or target role..."
+              className="h-11 w-full rounded-xl border border-border bg-navbar pl-10 pr-10 text-sm text-heading outline-none transition placeholder:text-nav-text focus:border-border-strong focus:ring-2 focus:ring-ring"
             />
+
+            {search && (
+              <button
+                type="button"
+                aria-label="Clear search"
+                onClick={() => setSearch("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-nav-text transition hover:bg-btn-hover-bg"
+              >
+                <X size={16} />
+              </button>
+            )}
           </div>
 
-          {/* FILTERS */}
-
-          <div className="flex flex-wrap gap-3">
-            {/* STATUS FILTER */}
-
-            <select
-              value={filter}
-              onChange={(e) =>
-                setFilter(e.target.value as "all" | "draft" | "completed")
-              }
-              className="h-11 rounded-xl border border-border bg-popup px-4 text-sm font-medium text-heading outline-none focus:border-border-strong"
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Status pills */}
+            <div
+              role="tablist"
+              aria-label="Filter by status"
+              className="inline-flex rounded-xl border border-border bg-navbar p-1"
             >
-              <option value="all">All Resumes</option>
+              {STATUS_TABS.map((tab) => {
+                const active = filter === tab.value;
 
-              <option value="draft">Drafts</option>
+                return (
+                  <button
+                    key={tab.value}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => setFilter(tab.value)}
+                    className={`inline-flex h-9 items-center gap-2 rounded-lg px-3 text-sm font-semibold transition sm:px-4 ${
+                      active
+                        ? "bg-btn text-btn-text shadow-sm"
+                        : "text-nav-text hover:bg-btn-hover-bg hover:text-heading"
+                    }`}
+                  >
+                    {tab.label}
+                    {allLoaded && !loading && (
+                      <span
+                        className={`rounded-full px-1.5 text-xs ${
+                          active ? "bg-btn-text/20" : "bg-btn-hover-bg"
+                        }`}
+                      >
+                        {statusCounts[tab.value]}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
 
-              <option value="completed">Completed</option>
-            </select>
-
-            {/* SORT */}
-
+            {/* Sort */}
             <select
               value={sort}
-              onChange={(e) =>
-                setSort(
-                  e.target.value as "updated" | "newest" | "oldest" | "az",
-                )
-              }
-              className="h-11 rounded-xl border border-border bg-popup px-4 text-sm font-medium text-heading outline-none focus:border-border-strong"
+              aria-label="Sort resumes"
+              onChange={(e) => setSort(e.target.value as SortKey)}
+              className="h-11 rounded-xl border border-border bg-navbar px-4 text-sm font-medium text-heading outline-none transition focus:border-border-strong focus:ring-2 focus:ring-ring"
             >
-              <option value="updated">Recently Updated</option>
-
-              <option value="newest">Newest First</option>
-
-              <option value="oldest">Oldest First</option>
-
+              <option value="updated">Recently updated</option>
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
               <option value="az">A → Z</option>
             </select>
           </div>
         </div>
       </div>
 
-      {/* ======================================
-          INITIAL LOADING
-      ====================================== */}
+      {/* Resumes */}
+      <DashboardSection
+        title={isFiltering ? "Results" : "All Resumes"}
+        count={loading ? undefined : sortedResumes.length}
+      >
+        {loading ? (
+          <ResumeGrid
+            resumes={[]}
+            loading={true}
+            onCreate={() => setOpen(true)}
+            onRefresh={refetch}
+          />
+        ) : sortedResumes.length === 0 ? (
+          resumes.length === 0 ? (
+            <EmptyResumeState onCreate={() => setOpen(true)} />
+          ) : (
+            <div className="rounded-3xl border-2 border-dashed border-border bg-navbar px-6 py-14 text-center">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-btn-hover-bg">
+                <Search size={24} className="text-subheading" />
+              </div>
 
-      {loading ? (
-        <ResumeGrid
-          resumes={[]}
-          loading={true}
-          onCreate={() => setOpen(true)}
-          onRefresh={refetch}
-        />
-      ) : sortedResumes.length === 0 ? (
-        /* ====================================
-           EMPTY / SEARCH EMPTY
-        ==================================== */
+              <h3 className="mt-4 text-lg font-bold text-heading">
+                No resumes found
+              </h3>
 
-        resumes.length === 0 ? (
-          <EmptyResumeState onCreate={() => setOpen(true)} />
-        ) : (
-          <div className="rounded-2xl border border-dashed border-border bg-popup p-12 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-btn-hover-bg">
-              <Search size={24} className="text-nav-text" />
+              <p className="mt-2 text-sm text-nav-text">
+                Try a different search or status filter.
+              </p>
+
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="mt-5 inline-flex h-10 items-center rounded-xl border border-border px-5 text-sm font-semibold text-subheading transition hover:border-btn hover:bg-btn hover:text-btn-text"
+              >
+                Clear filters
+              </button>
             </div>
+          )
+        ) : (
+          <ResumeGrid
+            resumes={sortedResumes}
+            loading={false}
+            onCreate={() => setOpen(true)}
+            onRefresh={refetch}
+          />
+        )}
+      </DashboardSection>
 
-            <h3 className="mt-4 text-lg font-semibold text-heading">
-              No resumes found
-            </h3>
-
-            <p className="mt-2 text-sm text-nav-text">
-              Try changing your search or filter.
-            </p>
-
-            <button
-              type="button"
-              onClick={() => {
-                setSearch("");
-                setFilter("all");
-              }}
-              className="mt-5 text-sm font-semibold text-subheading hover:underline"
-            >
-              Clear filters
-            </button>
-          </div>
-        )
-      ) : (
-        /* ====================================
-           RESUME GRID
-        ==================================== */
-
-        <ResumeGrid
-          resumes={sortedResumes}
-          loading={false}
-          onCreate={() => setOpen(true)}
-          onRefresh={refetch}
-        />
-      )}
-
-      {/* ======================================
-          INFINITE SCROLL TRIGGER
-      ====================================== */}
-
+      {/* Infinite scroll trigger */}
       {!loading && resumes.length > 0 && (
         <div
           ref={loadMoreRef}
-          className="flex min-h-20 items-center justify-center"
+          className="flex min-h-16 items-center justify-center"
         >
           {loadingMore && (
             <div className="flex items-center gap-2 text-sm text-nav-text">
@@ -348,14 +335,12 @@ export default function MyResumePage() {
           )}
 
           {!hasNextPage && !loadingMore && (
-            <p className="text-sm text-nav-text">You have reached the end.</p>
+            <p className="text-sm text-nav-text">
+              You've reached the end of your resumes.
+            </p>
           )}
         </div>
       )}
-
-      {/* ======================================
-          CREATE RESUME MODAL
-      ====================================== */}
 
       <CreateResumeModal open={open} onClose={() => setOpen(false)} />
     </div>
