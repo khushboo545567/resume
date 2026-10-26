@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
-import { ArrowRight, Bot, FilePlus2, Mail } from "lucide-react";
+import { ArrowRight, Bot, FilePlus2, Gauge, Mail, Sparkles } from "lucide-react";
 
 import PageSpinner from "../components/PageSpinner";
 
@@ -28,7 +28,8 @@ const INTERVIEW_LIMIT = DASHBOARD_PREVIEW_LIMIT;
 
 export default function DashboardPage() {
   const navigate = useNavigate();
-  const { handleCreateResume } = useOutletContext<QuickActions>();
+  const { handleCreateResume, handleCheckATSScore } =
+    useOutletContext<QuickActions>();
 
   // Greet the logged-in user by first name (falls back to the first word of
   // their full name, then to a neutral "there" while the session is loading).
@@ -94,15 +95,43 @@ export default function DashboardPage() {
     : sortedLetters.slice(0, COVER_LETTER_LIMIT);
 
   return (
-    <div className="min-w-0 space-y-10 sm:space-y-12">
-      {/* Greeting */}
-      <div>
-        <h1 className="text-2xl font-bold text-display sm:text-3xl">
-          Hi, {firstName}
-        </h1>
-        <p className="mt-1 text-sm text-subheading sm:text-base">
-          Here is everything you have created and practiced so far.
-        </p>
+    <div className="min-w-0 space-y-10 sm:space-y-14">
+      {/* Hero */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sidebar via-sidebar-hover to-border-sidebar p-6 text-sidebar-text shadow-xl sm:p-10">
+        <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-gold/20 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 left-1/3 h-56 w-56 rounded-full bg-accent/25 blur-3xl" />
+
+        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-xl">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-gold-soft">
+              <Sparkles size={13} /> Your career hub
+            </span>
+            <h1 className="mt-4 text-3xl font-bold leading-tight sm:text-4xl">
+              Welcome back, <span className="text-gold-soft">{firstName}</span>
+            </h1>
+            <p className="mt-2 text-sm text-sidebar-text/75 sm:text-base">
+              Here is everything you have created and practiced so far. Keep
+              the momentum going.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={handleCreateResume}
+              className="inline-flex h-11 items-center gap-2 rounded-xl bg-sidebar-text px-5 text-sm font-semibold text-display shadow-lg transition hover:-translate-y-0.5 hover:bg-popup"
+            >
+              <FilePlus2 size={17} /> New resume
+            </button>
+            <button
+              type="button"
+              onClick={handleCheckATSScore}
+              className="inline-flex h-11 items-center gap-2 rounded-xl border border-sidebar-text/30 bg-sidebar-text/10 px-5 text-sm font-semibold text-sidebar-text backdrop-blur transition hover:-translate-y-0.5 hover:bg-sidebar-text/20"
+            >
+              <Gauge size={17} /> Check ATS score
+            </button>
+          </div>
+        </div>
       </div>
 
       <DashboardStats
@@ -117,6 +146,7 @@ export default function DashboardPage() {
       {/* Resumes */}
       <DashboardSection
         title="Resumes"
+        count={data.stats.totalResumes}
         action={
           data.stats.totalResumes > RESUME_LIMIT && (
             <Link to="/myresume" className={sectionActionClass}>
@@ -147,6 +177,7 @@ export default function DashboardPage() {
       {/* Cover letters */}
       <DashboardSection
         title="Cover Letters"
+        count={loadingLetters ? undefined : sortedLetters.length}
         action={
           sortedLetters.length > COVER_LETTER_LIMIT && (
             <button
@@ -190,6 +221,7 @@ export default function DashboardPage() {
       {/* Interviews */}
       <DashboardSection
         title="Interviews"
+        count={loadingSessions ? undefined : sessions.length}
         action={
           sessions.length > INTERVIEW_LIMIT && (
             <Link to="/interview/history" className={sectionActionClass}>

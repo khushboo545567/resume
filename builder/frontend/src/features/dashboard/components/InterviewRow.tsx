@@ -28,9 +28,9 @@ export default function InterviewRow({ session }: Props) {
     <button
       type="button"
       onClick={() => navigate(`/interview/ai/session/${session._id}`)}
-      className="flex w-full min-w-0 items-center gap-3 rounded-2xl border border-border-popup bg-navbar p-4 text-left shadow-sm transition-shadow duration-200 hover:shadow-lg"
+      className="flex w-full min-w-0 items-center gap-3 group rounded-2xl border border-border-popup bg-popup p-4 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-gold/40 hover:shadow-lg"
     >
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-btn-hover-bg text-subheading">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-sidebar to-btn text-gold-soft shadow-md">
         <Bot size={18} />
       </div>
 
@@ -75,7 +75,7 @@ export default function InterviewRow({ session }: Props) {
         </div>
       </div>
 
-      <ChevronRight size={18} className="shrink-0 text-heading/40" />
+      <ChevronRight size={18} className="shrink-0 text-heading/40 transition group-hover:translate-x-1 group-hover:text-heading" />
     </button>
   );
 }
