@@ -1,3 +1,4 @@
+import { createContext, useContext } from "react";
 import { create } from "zustand";
 
 import type {
@@ -122,7 +123,7 @@ interface ResumeState {
   removeAchievement: (achievement: string) => void;
 }
 
-export const useResumeStore = create<ResumeState>((set) => ({
+const useBaseResumeStore = create<ResumeState>((set) => ({
   resume: null,
 
   setResume: (resume) =>
@@ -939,3 +940,58 @@ export const useResumeStore = create<ResumeState>((set) => ({
 
   // UNSER SAB
 }));
+
+/**
+ * Read-only override for `useResumeStore`.
+ *
+ * Wrap a subtree in `<ResumeOverrideContext.Provider value={resume}>` and every
+ * `useResumeStore(selector)` call inside it reads from that resume instead of
+ * the global editor store. Used by the resume-card thumbnails so the real
+ * templates can render any resume without touching the editor's state.
+ * With no provider (value `null`) the hook behaves exactly as before.
+ */
+export const ResumeOverrideContext = createContext<Resume | null>(null);
+
+// Actions are inert inside an override so a thumbnail can never write to the
+// real store (or anywhere else).
+const noop = () => undefined;
+
+const overrideStateCache = new WeakMap<Resume, ResumeState>();
+
+function getOverrideState(resume: Resume): ResumeState {
+  let state = overrideStateCache.get(resume);
+  if (!state) {
+    state = new Proxy({ resume } as unknown as ResumeState, {
+      get: (target, key) =>
+        key in target ? Reflect.get(target, key) : noop,
+    });
+    overrideStateCache.set(resume, state);
+  }
+  return state;
+}
+
+const identity = (state: ResumeState) => state;
+const constantSelector = () => null;
+
+function useResumeStoreWithOverride<T>(
+  selector: (state: ResumeState) => T = identity as unknown as (
+    state: ResumeState,
+  ) => T,
+): T {
+  const override = useContext(ResumeOverrideContext);
+
+  // Hooks must run unconditionally. With an override active we subscribe to
+  // the real store with a constant selector so editor changes never re-render
+  // the thumbnail.
+  const fromStore = useBaseResumeStore(
+    override ? (constantSelector as unknown as typeof selector) : selector,
+  );
+
+  return override ? selector(getOverrideState(override)) : fromStore;
+}
+
+// Keep the static API (getState, setState, subscribe, getInitialState) intact.
+export const useResumeStore = Object.assign(
+  useResumeStoreWithOverride,
+  useBaseResumeStore,
+) as typeof useBaseResumeStore;

@@ -8,7 +8,7 @@ import ResumeCardMenu from "./ResumeCardMenu";
 import RenameResumeModal from "./RenameResumeModal";
 import DeleteResumeModal from "./DeleteResumeModal";
 import DuplicateResumeModal from "./DuplicateResumeModal";
-import ResumeThumbnail from "./ResumeThumbnail"; // ← Add this import
+import LiveResumeThumbnail from "./LiveResumeThumbnail";
 
 import Card from "../../../components/ui/Card";
 import Badge from "../../../components/ui/Badge";
@@ -101,7 +101,7 @@ export default function ResumeCard({ resume, onRefresh }: ResumeCardProps) {
     <Card className="group overflow-visible transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
       <div className="h-64 overflow-hidden rounded-t-xl bg-linear-to-br from-navbar to-navbar-hover">
         <div className="flex h-full items-center justify-center">
-          <ResumeThumbnail resume={resume} />
+          <LiveResumeThumbnail resume={resume} />
         </div>
       </div>
 
