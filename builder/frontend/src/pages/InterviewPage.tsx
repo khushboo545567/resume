@@ -1,70 +1,168 @@
-import { Bot, CalendarCheck2 } from "lucide-react";
+import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  ArrowRight,
+  Bot,
+  CalendarCheck2,
+  Check,
+  MicVocal,
+} from "lucide-react";
+
+import StatCard from "../features/dashboard/components/StatCard";
+import DashboardSection from "../features/dashboard/components/DashboardSection";
+import InterviewHistoryBox from "../features/interview/components/InterviewHistoryBox";
 
 import { useInterviewHistory } from "../features/interview/hooks/useInterviewHistory";
 import { useMyBookings } from "../features/booking/hooks/useBookings";
-import InterviewHistoryBox from "../features/interview/components/InterviewHistoryBox";
+
+interface OptionProps {
+  icon: ReactNode;
+  tag: string;
+  title: string;
+  description: string;
+  points: string[];
+  cta: string;
+  onClick: () => void;
+}
+
+/** One "how do you want to practice" card. */
+function OptionCard({
+  icon,
+  tag,
+  title,
+  description,
+  points,
+  cta,
+  onClick,
+}: OptionProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-border-popup bg-popup text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-gold/40 hover:shadow-xl"
+    >
+      <div className="relative overflow-hidden bg-linear-to-br from-navbar to-navbar-hover p-6">
+        <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gold/15 transition-transform duration-500 group-hover:scale-150" />
+
+        <div className="relative flex items-start justify-between gap-3">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-sidebar to-btn text-gold-soft shadow-lg">
+            {icon}
+          </div>
+
+          <span className="rounded-full bg-btn-hover-bg px-3 py-1 text-xs font-semibold text-subheading">
+            {tag}
+          </span>
+        </div>
+      </div>
+
+      <div className="flex flex-1 flex-col p-6">
+        <h3 className="text-xl font-bold text-heading">{title}</h3>
+        <p className="mt-2 text-sm text-nav-text">{description}</p>
+
+        <ul className="mt-5 space-y-2.5">
+          {points.map((point) => (
+            <li
+              key={point}
+              className="flex items-start gap-2.5 text-sm text-heading"
+            >
+              <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-700/10 text-green-700">
+                <Check size={12} strokeWidth={3} />
+              </span>
+              {point}
+            </li>
+          ))}
+        </ul>
+
+        <span className="mt-6 inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-btn px-5 text-sm font-semibold text-btn-text shadow-md transition group-hover:bg-btn-hover">
+          {cta}
+          <ArrowRight
+            size={16}
+            className="transition group-hover:translate-x-1"
+          />
+        </span>
+      </div>
+    </button>
+  );
+}
 
 export default function InterviewPage() {
   const navigate = useNavigate();
   const { sessions, loading: loadingAi } = useInterviewHistory();
   const { data: bookings = [], isLoading: loadingBookings } = useMyBookings();
 
-  // Show the history box if the user has EITHER an AI practice session
-  // or a live booked session (confirmed/cancelled/completed) — not just
-  // AI ones, since someone might only ever book a live session.
+  // Show history if the user has EITHER an AI practice session or a live
+  // booked session, since someone might only ever book a live session.
   const loading = loadingAi || loadingBookings;
   const hasHistory = !loading && (sessions.length > 0 || bookings.length > 0);
 
   return (
-    <section className="mx-auto max-w-5xl px-4 py-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-heading">Interview Prep</h1>
-        <p className="mt-2 text-nav-text">
-          Practice with AI-generated questions or book a session with a
-          placement expert — the choice is yours.
-        </p>
+    <div className="min-w-0 space-y-8 sm:space-y-10">
+      {/* Banner (same look as the dashboard hero) */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sidebar via-sidebar-hover to-border-sidebar p-6 text-sidebar-text shadow-xl sm:p-8">
+        <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-gold/20 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 left-1/3 h-56 w-56 rounded-full bg-accent/25 blur-3xl" />
+
+        <div className="relative max-w-2xl">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-gold-soft">
+            <MicVocal size={13} /> Interview prep
+          </span>
+
+          <h1 className="mt-4 text-3xl font-bold leading-tight sm:text-4xl">
+            Walk into your next <span className="text-gold-soft">interview</span>{" "}
+            ready
+          </h1>
+
+          <p className="mt-2 text-sm text-sidebar-text/75 sm:text-base">
+            Practice with AI-generated questions or book a session with a
+            placement expert. The choice is yours.
+          </p>
+        </div>
       </div>
 
-      {hasHistory && <InterviewHistoryBox />}
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <button
-          onClick={() => navigate("/interview/ai")}
-          className="rounded-2xl border border-border bg-navbar p-6 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-        >
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-btn-hover-bg">
-            <Bot size={24} className="text-subheading" />
+      {/* Your numbers + history */}
+      {hasHistory && (
+        <div className="space-y-4">
+          <div className="grid min-w-0 grid-cols-2 gap-3 sm:gap-5">
+            <StatCard title="AI practice sessions" value={sessions.length} />
+            <StatCard title="Booked sessions" value={bookings.length} />
           </div>
 
-          <h3 className="text-lg font-semibold text-heading">
-            Give Interview with AI
-          </h3>
+          <InterviewHistoryBox />
+        </div>
+      )}
 
-          <p className="mt-2 text-sm text-nav-text">
-            Get personalised interview questions and instant feedback based on
-            your resume and target role.
-          </p>
-        </button>
+      {/* Options */}
+      <DashboardSection title="Choose how to practice">
+        <div className="grid min-w-0 gap-4 sm:gap-6 md:grid-cols-2">
+          <OptionCard
+            icon={<Bot size={26} />}
+            tag="Instant"
+            title="Interview with AI"
+            description="Get personalised interview questions and instant feedback based on your resume and target role."
+            points={[
+              "Questions tailored to your resume",
+              "Instant scoring and feedback",
+              "Practice any time, as often as you like",
+            ]}
+            cta="Start AI interview"
+            onClick={() => navigate("/interview/ai")}
+          />
 
-        <button
-          onClick={() => navigate("/interview/book")}
-          className="rounded-2xl border border-border bg-navbar p-6 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-        >
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-btn-hover-bg">
-            <CalendarCheck2 size={24} className="text-subheading" />
-          </div>
-
-          <h3 className="text-lg font-semibold text-heading">
-            Book a Session
-          </h3>
-
-          <p className="mt-2 text-sm text-nav-text">
-            Talk to a placement expert for 1:1 mock interviews and career
-            guidance.
-          </p>
-        </button>
-      </div>
-    </section>
+          <OptionCard
+            icon={<CalendarCheck2 size={26} />}
+            tag="Live expert"
+            title="Book a session"
+            description="Talk to a placement expert for 1:1 mock interviews and career guidance."
+            points={[
+              "1:1 mock interview with an expert",
+              "Personal feedback on your answers",
+              "Career guidance for your target role",
+            ]}
+            cta="Book a session"
+            onClick={() => navigate("/interview/book")}
+          />
+        </div>
+      </DashboardSection>
+    </div>
   );
 }
