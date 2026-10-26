@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { SearchX, Star, X } from "lucide-react";
+import { useOutletContext } from "react-router-dom";
+import { SearchX, Star, Upload, X } from "lucide-react";
 
 import {
   templates,
@@ -11,6 +12,7 @@ import type { ResumeTemplate } from "../features/resume/types/resume.types";
 
 import { useAuthStore } from "../store/auth.store";
 import { redirectToLogin } from "../config/auth.config";
+import type { QuickActions } from "../features/dashboard/hooks/useQuickActions";
 
 const DOMAIN_TABS: { label: string; value: Domain | "all" }[] = [
   { label: "All", value: "all" },
@@ -31,6 +33,7 @@ const LEVEL_OPTIONS: { label: string; value: ExperienceLevel | "all" }[] = [
 export default function TemplateGalleryPage() {
   const user = useAuthStore((state) => state.user);
   const isAuthLoading = useAuthStore((state) => state.isLoading);
+  const { handleOpenUploadResume } = useOutletContext<QuickActions>();
 
   const [selectedTemplateId, setSelectedTemplateId] =
     useState<ResumeTemplate | null>(null);
@@ -73,13 +76,26 @@ export default function TemplateGalleryPage() {
     <div className="mx-auto w-full max-w-7xl">
       {/* Header */}
       <div className="mb-8 text-center">
-        <h1 className="text-2xl font-bold text-display sm:text-3xl">
+        <span className="inline-flex rounded-full bg-btn-hover-bg px-3 py-1 text-xs font-semibold text-subheading">
+          Step 1 of 2: pick a design
+        </span>
+
+        <h1 className="mt-3 text-2xl font-bold text-display sm:text-3xl">
           Choose a template
         </h1>
         <p className="mx-auto mt-2 max-w-xl text-sm text-subheading sm:text-base">
-          Every layout is ATS-friendly. Pick one to start, and you can switch
-          templates later in the editor.
+          Every layout is ATS-friendly. Pick one, then name your resume and
+          start editing. You can switch templates later in the editor.
         </p>
+
+        <button
+          type="button"
+          onClick={handleOpenUploadResume}
+          className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-subheading transition hover:text-heading hover:underline"
+        >
+          <Upload size={16} />
+          Already have a resume? Import your PDF instead
+        </button>
       </div>
 
       {/* Domain tabs */}

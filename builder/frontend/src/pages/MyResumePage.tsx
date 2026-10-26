@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useOutletContext } from "react-router-dom";
 
 import { FilePlus2, Files, RotateCcw, Search, X } from "lucide-react";
 
 import ResumeGrid from "../features/resume/components/ResumeGrid";
-import CreateResumeModal from "../features/resume/components/CreateResumeModal";
 import EmptyResumeState from "../features/resume/components/EmptyResumeState";
 import DashboardSection from "../features/dashboard/components/DashboardSection";
 
 import { useResumes } from "../features/resume/hooks/useResumes";
 
+import type { QuickActions } from "../features/dashboard/hooks/useQuickActions";
 import type { Resume } from "../features/resume/types/resume.types";
 
 type StatusFilter = "all" | "draft" | "completed";
@@ -23,7 +24,7 @@ const STATUS_TABS: { value: StatusFilter; label: string }[] = [
 const time = (date?: string) => new Date(date || 0).getTime();
 
 export default function MyResumePage() {
-  const [open, setOpen] = useState(false);
+  const { handleCreateResume } = useOutletContext<QuickActions>();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<StatusFilter>("all");
   const [sort, setSort] = useState<SortKey>("updated");
@@ -182,7 +183,7 @@ export default function MyResumePage() {
 
           <button
             type="button"
-            onClick={() => setOpen(true)}
+            onClick={handleCreateResume}
             className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-sidebar-text px-5 text-sm font-semibold text-display shadow-lg transition hover:-translate-y-0.5 hover:bg-popup"
           >
             <FilePlus2 size={17} /> New resume
@@ -282,12 +283,12 @@ export default function MyResumePage() {
           <ResumeGrid
             resumes={[]}
             loading={true}
-            onCreate={() => setOpen(true)}
+            onCreate={handleCreateResume}
             onRefresh={refetch}
           />
         ) : sortedResumes.length === 0 ? (
           resumes.length === 0 ? (
-            <EmptyResumeState onCreate={() => setOpen(true)} />
+            <EmptyResumeState onCreate={handleCreateResume} />
           ) : (
             <div className="rounded-3xl border-2 border-dashed border-border bg-navbar px-6 py-14 text-center">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-btn-hover-bg">
@@ -315,7 +316,7 @@ export default function MyResumePage() {
           <ResumeGrid
             resumes={sortedResumes}
             loading={false}
-            onCreate={() => setOpen(true)}
+            onCreate={handleCreateResume}
             onRefresh={refetch}
           />
         )}
@@ -341,8 +342,6 @@ export default function MyResumePage() {
           )}
         </div>
       )}
-
-      <CreateResumeModal open={open} onClose={() => setOpen(false)} />
     </div>
   );
 }

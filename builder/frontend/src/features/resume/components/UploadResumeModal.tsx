@@ -1,52 +1,96 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, FileText, Loader2, UploadCloud } from "lucide-react";
+import {
+  ArrowLeft,
+  Check,
+  FileText,
+  Loader2,
+  UploadCloud,
+} from "lucide-react";
 
 import Modal from "../../../components/ui/Modal";
 import { templates } from "../config/templates";
 import { useUploadAndParseResume } from "../hooks/useUploadAndParseResume";
-import type { ResumeTemplate } from "../types/resume.types";
 
 interface Props {
   open: boolean;
   onClose: () => void;
 }
 
-type Step = "template" | "upload";
+type Step = "upload" | "template";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB, matches backend limit
+
+const STEPS = ["Upload PDF", "Choose design", "Edit"];
+
+// Pre-selected so the user can convert in one click if they don't care.
+const DEFAULT_TEMPLATE_SLUG = (templates.find((t) => t.featured) ?? templates[0])
+  .slug;
+
+function Stepper({ current }: { current: number }) {
+  return (
+    <ol className="mb-6 flex items-center gap-2 text-xs font-semibold sm:text-sm">
+      {STEPS.map((label, index) => {
+        const done = index < current;
+        const active = index === current;
+
+        return (
+          <li key={label} className="flex min-w-0 flex-1 items-center gap-2">
+            <span
+              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs ${
+                done || active
+                  ? "bg-btn text-btn-text"
+                  : "bg-btn-hover-bg text-nav-text"
+              }`}
+            >
+              {done ? <Check size={13} strokeWidth={3} /> : index + 1}
+            </span>
+
+            <span
+              className={`truncate ${
+                active ? "text-heading" : "text-nav-text"
+              }`}
+            >
+              {label}
+            </span>
+
+            {index < STEPS.length - 1 && (
+              <span className="h-px min-w-3 flex-1 bg-border-popup" />
+            )}
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
 
 export default function UploadResumeModal({ open, onClose }: Props) {
   const navigate = useNavigate();
   const uploadMutation = useUploadAndParseResume();
 
-  const [step, setStep] = useState<Step>("template");
-  const [selectedTemplateId, setSelectedTemplateId] =
-    useState<ResumeTemplate | null>(null);
+  const [step, setStep] = useState<Step>("upload");
+  const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const selectedTemplate = templates.find((t) => t.slug === selectedSlug);
+  const isPending = uploadMutation.isPending;
+
   const resetState = () => {
-    setStep("template");
-    setSelectedTemplateId(null);
+    setStep("upload");
+    setSelectedSlug(null);
     setSelectedFile(null);
     setError(null);
     setIsDragging(false);
   };
 
   const handleClose = () => {
-    if (uploadMutation.isPending) return;
+    if (isPending) return;
     resetState();
     onClose();
-  };
-
-  const handleSelectTemplate = (templateId: ResumeTemplate) => {
-    setSelectedTemplateId(templateId);
-    setError(null);
-    setStep("upload");
   };
 
   const validateAndSetFile = (file: File | undefined) => {
@@ -68,6 +112,8 @@ export default function UploadResumeModal({ open, onClose }: Props) {
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     validateAndSetFile(e.target.files?.[0]);
+    // Allow picking the same file again after going back.
+    e.target.value = "";
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -76,15 +122,23 @@ export default function UploadResumeModal({ open, onClose }: Props) {
     validateAndSetFile(e.dataTransfer.files?.[0]);
   };
 
-  const handleUpload = async () => {
-    if (!selectedFile || !selectedTemplateId) return;
+  const goToTemplates = () => {
+    if (!selectedFile) return;
+
+    setError(null);
+    setSelectedSlug((current) => current ?? DEFAULT_TEMPLATE_SLUG);
+    setStep("template");
+  };
+
+  const handleConvert = async () => {
+    if (!selectedFile || !selectedTemplate) return;
 
     setError(null);
 
     try {
       const resume = await uploadMutation.mutateAsync({
         file: selectedFile,
-        templateId: selectedTemplateId,
+        templateId: selectedTemplate.id,
       });
 
       resetState();
@@ -92,9 +146,7 @@ export default function UploadResumeModal({ open, onClose }: Props) {
       navigate(`/resume/${resume._id}/edit`);
     } catch (err) {
       console.error(err);
-      setError(
-        "Failed to parse your resume. Please check the file and try again.",
-      );
+      setError("We couldn't read this PDF. Please check the file and try again.");
     }
   };
 
@@ -102,62 +154,26 @@ export default function UploadResumeModal({ open, onClose }: Props) {
     <Modal
       open={open}
       onClose={handleClose}
-      title="Upload Resume"
+      title="Import your existing resume"
       description={
-        step === "template"
-          ? "Choose a template for your uploaded resume."
-          : "Upload your existing resume as a PDF. We'll parse it into your chosen template."
+        step === "upload"
+          ? "Upload your PDF and pick a design. We'll move your details into it, ready to edit."
+          : "Choose a design. You can change it any time in the editor."
       }
-      size={step === "template" ? "xl" : "md"}
+      size={step === "upload" ? "md" : "xl"}
     >
+      <Stepper current={step === "upload" ? 0 : 1} />
+
       {error && (
         <p className="mb-4 rounded-lg bg-red-600/10 px-3 py-2 text-sm text-red-600">
           {error}
         </p>
       )}
 
-      {step === "template" && (
-        <div className="grid max-h-[70vh] grid-cols-1 gap-5 overflow-y-auto sm:grid-cols-2 lg:grid-cols-3">
-          {templates.map((template) => (
-            <button
-              key={template.id}
-              type="button"
-              onClick={() => handleSelectTemplate(template.id)}
-              className={`relative text-left border rounded-xl p-5 transition hover:shadow-lg hover:-translate-y-0.5 border-border-popup ${template.color}`}
-            >
-              <div className="mb-4 flex justify-center">
-                <div className="overflow-hidden rounded-lg bg-white shadow-md">
-                  <img
-                    src={template.image}
-                    alt={template.name}
-                    className="w-full h-auto block"
-                  />
-                </div>
-              </div>
-              <h3 className="font-semibold text-lg">{template.name}</h3>
-              <span className="inline-block mt-3 text-xs font-medium text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
-                {template.ats}
-              </span>
-            </button>
-          ))}
-        </div>
-      )}
+      {/* ============ STEP 1: UPLOAD ============ */}
 
       {step === "upload" && (
         <div>
-          <button
-            type="button"
-            onClick={() => {
-              setStep("template");
-              setError(null);
-            }}
-            disabled={uploadMutation.isPending}
-            className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-nav-text hover:text-heading disabled:opacity-50"
-          >
-            <ArrowLeft size={16} />
-            Choose a different template
-          </button>
-
           <input
             ref={fileInputRef}
             type="file"
@@ -167,14 +183,22 @@ export default function UploadResumeModal({ open, onClose }: Props) {
           />
 
           <div
+            role="button"
+            tabIndex={0}
             onClick={() => fileInputRef.current?.click()}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                fileInputRef.current?.click();
+              }
+            }}
             onDragOver={(e) => {
               e.preventDefault();
               setIsDragging(true);
             }}
             onDragLeave={() => setIsDragging(false)}
             onDrop={handleDrop}
-            className={`flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed p-10 text-center cursor-pointer transition ${
+            className={`flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed p-10 text-center transition ${
               isDragging
                 ? "border-border-strong bg-btn-hover-bg/50"
                 : "border-border hover:border-border-strong"
@@ -194,28 +218,121 @@ export default function UploadResumeModal({ open, onClose }: Props) {
               <>
                 <UploadCloud size={32} className="text-heading/50" />
                 <p className="text-sm font-medium text-heading">
-                  Click to browse or drag & drop your resume
+                  Drop your resume PDF here, or click to browse
                 </p>
-                <p className="text-xs text-heading/60">PDF only, up to 5MB</p>
+                <p className="text-xs text-heading/60">
+                  PDF only, up to 5 MB. We read it and fill in the template
+                  for you.
+                </p>
               </>
             )}
           </div>
 
           <button
             type="button"
-            onClick={handleUpload}
-            disabled={!selectedFile || uploadMutation.isPending}
+            onClick={goToTemplates}
+            disabled={!selectedFile}
             className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-btn px-5 py-3 text-sm font-semibold text-btn-text transition hover:bg-btn-hover disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {uploadMutation.isPending ? (
-              <>
-                <Loader2 size={18} className="animate-spin" />
-                Parsing your resume...
-              </>
-            ) : (
-              "Upload & Continue"
-            )}
+            Continue: choose a design
           </button>
+        </div>
+      )}
+
+      {/* ============ STEP 2: CHOOSE DESIGN ============ */}
+
+      {step === "template" && (
+        <div>
+          {/* File summary */}
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border-popup bg-navbar px-4 py-3">
+            <div className="flex min-w-0 items-center gap-2 text-sm text-heading">
+              <FileText size={18} className="shrink-0 text-subheading" />
+              <span className="truncate font-medium">{selectedFile?.name}</span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setStep("upload");
+                setError(null);
+              }}
+              disabled={isPending}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-nav-text hover:text-heading disabled:opacity-50"
+            >
+              <ArrowLeft size={16} />
+              Change file
+            </button>
+          </div>
+
+          {/* Designs */}
+          <div className="grid max-h-[45vh] grid-cols-2 gap-4 overflow-y-auto p-1 sm:grid-cols-3 lg:grid-cols-4">
+            {templates.map((template) => {
+              const selected = template.slug === selectedSlug;
+
+              return (
+                <button
+                  key={template.slug}
+                  type="button"
+                  disabled={isPending}
+                  aria-pressed={selected}
+                  onClick={() => setSelectedSlug(template.slug)}
+                  className={`relative rounded-xl border bg-popup p-2 text-left transition disabled:cursor-not-allowed disabled:opacity-60 ${
+                    selected
+                      ? "border-btn ring-2 ring-ring"
+                      : "border-border-popup hover:-translate-y-0.5 hover:shadow-lg"
+                  }`}
+                >
+                  <div className="overflow-hidden rounded-lg bg-white shadow-sm">
+                    <img
+                      src={template.image}
+                      alt={`${template.name} resume preview`}
+                      loading="lazy"
+                      className="block aspect-[210/297] w-full object-cover object-top"
+                    />
+                  </div>
+
+                  {selected && (
+                    <span className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-btn text-btn-text shadow">
+                      <Check size={14} strokeWidth={3} />
+                    </span>
+                  )}
+
+                  <p className="mt-2 line-clamp-1 text-sm font-semibold text-heading">
+                    {template.name}
+                  </p>
+                  <span className="mt-1 inline-block rounded-full bg-green-700/10 px-2 py-0.5 text-[11px] font-medium text-green-700">
+                    {template.ats}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Action */}
+          <div className="mt-5 border-t border-border-popup pt-5">
+            <button
+              type="button"
+              onClick={handleConvert}
+              disabled={!selectedTemplate || isPending}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-btn px-5 py-3 text-sm font-semibold text-btn-text transition hover:bg-btn-hover disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isPending ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  Reading your resume and building it in{" "}
+                  {selectedTemplate?.name}...
+                </>
+              ) : (
+                `Convert to ${selectedTemplate?.name ?? "this design"}`
+              )}
+            </button>
+
+            {isPending && (
+              <p className="mt-3 text-center text-xs text-heading/60">
+                This can take a little while. Please keep this window open.
+              </p>
+            )}
+          </div>
         </div>
       )}
     </Modal>

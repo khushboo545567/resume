@@ -140,7 +140,7 @@ export default function Navbar({
             className="inline-flex items-center gap-2 whitespace-nowrap rounded-xl border border-border px-3 py-2.5 text-sm font-semibold text-heading transition hover:bg-btn-hover-bg xl:px-4"
           >
             <Upload size={18} />
-            <span>Upload Resume</span>
+            <span>Import Resume</span>
           </button>
 
           {/* Notifications */}

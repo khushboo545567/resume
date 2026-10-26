@@ -261,7 +261,7 @@ export default function Sidebar({
               className="flex w-full items-center justify-center gap-2 rounded-xl border border-border-sidebar px-4 py-2.5 text-sm font-semibold text-sidebar-text transition hover:bg-sidebar-hover"
             >
               <Upload size={16} />
-              Upload Resume
+              Import Resume
             </button>
           </div>
 

@@ -106,7 +106,7 @@ export default function HomePage() {
   const isAuthLoading = useAuthStore((state) => state.isLoading);
 
   const {
-    handleCreateResume,
+    handleChooseTemplate,
     handleCreateResumeWithAI,
     handleCheckATSScore,
     handleOpenUploadResume,
@@ -178,7 +178,7 @@ export default function HomePage() {
 
             <button
               type="button"
-              onClick={handleCreateResume}
+              onClick={handleChooseTemplate}
               className="flex h-12 items-center justify-center gap-2 rounded-xl border border-border-strong bg-transparent px-5 text-base font-semibold text-heading transition hover:bg-btn-hover-bg sm:px-7"
             >
               Choose a template

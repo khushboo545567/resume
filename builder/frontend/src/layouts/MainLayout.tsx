@@ -4,6 +4,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "../features/dashboard/components/Sidebar";
 import Navbar from "../features/dashboard/components/Navbar";
 import UploadResumeModal from "../features/resume/components/UploadResumeModal";
+import CreateResumeChooserModal from "../features/resume/components/CreateResumeChooserModal";
 import { useQuickActions } from "../features/dashboard/hooks/useQuickActions";
 
 // Routes whose editor needs the full viewport width/height to itself —
@@ -16,8 +17,13 @@ const FULL_BLEED_EDITOR_PATTERN =
 
 export default function MainLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { isUploadModalOpen, closeUploadModal, ...quickActions } =
-    useQuickActions();
+  const {
+    isUploadModalOpen,
+    closeUploadModal,
+    isCreateChooserOpen,
+    closeCreateChooser,
+    ...quickActions
+  } = useQuickActions();
   const { pathname } = useLocation();
 
   const isFullBleedEditor = FULL_BLEED_EDITOR_PATTERN.test(pathname);
@@ -58,6 +64,15 @@ export default function MainLayout() {
           <Outlet context={quickActions} />
         </main>
       </div>
+
+      <CreateResumeChooserModal
+        open={isCreateChooserOpen}
+        onClose={closeCreateChooser}
+        onChooseTemplate={quickActions.handleChooseTemplate}
+        onImport={quickActions.handleOpenUploadResume}
+        onQuickStart={quickActions.handleQuickStart}
+        quickStartLoading={quickActions.isCreatingQuickResume}
+      />
 
       <UploadResumeModal open={isUploadModalOpen} onClose={closeUploadModal} />
     </div>
