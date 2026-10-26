@@ -55,7 +55,7 @@ export default function MainLayout() {
               : "min-w-0 flex-1 overflow-x-hidden p-4 sm:p-6 [@media(min-width:1400px)]:p-8"
           }
         >
-          <Outlet />
+          <Outlet context={quickActions} />
         </main>
       </div>
 
