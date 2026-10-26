@@ -1,7 +1,7 @@
 import { useState } from "react";
 import BrandWordmark from "../../../components/BrandWordmark";
 import UserAvatar from "../../../components/UserAvatar";
-import { Plus, ChevronDown, Upload } from "lucide-react";
+import { Plus, ChevronDown, Gauge, Loader2, Upload } from "lucide-react";
 // import { Search } from "lucide-react"; // used by the commented-out search box below
 import { CiMenuBurger } from "react-icons/ci";
 
@@ -123,9 +123,13 @@ export default function Navbar({
             className="inline-flex items-center gap-2 whitespace-nowrap rounded-xl bg-btn px-3 py-2.5 text-sm font-semibold text-btn-text transition hover:bg-btn-hover disabled:cursor-not-allowed disabled:opacity-50 xl:px-4"
           >
             {isCreatingAtsResume ? (
-              "Preparing..."
+              <>
+                <Loader2 size={18} className="animate-spin" />
+                <span>Preparing...</span>
+              </>
             ) : (
               <>
+                <Gauge size={18} />
                 <span className="hidden xl:inline">Check ATS Score</span>
                 <span className="xl:hidden">ATS</span>
               </>

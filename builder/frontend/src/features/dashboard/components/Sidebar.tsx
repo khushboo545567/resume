@@ -15,6 +15,8 @@ import {
   Mail,
   Plus,
   Upload,
+  Gauge,
+  Loader2,
   LogOut,
   X,
 } from "lucide-react";
@@ -252,6 +254,11 @@ export default function Sidebar({
               disabled={isCreatingAtsResume}
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-btn px-4 py-2.5 text-sm font-semibold text-btn-text transition hover:bg-btn-hover disabled:cursor-not-allowed disabled:opacity-50"
             >
+              {isCreatingAtsResume ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Gauge size={16} />
+              )}
               {isCreatingAtsResume ? "Preparing..." : "Check ATS Score"}
             </button>
 

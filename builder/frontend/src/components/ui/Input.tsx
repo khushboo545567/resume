@@ -6,6 +6,9 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
   error?: string;
 
+  /** Small helper text shown under the field when there is no error. */
+  hint?: string;
+
   leftIcon?: ReactNode;
 
   rightIcon?: ReactNode;
@@ -17,6 +20,8 @@ export default function Input({
   label,
 
   error,
+
+  hint,
 
   leftIcon,
 
@@ -57,7 +62,11 @@ export default function Input({
         {rightIcon && <div className="ml-3 text-heading/50">{rightIcon}</div>}
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error ? (
+        <p className="text-sm text-red-600">{error}</p>
+      ) : (
+        hint && <p className="text-xs text-heading/60">{hint}</p>
+      )}
     </div>
   );
 }

@@ -4,11 +4,11 @@ import { SearchX, Star, Upload, X } from "lucide-react";
 
 import {
   templates,
+  type TemplateOption,
   type Domain,
   type ExperienceLevel,
 } from "../features/resume/config/templates";
 import CreateResumeModal from "../features/resume/components/CreateResumeModal";
-import type { ResumeTemplate } from "../features/resume/types/resume.types";
 
 import { useAuthStore } from "../store/auth.store";
 import { redirectToLogin } from "../config/auth.config";
@@ -35,8 +35,8 @@ export default function TemplateGalleryPage() {
   const isAuthLoading = useAuthStore((state) => state.isLoading);
   const { handleOpenUploadResume } = useOutletContext<QuickActions>();
 
-  const [selectedTemplateId, setSelectedTemplateId] =
-    useState<ResumeTemplate | null>(null);
+  const [selectedTemplate, setSelectedTemplate] =
+    useState<TemplateOption | null>(null);
   const [domainFilter, setDomainFilter] = useState<Domain | "all">("all");
   const [levelFilter, setLevelFilter] = useState<ExperienceLevel | "all">(
     "all",
@@ -49,7 +49,7 @@ export default function TemplateGalleryPage() {
     setLevelFilter("all");
   };
 
-  const handleTemplateClick = (templateId: ResumeTemplate) => {
+  const handleTemplateClick = (template: TemplateOption) => {
     if (isAuthLoading) return;
 
     if (!user) {
@@ -57,7 +57,7 @@ export default function TemplateGalleryPage() {
       return;
     }
 
-    setSelectedTemplateId(templateId);
+    setSelectedTemplate(template);
   };
 
   const filteredTemplates = useMemo(() => {
@@ -191,7 +191,7 @@ export default function TemplateGalleryPage() {
             <button
               key={template.slug}
               type="button"
-              onClick={() => handleTemplateClick(template.id)}
+              onClick={() => handleTemplateClick(template)}
               className="group block text-left focus:outline-none"
             >
               {/* Preview */}
@@ -238,11 +238,13 @@ export default function TemplateGalleryPage() {
         </div>
       )}
 
-      {selectedTemplateId && (
+      {selectedTemplate && (
         <CreateResumeModal
-          open={!!selectedTemplateId}
-          onClose={() => setSelectedTemplateId(null)}
-          templateId={selectedTemplateId}
+          open
+          onClose={() => setSelectedTemplate(null)}
+          templateId={selectedTemplate.id}
+          templateName={selectedTemplate.name}
+          templatePreview={selectedTemplate.image}
         />
       )}
     </div>

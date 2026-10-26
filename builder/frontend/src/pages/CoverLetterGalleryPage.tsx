@@ -7,14 +7,16 @@ import DashboardSection, {
   dashboardCardGridClass,
 } from "../features/dashboard/components/DashboardSection";
 
-import { coverLetterTemplates } from "../features/coverLetter/config/coverLetterTemplates";
+import {
+  coverLetterTemplates,
+  type CoverLetterTemplateOption,
+} from "../features/coverLetter/config/coverLetterTemplates";
 import CreateCoverLetterModal from "../features/coverLetter/components/CreateCoverLetterModal";
 import GenerateCoverLetterWithAiModal from "../features/coverLetter/components/GenerateCoverLetterWithAiModal";
-import type { CoverLetterTemplate } from "../features/coverLetter/types/coverLetter.types";
 
 export default function CoverLetterGalleryPage() {
-  const [selectedTemplateId, setSelectedTemplateId] =
-    useState<CoverLetterTemplate | null>(null);
+  const [selectedTemplate, setSelectedTemplate] =
+    useState<CoverLetterTemplateOption | null>(null);
 
   const [aiModalOpen, setAiModalOpen] = useState(false);
 
@@ -62,7 +64,7 @@ export default function CoverLetterGalleryPage() {
             <button
               key={template.id}
               type="button"
-              onClick={() => setSelectedTemplateId(template.id)}
+              onClick={() => setSelectedTemplate(template)}
               className="group min-w-0 text-left"
             >
               <Card className="h-full overflow-hidden transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl">
@@ -109,11 +111,13 @@ export default function CoverLetterGalleryPage() {
         </div>
       </DashboardSection>
 
-      {selectedTemplateId && (
+      {selectedTemplate && (
         <CreateCoverLetterModal
-          open={!!selectedTemplateId}
-          onClose={() => setSelectedTemplateId(null)}
-          templateId={selectedTemplateId}
+          open
+          onClose={() => setSelectedTemplate(null)}
+          templateId={selectedTemplate.id}
+          templateName={selectedTemplate.name}
+          templatePreview={selectedTemplate.thumbnail}
         />
       )}
 
