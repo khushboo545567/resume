@@ -84,7 +84,7 @@ function SectionHeading({
   subtitle?: string;
 }) {
   return (
-    <div className="mb-10 text-center">
+    <div className="mb-6 text-center sm:mb-10">
       <h2 className="text-2xl font-bold text-display sm:text-3xl">{title}</h2>
       {subtitle && (
         <p className="mx-auto mt-2 max-w-xl text-sm text-subheading sm:text-base">
@@ -138,7 +138,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-20 pb-8 sm:space-y-28">
+    <div className="mx-auto w-full max-w-6xl space-y-14 pb-8 sm:space-y-28">
       {/* 1. Hero */}
       <section className="grid items-center gap-10 pt-4 sm:pt-8 lg:grid-cols-2 lg:gap-14">
         <div className="text-center lg:text-left">
@@ -223,7 +223,7 @@ export default function HomePage() {
 
         {/* Visual: real template previews */}
         <div
-          className="relative mx-auto h-[300px] w-full max-w-[460px] sm:h-[420px]"
+          className="relative mx-auto hidden h-[420px] w-full max-w-[460px] sm:block"
           aria-hidden="true"
         >
           <div className="absolute inset-x-4 inset-y-6 rounded-[3rem] bg-btn-hover-bg" />
@@ -255,19 +255,26 @@ export default function HomePage() {
       </section>
 
       {/* 2. Why use ResumeAI */}
-      <section className="rounded-3xl border border-border-popup bg-popup px-6 py-12 shadow-sm sm:px-10 sm:py-16">
+      <section className="sm:rounded-3xl sm:border sm:border-border-popup sm:bg-popup sm:px-10 sm:py-16 sm:shadow-sm">
         <SectionHeading title="Why use ResumeAI for your next resume?" />
 
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 sm:grid-cols-2 sm:gap-10 lg:grid-cols-4">
           {BENEFITS.map((benefit) => (
-            <div key={benefit.title} className="text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-btn-hover-bg text-subheading">
+            <div
+              key={benefit.title}
+              className="flex items-start gap-4 text-left sm:block sm:text-center"
+            >
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-btn-hover-bg text-subheading sm:mx-auto sm:mb-4 sm:h-16 sm:w-16 [&>svg]:h-5 [&>svg]:w-5 sm:[&>svg]:h-[26px] sm:[&>svg]:w-[26px]">
                 {benefit.icon}
               </div>
-              <h3 className="text-lg font-semibold text-heading">
-                {benefit.title}
-              </h3>
-              <p className="mt-2 text-sm text-nav-text">{benefit.text}</p>
+              <div>
+                <h3 className="text-base font-semibold text-heading sm:text-lg">
+                  {benefit.title}
+                </h3>
+                <p className="mt-1 text-sm text-nav-text sm:mt-2">
+                  {benefit.text}
+                </p>
+              </div>
             </div>
           ))}
         </div>
@@ -280,21 +287,28 @@ export default function HomePage() {
           subtitle="Three steps from a blank page to a resume you can send."
         />
 
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-3 md:gap-8">
           {STEPS.map((step, index) => (
-            <div key={step.title} className="text-center md:text-left">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-sidebar text-lg font-bold text-sidebar-text md:mx-0">
+            <div
+              key={step.title}
+              className="flex items-start gap-4 text-left md:block"
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sidebar text-base font-bold text-sidebar-text md:mb-4 md:h-12 md:w-12 md:text-lg">
                 {index + 1}
               </div>
-              <h3 className="text-xl font-semibold text-heading">
-                {step.title}
-              </h3>
-              <p className="mt-2 text-nav-text">{step.text}</p>
+              <div>
+                <h3 className="text-base font-semibold text-heading md:text-xl">
+                  {step.title}
+                </h3>
+                <p className="mt-1 text-sm text-nav-text md:mt-2 md:text-base">
+                  {step.text}
+                </p>
+              </div>
             </div>
           ))}
         </div>
 
-        <div className="mt-10 text-center">
+        <div className="mt-8 text-center sm:mt-10">
           <button
             type="button"
             onClick={handleCreateResumeWithAI}
@@ -344,7 +358,7 @@ export default function HomePage() {
       </section>
 
       {/* 5. ATS check */}
-      <section className="grid items-center gap-10 rounded-3xl bg-section-panel px-6 py-12 sm:px-10 sm:py-14 lg:grid-cols-2 lg:gap-14">
+      <section className="grid items-center gap-10 rounded-3xl bg-section-panel px-5 py-8 sm:px-10 sm:py-14 lg:grid-cols-2 lg:gap-14">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-accent">
             ATS check
@@ -369,7 +383,7 @@ export default function HomePage() {
           </button>
         </div>
 
-        <div className="rounded-2xl border border-border-popup bg-popup p-6 shadow-lg">
+        <div className="sm:rounded-2xl sm:border sm:border-border-popup sm:bg-popup sm:p-6 sm:shadow-lg">
           <p className="mb-4 text-sm font-semibold text-heading">
             What the checker looks at
           </p>
@@ -378,7 +392,7 @@ export default function HomePage() {
             {ATS_POINTS.map((point) => (
               <li
                 key={point}
-                className="flex items-start gap-3 rounded-xl border border-border bg-navbar px-4 py-3 text-sm text-heading"
+                className="flex items-start gap-3 text-sm text-heading sm:rounded-xl sm:border sm:border-border sm:bg-navbar sm:px-4 sm:py-3"
               >
                 <CheckCircle2
                   size={18}
