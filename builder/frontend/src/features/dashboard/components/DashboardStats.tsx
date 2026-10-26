@@ -1,39 +1,49 @@
-import { FileText, FileClock, CircleCheckBig, Clock3 } from "lucide-react";
+import { Bot, Download, FileText, Mail } from "lucide-react";
 
 import StatCard from "./StatCard";
+
 interface Props {
-  total: number;
+  resumes: number;
   draft: number;
   completed: number;
+  coverLetters: number | string;
+  interviews: number | string;
   downloads: number;
 }
 
 export default function DashboardStats({
-  total,
+  resumes,
   draft,
   completed,
+  coverLetters,
+  interviews,
   downloads,
 }: Props) {
   return (
-    <div className="grid min-w-0 grid-cols-1 gap-3 min-[420px]:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+    <div className="grid min-w-0 grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
       <StatCard
-        title="Total Resumes"
-        value={total}
-        icon={<FileText size={22} />}
+        title="Resumes"
+        value={resumes}
+        subtitle={`${draft} draft · ${completed} completed`}
+        icon={<FileText size={20} />}
       />
 
-      <StatCard title="Draft" value={draft} icon={<FileClock size={22} />} />
+      <StatCard
+        title="Cover Letters"
+        value={coverLetters}
+        icon={<Mail size={20} />}
+      />
 
       <StatCard
-        title="Completed"
-        value={completed}
-        icon={<CircleCheckBig size={22} />}
+        title="AI Interviews"
+        value={interviews}
+        icon={<Bot size={20} />}
       />
 
       <StatCard
         title="Downloads"
         value={downloads}
-        icon={<Clock3 size={22} />}
+        icon={<Download size={20} />}
       />
     </div>
   );

@@ -1,31 +1,32 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { Link, useNavigate, useOutletContext } from "react-router-dom";
+import { ArrowRight, Bot, FilePlus2, Mail } from "lucide-react";
+
 import PageSpinner from "../components/PageSpinner";
 
-import DashboardHeader from "../features/dashboard/components/DashboardHeader";
 import DashboardStats from "../features/dashboard/components/DashboardStats";
-
+import DashboardSection, {
+  sectionActionClass,
+} from "../features/dashboard/components/DashboardSection";
+import DashboardEmpty from "../features/dashboard/components/DashboardEmpty";
+import InterviewRow from "../features/dashboard/components/InterviewRow";
 import { useDashboard } from "../features/dashboard/hooks/useDashboard";
-import WelcomeBanner from "../features/dashboard/components/WelcomeBanner";
-import QuickActions from "../features/dashboard/components/QuickActions";
+import type { QuickActions } from "../features/dashboard/hooks/useQuickActions";
 
 import ResumeGrid from "../features/resume/components/ResumeGrid";
-import CreateResumeModal from "../features/resume/components/CreateResumeModal";
-import AnalyseATSScoreModal from "../features/resume/components/AnalyseATSScoreModal";
-import ResumeCompletionCard from "../features/resume/components/ResumeCompletionCard";
-import AISuggestionsCard from "../features/dashboard/components/AISuggestionsCard";
-import EmptyResumeState from "../features/resume/components/EmptyResumeState";
-import type { Resume } from "../features/resume/types/resume.types";
-
-import { useNavigate } from "react-router-dom";
+import CoverLetterCard from "../features/coverLetter/components/CoverLetterCard";
+import { useCoverLetters } from "../features/coverLetter/hooks/useCoverLetters";
+import { useInterviewHistory } from "../features/interview/hooks/useInterviewHistory";
 
 import { useAuthStore } from "../store/auth.store";
 
-export default function DashboardPage() {
-  const [open, setOpen] = useState(false);
-  const [analyseOpen, setAnalyseOpen] = useState(false);
-  const [search, setSearch] = useState("");
+const RESUME_LIMIT = 3;
+const COVER_LETTER_LIMIT = 4;
+const INTERVIEW_LIMIT = 3;
 
+export default function DashboardPage() {
   const navigate = useNavigate();
+  const { handleCreateResume } = useOutletContext<QuickActions>();
 
   // Greet the logged-in user by first name (falls back to the first word of
   // their full name, then to a neutral "there" while the session is loading).
@@ -35,138 +36,189 @@ export default function DashboardPage() {
     user?.fullName?.trim().split(/\s+/)[0] ||
     "there";
 
-  // Filter & Sort States
-  const [filter, setFilter] = useState<"all" | "draft" | "completed">("all");
-  const [sort, setSort] = useState<"updated" | "newest" | "oldest" | "az">(
-    "updated",
+  const { data, isLoading, refetch } = useDashboard();
+  const {
+    coverLetters,
+    loading: loadingLetters,
+    isError: lettersError,
+  } = useCoverLetters();
+  const {
+    sessions,
+    loading: loadingSessions,
+    isError: sessionsError,
+  } = useInterviewHistory();
+
+  const [showAllLetters, setShowAllLetters] = useState(false);
+
+  const latestResumes = useMemo(
+    () =>
+      [...(data?.recentResumes ?? [])]
+        .sort(
+          (a, b) =>
+            new Date(b.updatedAt || 0).getTime() -
+            new Date(a.updatedAt || 0).getTime(),
+        )
+        .slice(0, RESUME_LIMIT),
+    [data],
   );
 
-  const { data, isLoading, refetch } = useDashboard();
+  const sortedLetters = useMemo(
+    () =>
+      [...coverLetters].sort(
+        (a, b) =>
+          new Date(b.updatedAt || 0).getTime() -
+          new Date(a.updatedAt || 0).getTime(),
+      ),
+    [coverLetters],
+  );
+
+  const latestSessions = useMemo(
+    () =>
+      [...sessions]
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        )
+        .slice(0, INTERVIEW_LIMIT),
+    [sessions],
+  );
 
   if (isLoading || !data) {
     return <PageSpinner />;
   }
 
-  const resumes = data.recentResumes;
-
-  const total = data.stats.totalResumes;
-
-  // ==================== FILTERING ====================
-  const filteredResumes = resumes.filter((resume: Resume) => {
-    const keyword = search.toLowerCase().trim();
-
-    const title = resume.title?.toString().toLowerCase() ?? "";
-    const targetRole = resume.targetRole?.toString().toLowerCase() ?? "";
-
-    const matchesSearch =
-      title.includes(keyword) || targetRole.includes(keyword);
-    const matchesFilter = filter === "all" ? true : resume.status === filter;
-
-    return matchesSearch && matchesFilter;
-  });
-
-  // ==================== SORTING ====================
-  const sortedResumes = [...filteredResumes];
-
-  switch (sort) {
-    case "updated":
-      sortedResumes.sort((a, b) => {
-        const dateA = new Date(a.updatedAt || 0).getTime();
-        const dateB = new Date(b.updatedAt || 0).getTime();
-        return dateB - dateA;
-      });
-      break;
-
-    case "newest":
-      sortedResumes.sort((a, b) => {
-        const dateA = new Date(a.createdAt || 0).getTime();
-        const dateB = new Date(b.createdAt || 0).getTime();
-        return dateB - dateA;
-      });
-      break;
-
-    case "oldest":
-      sortedResumes.sort((a, b) => {
-        const dateA = new Date(a.createdAt || 0).getTime();
-        const dateB = new Date(b.createdAt || 0).getTime();
-        return dateA - dateB;
-      });
-      break;
-
-    case "az":
-      sortedResumes.sort((a, b) => {
-        const titleA = a.title?.toString().toLowerCase() ?? "";
-        const titleB = b.title?.toString().toLowerCase() ?? "";
-        return titleA.localeCompare(titleB);
-      });
-      break;
-  }
+  const visibleLetters = showAllLetters
+    ? sortedLetters
+    : sortedLetters.slice(0, COVER_LETTER_LIMIT);
 
   return (
-    <>
-      <div className="min-w-0 space-y-6 sm:space-y-8">
-        <WelcomeBanner
-          name={firstName}
-          onCreate={() => setOpen(true)}
-          onContinue={() => {
-            if (sortedResumes.length > 0) {
-              navigate(`/resume/${sortedResumes[0]._id}/edit`);
-            }
-          }}
-        />
-        <QuickActions
-          onCreate={() => setOpen(true)}
-          onAnalyseATS={() => setAnalyseOpen(true)}
-        />
-        <DashboardHeader
-          total={total}
-          search={search}
-          filter={filter}
-          sort={sort}
-          onSearch={setSearch}
-          onFilter={setFilter}
-          onSort={setSort}
-          onCreate={() => setOpen(true)}
-          onAnalyseATS={() => setAnalyseOpen(true)}
-        />
+    <div className="min-w-0 space-y-10 sm:space-y-12">
+      {/* Greeting */}
+      <div>
+        <h1 className="text-2xl font-bold text-display sm:text-3xl">
+          Hi, {firstName}
+        </h1>
+        <p className="mt-1 text-sm text-subheading sm:text-base">
+          Here is everything you have created and practiced so far.
+        </p>
+      </div>
 
-        <DashboardStats
-          total={data.stats.totalResumes}
-          draft={data.stats.draftResumes}
-          completed={data.stats.completedResumes}
-          downloads={data.analytics.downloads}
-        />
+      <DashboardStats
+        resumes={data.stats.totalResumes}
+        draft={data.stats.draftResumes}
+        completed={data.stats.completedResumes}
+        coverLetters={loadingLetters ? "-" : coverLetters.length}
+        interviews={loadingSessions ? "-" : sessions.length}
+        downloads={data.analytics.downloads}
+      />
 
-        {/* {resumes.length > 0 && <DashboardAnalytics resumeId={resumes[0]._id} />} */}
-
-        <div className="grid min-w-0 gap-4 sm:gap-6 lg:grid-cols-2">
-          <ResumeCompletionCard
-            percentage={data.resumeCompletion.percentage}
-            missing={data.resumeCompletion.missing}
+      {/* Resumes */}
+      <DashboardSection
+        title="Resumes"
+        action={
+          latestResumes.length > 0 && (
+            <Link to="/myresume" className={sectionActionClass}>
+              View all
+              <ArrowRight size={15} />
+            </Link>
+          )
+        }
+      >
+        {latestResumes.length === 0 ? (
+          <DashboardEmpty
+            icon={<FilePlus2 size={22} />}
+            title="No resumes yet"
+            text="Pick a template and build your first ATS-friendly resume."
+            buttonLabel="Create resume"
+            onClick={handleCreateResume}
           />
-
-          <AISuggestionsCard suggestions={data.aiSuggestions} />
-        </div>
-
-        {sortedResumes.length === 0 ? (
-          <EmptyResumeState onCreate={() => setOpen(true)} />
         ) : (
           <ResumeGrid
-            resumes={sortedResumes}
-            loading={isLoading}
-            onCreate={() => setOpen(true)}
+            resumes={latestResumes}
+            loading={false}
+            onCreate={handleCreateResume}
             onRefresh={refetch}
           />
         )}
+      </DashboardSection>
 
-        {/* <RecentActivity /> */}
+      {/* Cover letters */}
+      <DashboardSection
+        title="Cover Letters"
+        action={
+          sortedLetters.length > COVER_LETTER_LIMIT && (
+            <button
+              type="button"
+              onClick={() => setShowAllLetters((prev) => !prev)}
+              className={sectionActionClass}
+            >
+              {showAllLetters
+                ? "Show less"
+                : `View all (${sortedLetters.length})`}
+            </button>
+          )
+        }
+      >
+        {loadingLetters ? (
+          <div className="h-24 animate-pulse rounded-2xl bg-border-popup" />
+        ) : lettersError ? (
+          <p className="text-sm text-nav-text">
+            We couldn't load your cover letters. Please try again later.
+          </p>
+        ) : sortedLetters.length === 0 ? (
+          <DashboardEmpty
+            icon={<Mail size={22} />}
+            title="No cover letters yet"
+            text="Write a cover letter that matches your resume, with or without AI."
+            buttonLabel="Write cover letter"
+            onClick={() => navigate("/cover-letters")}
+          />
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
+            {visibleLetters.map((coverLetter) => (
+              <CoverLetterCard
+                key={coverLetter._id}
+                coverLetter={coverLetter}
+              />
+            ))}
+          </div>
+        )}
+      </DashboardSection>
 
-        <CreateResumeModal open={open} onClose={() => setOpen(false)} />
-        <AnalyseATSScoreModal
-          open={analyseOpen}
-          onClose={() => setAnalyseOpen(false)}
-        />
-      </div>
-    </>
+      {/* Interviews */}
+      <DashboardSection
+        title="Interviews"
+        action={
+          latestSessions.length > 0 && (
+            <Link to="/interview/history" className={sectionActionClass}>
+              View history
+              <ArrowRight size={15} />
+            </Link>
+          )
+        }
+      >
+        {loadingSessions ? (
+          <div className="h-20 animate-pulse rounded-2xl bg-border-popup" />
+        ) : sessionsError ? (
+          <p className="text-sm text-nav-text">
+            We couldn't load your interview history. Please try again later.
+          </p>
+        ) : latestSessions.length === 0 ? (
+          <DashboardEmpty
+            icon={<Bot size={22} />}
+            title="No interviews yet"
+            text="Practice with questions built from your resume and target role."
+            buttonLabel="Start AI interview"
+            onClick={() => navigate("/interview/ai")}
+          />
+        ) : (
+          <div className="space-y-3">
+            {latestSessions.map((session) => (
+              <InterviewRow key={session._id} session={session} />
+            ))}
+          </div>
+        )}
+      </DashboardSection>
+    </div>
   );
 }
