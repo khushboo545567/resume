@@ -5,13 +5,13 @@ import type { User, UserProfile } from "../types/auth.types";
 
 /**
  * /auth/profile only returns profilePhotoId (an ID, not an image). Throne8 turns it
- * into a URL with GET /profile-photo/get-photo/:id, so we do the same here.
+ * into a URL with GET /profile/profile-photo/get-photo/:id, so we do the same here.
  * Never throws: a missing photo must not break login, the UI falls back to initials.
  */
 const getProfilePhotoUrl = async (photoId?: string | null): Promise<string | null> => {
   if (!photoId) return null;
   try {
-    const res = await authApi.get(`/profile-photo/get-photo/${photoId}`);
+    const res = await authApi.get(`/profile/profile-photo/get-photo/${photoId}`);
     return res.data?.data?.photo?.cloudinarySecureUrl ?? null;
   } catch {
     return null;
