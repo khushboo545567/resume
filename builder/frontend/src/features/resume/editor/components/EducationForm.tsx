@@ -1,8 +1,13 @@
 import { useGenerateCoursework } from "../../../ai/hooks/useGenerateCoursework";
 
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 
 import Button from "../../../../components/ui/Button";
+import SuggestInput from "../../../../components/ui/SuggestInput";
+import {
+  searchDegrees,
+  searchFieldsOfStudy,
+} from "../../config/educationOptions";
 
 import { useResumeStore } from "../../../../store/resume.store";
 
@@ -42,7 +47,7 @@ export default function EducationForm({
     (state) => state.updateEducationItem,
   );
 
-  const { register, handleSubmit, reset, watch, setValue } =
+  const { register, handleSubmit, reset, watch, setValue, control } =
     useForm<EducationFormData>({
       defaultValues: initialData ?? {
         institution: "",
@@ -122,16 +127,36 @@ export default function EducationForm({
           className="h-12 rounded-lg border border-border bg-navbar px-4 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
         />
 
-        <input
-          {...register("degree")}
-          placeholder="Degree (e.g. B.E., B.Tech)"
-          className="h-12 rounded-lg border border-border bg-navbar px-4 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
+        <Controller
+          name="degree"
+          control={control}
+          render={({ field }) => (
+            <SuggestInput
+              placeholder="Degree (e.g. B.E., B.Tech)"
+              emptyHeading="Popular degrees"
+              name={field.name}
+              value={field.value ?? ""}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              getSuggestions={searchDegrees}
+            />
+          )}
         />
 
-        <input
-          {...register("fieldOfStudy")}
-          placeholder="Field of Study (e.g. Computer Science)"
-          className="h-12 rounded-lg border border-border bg-navbar px-4 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
+        <Controller
+          name="fieldOfStudy"
+          control={control}
+          render={({ field }) => (
+            <SuggestInput
+              placeholder="Field of Study (e.g. Computer Science)"
+              emptyHeading="Popular fields"
+              name={field.name}
+              value={field.value ?? ""}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              getSuggestions={searchFieldsOfStudy}
+            />
+          )}
         />
 
         {/* Start date */}

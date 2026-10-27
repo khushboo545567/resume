@@ -1,11 +1,13 @@
 // //   // Watch all form values
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { X, Pencil } from "lucide-react";
 
 import { useResumeStore } from "../../../../store/resume.store";
 import { uploadProfilePhoto } from "../../../../services/upload.service";
+import SuggestInput from "../../../../components/ui/SuggestInput";
+import { searchRoles } from "../../config/jobRoles";
 
 export interface PersonalInfoFormData {
   fullName: string;
@@ -45,7 +47,7 @@ export default function PersonalInfoSection() {
   const zoom = resume?.personalInfo.photoZoom ?? 1;
   const position = resume?.personalInfo.photoPosition ?? { x: 0, y: 0 };
 
-  const { register, reset } = useForm<PersonalInfoFormData>({
+  const { register, reset, control } = useForm<PersonalInfoFormData>({
     defaultValues: {
       fullName: "",
       title: "",
@@ -287,20 +289,25 @@ export default function PersonalInfoSection() {
           />
         </div>
 
-        <div>
-          <label className="font-medium">Professional Title</label>
-
-          <input
-            {...register("title", {
-              onChange: (e) =>
-                updatePersonalInfo({
-                  title: e.target.value,
-                }),
-            })}
-            className="mt-2 h-12 w-full rounded-lg border border-border px-4"
-            placeholder="Frontend Developer"
-          />
-        </div>
+        <Controller
+          name="title"
+          control={control}
+          render={({ field }) => (
+            <SuggestInput
+              label="Professional Title"
+              placeholder="Frontend Developer"
+              emptyHeading="Popular roles"
+              name={field.name}
+              value={field.value ?? ""}
+              onChange={(value) => {
+                field.onChange(value);
+                updatePersonalInfo({ title: value });
+              }}
+              onBlur={field.onBlur}
+              getSuggestions={searchRoles}
+            />
+          )}
+        />
 
         <div>
           <label className="font-medium">Email</label>

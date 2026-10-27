@@ -9,6 +9,8 @@ import { useState } from "react";
 import { useGenerateExperience } from "../../../ai/hooks/useGenerateExperience";
 import AIQuickContextModal from "../../../ai/components/AIQuickContextModal";
 import BoldableInput from "./BoldableInput";
+import SuggestInput from "../../../../components/ui/SuggestInput";
+import { searchRoles } from "../../config/jobRoles";
 
 interface Props {
   onClose: () => void;
@@ -231,22 +233,27 @@ export default function ExperienceForm({
           )}
         </div>
 
-        <div>
-          <label className="text-sm font-semibold text-heading">Position</label>
-          <input
-            {...register("position", {
-              required: "Position is required",
-              minLength: { value: 2, message: "Minimum 2 characters required" },
-            })}
-            placeholder="Senior Frontend Developer"
-            className="mt-2 h-12 w-full rounded-lg border border-border bg-navbar px-4 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
-          />
-          {errors.position && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.position.message}
-            </p>
+        <Controller
+          name="position"
+          control={control}
+          rules={{
+            required: "Position is required",
+            minLength: { value: 2, message: "Minimum 2 characters required" },
+          }}
+          render={({ field }) => (
+            <SuggestInput
+              label="Position"
+              placeholder="Senior Frontend Developer"
+              emptyHeading="Popular roles"
+              error={errors.position?.message}
+              name={field.name}
+              value={field.value ?? ""}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              getSuggestions={searchRoles}
+            />
           )}
-        </div>
+        />
 
         <div className="sm:col-span-2">
           <label className="text-sm font-semibold text-heading">Location</label>
