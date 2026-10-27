@@ -5,6 +5,8 @@ import type { KeyboardEvent } from "react";
 import { X } from "lucide-react";
 
 import { useResumeStore } from "../../../../store/resume.store";
+import SuggestInput from "../../../../components/ui/SuggestInput";
+import { searchLanguages } from "../../config/languageOptions";
 
 const PROFICIENCY_LEVELS = ["Native", "Fluent", "Conversational", "Basic"];
 
@@ -29,8 +31,10 @@ export default function LanguagesSection() {
     setLevel(PROFICIENCY_LEVELS[0]);
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key !== "Enter") return;
+  // Runs for Enter inside the field; SuggestInput has already handled it
+  // (and cancelled it) when the key was used to pick a suggestion.
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== "Enter" || e.defaultPrevented) return;
     e.preventDefault();
     handleAdd();
   };
@@ -44,14 +48,24 @@ export default function LanguagesSection() {
         </p>
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="English"
-          className="h-12 flex-1 rounded-xl border border-border bg-navbar px-4 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
-        />
+      <div
+        className="flex flex-col gap-3 sm:flex-row sm:items-start"
+        onKeyDown={handleKeyDown}
+      >
+        <div className="flex-1">
+          <SuggestInput
+            value={name}
+            onChange={setName}
+            placeholder="English"
+            emptyHeading="Popular languages"
+            getSuggestions={(text) =>
+              searchLanguages(
+                text,
+                languages.map((language) => language.name),
+              )
+            }
+          />
+        </div>
 
         <select
           value={level}

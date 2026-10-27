@@ -3,6 +3,9 @@ import { Controller, useForm, useFieldArray } from "react-hook-form";
 import MonthYearPicker from "./MonthYearPicker";
 import Button from "../../../../components/ui/Button";
 import Input from "../../../../components/ui/Input";
+import SuggestInput from "../../../../components/ui/SuggestInput";
+import { searchProjectRoles } from "../../config/roleOptions";
+import { searchTechnologies } from "../../config/technologyOptions";
 import { useResumeStore } from "../../../../store/resume.store";
 import type { Resume } from "../../types/resume.types";
 
@@ -116,8 +119,8 @@ export default function ProjectForm({
 
   const technologies = watch("technologies") || [];
 
-  const addTechnology = () => {
-    const value = technology.trim();
+  const addTechnology = (picked?: string) => {
+    const value = (picked ?? technology).trim();
 
     if (!value) return;
 
@@ -319,10 +322,21 @@ export default function ProjectForm({
 
       {/* ROLE */}
 
-      <Input
-        label="Role"
-        placeholder="Full Stack Developer"
-        {...register("role")}
+      <Controller
+        name="role"
+        control={control}
+        render={({ field }) => (
+          <SuggestInput
+            label="Role"
+            placeholder="Full Stack Developer"
+            emptyHeading="Popular roles"
+            name={field.name}
+            value={field.value ?? ""}
+            onChange={field.onChange}
+            onBlur={field.onBlur}
+            getSuggestions={searchProjectRoles}
+          />
+        )}
       />
 
       {/* HIGHLIGHT LINE — Executive Blue template only */}
@@ -460,22 +474,27 @@ export default function ProjectForm({
       <div>
         <label className="text-sm font-semibold text-heading">Technologies</label>
 
-        <div className="mt-2 flex gap-3">
-          <input
-            type="text"
-            value={technology}
-            onChange={(e) => setTechnology(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                addTechnology();
-              }
-            }}
-            placeholder="React"
-            className="h-12 flex-1 rounded-lg border border-border bg-navbar px-4 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
-          />
+        <div
+          className="mt-2 flex items-start gap-3"
+          onKeyDown={(e) => {
+            // SuggestInput already handled Enter if it picked an option.
+            if (e.key !== "Enter" || e.defaultPrevented) return;
+            e.preventDefault();
+            addTechnology();
+          }}
+        >
+          <div className="flex-1">
+            <SuggestInput
+              placeholder="React"
+              emptyHeading="Popular technologies"
+              value={technology}
+              onChange={setTechnology}
+              onPick={addTechnology}
+              getSuggestions={(text) => searchTechnologies(text, technologies)}
+            />
+          </div>
 
-          <Button type="button" onClick={addTechnology}>
+          <Button type="button" className="h-12" onClick={() => addTechnology()}>
             Add
           </Button>
         </div>

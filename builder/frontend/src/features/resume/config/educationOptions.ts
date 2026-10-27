@@ -5,10 +5,7 @@
  * find an entry by the short name they actually type ("btech", "cse", "mba").
  */
 
-interface Option {
-  name: string;
-  aliases?: string[];
-}
+import { searchOptions, type Option } from "./searchOptions";
 
 const DEGREES: Option[] = [
   { name: "B.Tech", aliases: ["btech", "bachelor of technology", "b.e", "be"] },
@@ -51,56 +48,23 @@ const FIELDS_OF_STUDY: Option[] = [
   { name: "Economics" },
   { name: "English Literature", aliases: ["english"] },
   { name: "Science", aliases: ["pcm", "pcb"] },
+  { name: "Biotechnology", aliases: ["biotech"] },
+  { name: "Aerospace Engineering", aliases: ["aeronautical"] },
+  { name: "Automobile Engineering", aliases: ["automotive"] },
+  { name: "Instrumentation Engineering", aliases: ["instrumentation"] },
+  { name: "Industrial Engineering", aliases: ["production"] },
+  { name: "Environmental Science", aliases: ["environment"] },
+  { name: "Pharmacy", aliases: ["pharma"] },
+  { name: "Nursing" },
+  { name: "Psychology" },
+  { name: "Statistics", aliases: ["stats"] },
+  { name: "Graphic Design", aliases: ["design", "animation"] },
+  { name: "Mass Communication", aliases: ["journalism", "media"] },
+  { name: "Law", aliases: ["llb", "legal studies"] },
 ];
 
-const normalize = (text: string) => text.toLowerCase().replace(/[^a-z0-9+#]/g, "");
-
-const words = (text: string) =>
-  text
-    .toLowerCase()
-    .split(/[^a-z0-9+#.]+/)
-    .filter(Boolean);
-
-function score(option: Option, query: string, queryWords: string[]): number {
-  const name = normalize(option.name);
-
-  if (name.startsWith(query)) return 0;
-
-  if (option.aliases?.some((alias) => normalize(alias).startsWith(query))) {
-    return 1;
-  }
-
-  const optionWords = words(option.name);
-  if (queryWords.every((q) => optionWords.some((word) => word.startsWith(q)))) {
-    return 2;
-  }
-
-  // Matching in the middle of a word is only trustworthy for longer input.
-  if (query.length < 4) return -1;
-
-  return name.includes(query) ? 3 : -1;
-}
-
-function search(list: Option[], input: string, limit: number): string[] {
-  const query = normalize(input);
-  if (!query) return list.slice(0, limit).map((option) => option.name);
-
-  const queryWords = words(input);
-
-  return list
-    .map((option, index) => ({
-      name: option.name,
-      index,
-      rank: score(option, query, queryWords),
-    }))
-    .filter((match) => match.rank >= 0)
-    .sort((a, b) => a.rank - b.rank || a.index - b.index)
-    .slice(0, limit)
-    .map((match) => match.name);
-}
-
 export const searchDegrees = (input: string, limit = 6) =>
-  search(DEGREES, input, limit);
+  searchOptions(DEGREES, input, limit);
 
 export const searchFieldsOfStudy = (input: string, limit = 6) =>
-  search(FIELDS_OF_STUDY, input, limit);
+  searchOptions(FIELDS_OF_STUDY, input, limit);

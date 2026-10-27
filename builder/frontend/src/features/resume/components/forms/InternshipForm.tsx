@@ -7,6 +7,9 @@ import type { Resume } from "../../types/resume.types";
 import { useGenerateInternship } from "../../../ai/hooks/useGenerateInternship";
 import AIInternshipContextModal from "../../../ai/components/AIInternshipContextModal";
 import MonthYearPicker from "../../editor/components/MonthYearPicker";
+import SuggestInput from "../../../../components/ui/SuggestInput";
+import { searchInternshipRoles } from "../../config/roleOptions";
+import { searchLocations } from "../../config/locations";
 interface Props {
   onClose: () => void;
   editIndex?: number;
@@ -188,42 +191,54 @@ export default function InternshipForm({
           )}
         </div>
 
-        <div>
-          <label className="text-sm font-semibold text-heading">Role</label>
-          <input
-            {...register("role", {
-              required: "Role is required",
-              minLength: { value: 2, message: "Minimum 2 characters required" },
-            })}
-            placeholder="Software Development Intern"
-            className="mt-2 h-12 w-full rounded-lg border border-border bg-navbar px-4 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
-          />
-          {errors.role && (
-            <p className="mt-1 text-sm text-red-600">{errors.role.message}</p>
+        <Controller
+          name="role"
+          control={control}
+          rules={{
+            required: "Role is required",
+            minLength: { value: 2, message: "Minimum 2 characters required" },
+          }}
+          render={({ field }) => (
+            <SuggestInput
+              label="Role"
+              placeholder="Software Development Intern"
+              emptyHeading="Popular roles"
+              error={errors.role?.message}
+              name={field.name}
+              value={field.value ?? ""}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              getSuggestions={searchInternshipRoles}
+            />
           )}
-        </div>
+        />
 
         {/* location added -------------*/}
         <div className="sm:col-span-2">
-          <label className="text-sm font-semibold text-heading">Location</label>
-
-          <input
-            {...register("location", {
+          <Controller
+            name="location"
+            control={control}
+            rules={{
               required: "Location is required",
               minLength: {
                 value: 2,
                 message: "Minimum 2 characters required",
               },
-            })}
-            placeholder="Bhopal.."
-            className="mt-2 h-12 w-full rounded-lg border border-border bg-navbar px-4 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
+            }}
+            render={({ field }) => (
+              <SuggestInput
+                label="Location"
+                placeholder="Bhopal, India"
+                emptyHeading="Popular locations"
+                error={errors.location?.message}
+                name={field.name}
+                value={field.value ?? ""}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                getSuggestions={searchLocations}
+              />
+            )}
           />
-
-          {errors.location && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.location.message}
-            </p>
-          )}
         </div>
 
         {/* <div>

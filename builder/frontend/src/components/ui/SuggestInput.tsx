@@ -17,6 +17,9 @@ interface SuggestInputProps {
   onChange: (value: string) => void;
   onBlur?: () => void;
 
+  /** Called when an option is picked from the list (not for typed text). */
+  onPick?: (option: string) => void;
+
   /** Returns the options to offer for the current text (may be empty). */
   getSuggestions: (text: string) => string[];
 
@@ -54,6 +57,7 @@ export default function SuggestInput({
   value,
   onChange,
   onBlur,
+  onPick,
   getSuggestions,
   emptyHeading = "Popular",
   hint,
@@ -73,6 +77,7 @@ export default function SuggestInput({
 
   const pick = (option: string) => {
     onChange(option);
+    onPick?.(option);
     setOpen(false);
     setActive(-1);
   };

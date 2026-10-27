@@ -8,6 +8,7 @@ import {
   searchDegrees,
   searchFieldsOfStudy,
 } from "../../config/educationOptions";
+import { searchLocations } from "../../config/locations";
 
 import { useResumeStore } from "../../../../store/resume.store";
 
@@ -121,10 +122,20 @@ export default function EducationForm({
           className="h-12 rounded-lg border border-border bg-navbar px-4 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
         />
 
-        <input
-          {...register("location")}
-          placeholder="Location (e.g. Hyderabad, India)"
-          className="h-12 rounded-lg border border-border bg-navbar px-4 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
+        <Controller
+          name="location"
+          control={control}
+          render={({ field }) => (
+            <SuggestInput
+              placeholder="Location (e.g. Hyderabad, India)"
+              emptyHeading="Popular locations"
+              name={field.name}
+              value={field.value ?? ""}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              getSuggestions={searchLocations}
+            />
+          )}
         />
 
         <Controller
