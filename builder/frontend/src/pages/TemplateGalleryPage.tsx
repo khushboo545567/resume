@@ -192,7 +192,7 @@ export default function TemplateGalleryPage() {
               key={template.slug}
               type="button"
               onClick={() => handleTemplateClick(template)}
-              className="group block text-left focus:outline-none"
+              className="group flex h-full flex-col justify-start text-left focus:outline-none"
             >
               {/* Preview */}
               <div className="relative overflow-hidden rounded-xl border border-border-popup bg-popup shadow-sm transition-shadow duration-200 group-hover:shadow-xl group-focus-visible:ring-2 group-focus-visible:ring-ring">
