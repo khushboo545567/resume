@@ -506,6 +506,7 @@ export default function QuickGenerateForm({
                     control={control}
                     render={({ field }) => (
                       <MonthYearPicker
+                        compact
                         value={field.value || ""}
                         onChange={field.onChange}
                         maxYear={CURRENT_YEAR}
@@ -520,6 +521,7 @@ export default function QuickGenerateForm({
                     control={control}
                     render={({ field }) => (
                       <MonthYearPicker
+                        compact
                         value={field.value || ""}
                         onChange={field.onChange}
                         maxYear={CURRENT_YEAR}
@@ -624,6 +626,7 @@ export default function QuickGenerateForm({
                     control={control}
                     render={({ field }) => (
                       <MonthYearPicker
+                        compact
                         value={field.value || ""}
                         onChange={field.onChange}
                         maxYear={CURRENT_YEAR}
@@ -638,6 +641,7 @@ export default function QuickGenerateForm({
                     control={control}
                     render={({ field }) => (
                       <MonthYearPicker
+                        compact
                         value={field.value || ""}
                         onChange={field.onChange}
                         maxYear={CURRENT_YEAR}

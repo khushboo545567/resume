@@ -1,33 +1,38 @@
-import { useForm, useFieldArray, Controller } from "react-hook-form";
-import { useEffect } from "react";
-import MonthYearPicker from "./MonthYearPicker";
-import Button from "../../../../components/ui/Button";
+import { useEffect, useState } from "react";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
+
+import Input from "../../../../components/ui/Input";
+import SuggestInput from "../../../../components/ui/SuggestInput";
 import { useResumeStore } from "../../../../store/resume.store";
 import type { Resume } from "../../types/resume.types";
+import { searchRoles } from "../../config/jobRoles";
+
 import { useRewriteExperience } from "../../../ai/services/rewriteExperience.service";
-import { useState } from "react";
 import { useGenerateExperience } from "../../../ai/hooks/useGenerateExperience";
 import AIQuickContextModal from "../../../ai/components/AIQuickContextModal";
+import AIGenerateButton from "../../../ai/components/AIGenerateButton";
+
 import BoldableInput from "./BoldableInput";
-import SuggestInput from "../../../../components/ui/SuggestInput";
-import { searchRoles } from "../../config/jobRoles";
+import BulletListField from "./form/BulletListField";
+import DateRangeFields from "./form/DateRangeFields";
+import FormCard from "./form/FormCard";
+import { parseBullets } from "../utils/parseBullets";
 
 interface Props {
   onClose: () => void;
   editIndex?: number;
   initialData?: Resume["experience"][number];
 }
-const CURRENT_YEAR = new Date().getFullYear();
+
 interface ExperienceFormData {
   company: string;
   position: string;
   startDate: string;
   endDate: string;
+  location: string;
   currentlyWorking: boolean;
-
   responsibilities: { value: string }[];
   achievements: { value: string }[];
-  location: string;
 }
 
 export default function ExperienceForm({
@@ -56,7 +61,7 @@ export default function ExperienceForm({
     },
   });
 
-  // Reset form when editing
+  // Fill the form when editing an existing item
   useEffect(() => {
     if (initialData) {
       reset({
@@ -80,35 +85,40 @@ export default function ExperienceForm({
     fields: responsibilityFields,
     append: addResponsibility,
     remove: removeResponsibility,
-  } = useFieldArray({
-    control,
-    name: "responsibilities",
-  });
+  } = useFieldArray({ control, name: "responsibilities" });
 
   const {
     fields: achievementFields,
     append: addAchievement,
     remove: removeAchievement,
-  } = useFieldArray({
-    control,
-    name: "achievements",
-  });
+  } = useFieldArray({ control, name: "achievements" });
 
   const updateExperienceItem = useResumeStore(
     (state) => state.updateExperienceItem,
   );
   const addExperience = useResumeStore((state) => state.addExperience);
 
-  // AI Rewrite Hook (React Query)
   const { mutateAsync: rewriteExperience, isPending: isRewriting } =
     useRewriteExperience();
-
-  const [showContextModal, setShowContextModal] = useState(false);
-
   const { mutateAsync: generateExperience, isPending: isGenerating } =
     useGenerateExperience();
 
-  const company = watch("company");
+  const [showContextModal, setShowContextModal] = useState(false);
+
+  const [company, position, startDate, endDate, currentlyWorking] = watch([
+    "company",
+    "position",
+    "startDate",
+    "endDate",
+    "currentlyWorking",
+  ]);
+
+  const setResponsibilities = (bullets: string[]) =>
+    setValue(
+      "responsibilities",
+      bullets.map((value) => ({ value })),
+      { shouldDirty: true },
+    );
 
   const handleGenerateClick = () => {
     if (!company?.trim() || !position?.trim()) {
@@ -131,21 +141,13 @@ export default function ExperienceForm({
         context,
       });
 
-      const bullets = Array.isArray(result) ? result : [];
-
-      setValue(
-        "responsibilities",
-        bullets.map((r: string) => ({ value: r })),
-      );
-
+      setResponsibilities(parseBullets(result));
       setShowContextModal(false);
     } catch (error) {
       console.error("Generate failed:", error);
       alert("Failed to generate with AI. Please try again.");
     }
   };
-
-  const position = watch("position");
 
   const handleRewrite = async () => {
     const responsibilities = watch("responsibilities")
@@ -168,19 +170,7 @@ export default function ExperienceForm({
         targetRole: position.trim(),
       });
 
-      const newResponsibilities = Array.isArray(result)
-        ? result
-        : typeof result === "string"
-          ? result
-              .split("\n")
-              .map((line) => line.trim())
-              .filter(Boolean)
-          : [];
-
-      setValue(
-        "responsibilities",
-        newResponsibilities.map((r) => ({ value: r })),
-      );
+      setResponsibilities(parseBullets(result));
     } catch (error) {
       console.error("Rewrite failed:", error);
       alert("Failed to rewrite with AI. Please try again.");
@@ -194,9 +184,7 @@ export default function ExperienceForm({
       responsibilities: data.responsibilities
         .map((r) => r.value.trim())
         .filter(Boolean),
-      achievements: data.achievements
-        .map((a) => a.value.trim())
-        .filter(Boolean),
+      achievements: data.achievements.map((a) => a.value.trim()).filter(Boolean),
     };
 
     if (editIndex !== undefined) {
@@ -209,29 +197,33 @@ export default function ExperienceForm({
   };
 
   return (
-    <form
+    <FormCard
+      title={editIndex !== undefined ? "Edit Experience" : "Add Experience"}
+      submitLabel={
+        editIndex !== undefined ? "Update Experience" : "Save Experience"
+      }
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-6 rounded-2xl border border-border bg-popup p-4 sm:p-6"
+      onCancel={onClose}
+      extra={
+        <AIQuickContextModal
+          open={showContextModal}
+          onClose={() => setShowContextModal(false)}
+          onSubmit={handleContextSubmit}
+          loading={isGenerating}
+        />
+      }
     >
-      <h2 className="text-base font-bold text-heading sm:text-xl">
-        {editIndex !== undefined ? "Edit Experience" : "Add Experience"}
-      </h2>
-
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
-        <div>
-          <label className="text-sm font-semibold text-heading">Company</label>
-          <input
-            {...register("company", {
-              required: "Company is required",
-              minLength: { value: 2, message: "Minimum 2 characters required" },
-            })}
-            placeholder="Google"
-            className="mt-2 h-12 w-full rounded-lg border border-border bg-navbar px-4 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
-          />
-          {errors.company && (
-            <p className="mt-1 text-sm text-red-600">{errors.company.message}</p>
-          )}
-        </div>
+        <Input
+          label="Company"
+          required
+          placeholder="Google"
+          error={errors.company?.message}
+          {...register("company", {
+            required: "Company is required",
+            minLength: { value: 2, message: "Minimum 2 characters required" },
+          })}
+        />
 
         <Controller
           name="position"
@@ -243,6 +235,7 @@ export default function ExperienceForm({
           render={({ field }) => (
             <SuggestInput
               label="Position"
+              required
               placeholder="Senior Frontend Developer"
               emptyHeading="Popular roles"
               error={errors.position?.message}
@@ -256,183 +249,82 @@ export default function ExperienceForm({
         />
 
         <div className="sm:col-span-2">
-          <label className="text-sm font-semibold text-heading">Location</label>
-          <input
-            {...register("location")}
+          <Input
+            label="Location"
             placeholder="Berlin, Germany"
-            className="mt-2 h-12 w-full rounded-lg border border-border bg-navbar px-4 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
+            {...register("location")}
           />
         </div>
-
-        <div>
-          <label className="text-sm font-semibold text-heading">Start Date</label>
-
-          <Controller
-            name="startDate"
-            control={control}
-            render={({ field }) => (
-              <MonthYearPicker
-                value={field.value || ""}
-                onChange={field.onChange}
-                maxYear={CURRENT_YEAR}
-                placeholder="Select start month"
-              />
-            )}
-          />
-        </div>
-
-        <div>
-          <label className="text-sm font-semibold text-heading">End Date</label>
-
-          <Controller
-            name="endDate"
-            control={control}
-            render={({ field }) => (
-              <MonthYearPicker
-                value={field.value || ""}
-                onChange={field.onChange}
-                maxYear={CURRENT_YEAR}
-                disabled={watch("currentlyWorking")}
-                placeholder="Select end month"
-              />
-            )}
-          />
-
-          {watch("currentlyWorking") && (
-            <p className="mt-1 text-xs text-subheading">
-              Present will be shown on resume.
-            </p>
-          )}
-        </div>
       </div>
 
-      <label className="flex items-center gap-3 text-heading">
-        <input
-          type="checkbox"
-          {...register("currentlyWorking", {
-            onChange: (e) => {
-              if (e.target.checked) {
-                setValue("endDate", "");
-              }
-            },
-          })}
-        />
-        I currently work here
-      </label>
-
-      {/* Responsibilities with AI Button */}
-      <div>
-        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-          <h3 className="font-semibold text-heading">Responsibilities</h3>
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={handleGenerateClick}
-              disabled={isGenerating}
-              className="rounded-lg bg-btn px-4 py-2 text-btn-text text-sm flex items-center gap-2 hover:bg-btn-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {isGenerating ? "Generating..." : "✨ Generate with AI"}
-            </button>
-            <button
-              type="button"
-              onClick={handleRewrite}
-              disabled={isRewriting || !position?.trim()}
-              className="rounded-lg bg-btn px-4 py-2 text-btn-text text-sm flex items-center gap-2 hover:bg-btn-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {isRewriting ? "✍️ Rewriting..." : "✨ Rewrite with AI"}
-            </button>
-          </div>
-        </div>
-
-        <div className="space-y-3 mt-3">
-          {responsibilityFields.map((field, index) => (
-            <div key={field.id} className="flex flex-wrap items-start gap-3 sm:flex-nowrap">
-              {/* <input
-                {...register(`responsibilities.${index}.value`)}
-                placeholder="Built Resume Builder used by 5000+ students"
-                className="flex-1 rounded-lg border border-border bg-navbar px-4 h-11 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
-              /> */}
-
-              <Controller
-                control={control}
-                name={`responsibilities.${index}.value`}
-                render={({ field: { value, onChange } }) => (
-                  <BoldableInput
-                    value={value}
-                    onChange={onChange}
-                    placeholder="Built Resume Builder used by 5000+ students"
-                  />
-                )}
-              />
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => removeResponsibility(index)}
-                disabled={responsibilityFields.length === 1}
-              >
-                Remove
-              </Button>
-            </div>
-          ))}
-
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => addResponsibility({ value: "" })}
-          >
-            + Add Responsibility
-          </Button>
-        </div>
-      </div>
-
-      {/* Achievements Section */}
-      <div>
-        <h3 className="font-semibold text-heading">Achievements</h3>
-        <div className="space-y-3 mt-3">
-          {achievementFields.map((field, index) => (
-            <div key={field.id} className="flex items-center gap-3">
-              <input
-                {...register(`achievements.${index}.value`)}
-                placeholder="Reduced page load by 40%"
-                className="min-w-0 flex-1 rounded-lg border border-border bg-navbar px-4 h-11 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => removeAchievement(index)}
-                disabled={achievementFields.length === 1}
-              >
-                Remove
-              </Button>
-            </div>
-          ))}
-
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => addAchievement({ value: "" })}
-          >
-            + Add Achievement
-          </Button>
-        </div>
-      </div>
-
-      <div className="flex justify-end gap-4">
-        <Button type="button" variant="outline" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button type="submit">
-          {editIndex !== undefined ? "Update Experience" : "Save Experience"}
-        </Button>
-      </div>
-
-      <AIQuickContextModal
-        open={showContextModal}
-        onClose={() => setShowContextModal(false)}
-        onSubmit={handleContextSubmit}
-        loading={isGenerating}
+      <DateRangeFields
+        startDate={startDate ?? ""}
+        endDate={endDate ?? ""}
+        current={!!currentlyWorking}
+        onStartChange={(value) =>
+          setValue("startDate", value, { shouldDirty: true })
+        }
+        onEndChange={(value) =>
+          setValue("endDate", value, { shouldDirty: true })
+        }
+        onCurrentChange={(checked) => {
+          setValue("currentlyWorking", checked, { shouldDirty: true });
+          if (checked) setValue("endDate", "", { shouldDirty: true });
+        }}
+        currentLabel="I currently work here"
       />
-    </form>
+
+      <BulletListField
+        title="Responsibilities"
+        hint="Select text, then tap B to make it bold."
+        ids={responsibilityFields.map((field) => field.id)}
+        addLabel="Add responsibility"
+        onAdd={() => addResponsibility({ value: "" })}
+        onRemove={removeResponsibility}
+        actions={
+          <>
+            <AIGenerateButton
+              onClick={handleGenerateClick}
+              loading={isGenerating}
+            />
+            <AIGenerateButton
+              onClick={handleRewrite}
+              loading={isRewriting}
+              disabled={!position?.trim()}
+              label="Rewrite with AI"
+              loadingLabel="Rewriting..."
+            />
+          </>
+        }
+        renderInput={(index) => (
+          <Controller
+            control={control}
+            name={`responsibilities.${index}.value`}
+            render={({ field: { value, onChange } }) => (
+              <BoldableInput
+                value={value}
+                onChange={onChange}
+                placeholder="Built Resume Builder used by 5000+ students"
+              />
+            )}
+          />
+        )}
+      />
+
+      <BulletListField
+        title="Achievements"
+        ids={achievementFields.map((field) => field.id)}
+        addLabel="Add achievement"
+        onAdd={() => addAchievement({ value: "" })}
+        onRemove={removeAchievement}
+        renderInput={(index) => (
+          <Input
+            placeholder="Reduced page load by 40%"
+            aria-label={`Achievement ${index + 1}`}
+            {...register(`achievements.${index}.value`)}
+          />
+        )}
+      />
+    </FormCard>
   );
 }

@@ -1,10 +1,11 @@
 import { useState } from "react";
 import type { KeyboardEvent } from "react";
-import { Award, X, Plus } from "lucide-react";
+import { Award, Plus } from "lucide-react";
 
 import { useResumeStore } from "../../../../store/resume.store";
 import Input from "../../../../components/ui/Input";
 import Button from "../../../../components/ui/Button";
+import ChipList from "../components/form/ChipList";
 
 export default function CertificationsSection() {
   const resume = useResumeStore((state) => state.resume);
@@ -57,16 +58,12 @@ export default function CertificationsSection() {
   };
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <p className="text-xs text-heading/60 sm:text-sm">
-          Press Enter or click Add to add a certification. Add a link if you
-          want it to show up as a clickable, underlined link on your resume.
-        </p>
-      </div>
+    <div className="space-y-6">
+      <p className="text-sm text-heading/60">
+        Press Enter or click Add to add a certification. Add a link if you want
+        it to show up as a clickable, underlined link on your resume.
+      </p>
 
-      {/* Resume Heading */}
       <Input
         label="Resume Heading"
         placeholder="Certifications"
@@ -76,52 +73,43 @@ export default function CertificationsSection() {
         }
       />
 
-      {/* Certification Name + Link Inputs + Add Button */}
       <div className="space-y-3">
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <input
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="AWS Certified Cloud Practitioner"
-            className="h-12 flex-1 rounded-xl border border-border px-4 outline-none focus:border-border-strong"
-          />
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+          <div className="flex-1">
+            <Input
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="AWS Certified Cloud Practitioner"
+              aria-label="Certification name"
+            />
+          </div>
 
           <Button
             type="button"
+            size="lg"
             leftIcon={<Plus size={18} />}
             onClick={handleAddCertification}
+            className="w-full sm:w-auto"
           >
             Add
           </Button>
         </div>
 
-        <input
+        <Input
           value={link}
           onChange={(e) => setLink(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Certificate link (optional) — e.g. https://coursera.org/verify/xxxx"
-          className="h-12 w-full rounded-xl border border-border px-4 outline-none focus:border-border-strong"
+          placeholder="Certificate link (optional), e.g. https://coursera.org/verify/xxxx"
+          aria-label="Certificate link"
         />
       </div>
 
-      {/* Certification List */}
-      <div className="flex flex-wrap gap-3">
-        {certifications.map((certification) => (
-          <button
-            key={certification}
-            type="button"
-            onClick={() => removeCertification(certification)}
-            className="flex items-center gap-2 rounded-full bg-btn-hover-bg px-4 py-2 text-heading transition hover:bg-border-popup"
-          >
-            <Award size={16} />
-
-            <span>{certification}</span>
-
-            <X size={16} />
-          </button>
-        ))}
-      </div>
+      <ChipList
+        items={certifications}
+        onRemove={removeCertification}
+        icon={<Award size={16} />}
+      />
     </div>
   );
 }

@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 type Variant = "primary" | "secondary" | "outline" | "danger" | "ghost";
 
-type Size = "sm" | "md" | "lg";
+type Size = "sm" | "md" | "lg" | "icon";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
@@ -38,6 +38,9 @@ const sizeClasses: Record<Size, string> = {
   md: "h-11 px-5",
 
   lg: "h-12 px-6 text-base",
+
+  /** Square button for a single icon, same height as an Input. */
+  icon: "h-12 w-12 shrink-0",
 };
 
 export default function Button({

@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import type { KeyboardEvent } from "react";
-import { X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 
 import { useResumeStore } from "../../../../store/resume.store";
+import Button from "../../../../components/ui/Button";
+import Select from "../../../../components/ui/Select";
 import SuggestInput from "../../../../components/ui/SuggestInput";
 import { searchLanguages } from "../../config/languageOptions";
 
@@ -40,13 +42,11 @@ export default function LanguagesSection() {
   };
 
   return (
-    <div className="space-y-8">
-      <div>
-        <p className="text-xs text-heading/60 sm:text-sm">
-          Add a language name and proficiency level, then press Enter or click
-          Add.
-        </p>
-      </div>
+    <div className="space-y-6">
+      <p className="text-sm text-heading/60">
+        Add a language name and proficiency level, then press Enter or click
+        Add.
+      </p>
 
       <div
         className="flex flex-col gap-3 sm:flex-row sm:items-start"
@@ -57,6 +57,7 @@ export default function LanguagesSection() {
             value={name}
             onChange={setName}
             placeholder="English"
+            aria-label="Language"
             emptyHeading="Popular languages"
             getSuggestions={(text) =>
               searchLanguages(
@@ -67,43 +68,49 @@ export default function LanguagesSection() {
           />
         </div>
 
-        <select
-          value={level}
-          onChange={(e) => setLevel(e.target.value)}
-          className="h-12 rounded-xl border border-border bg-navbar px-4 text-heading outline-none focus:border-border-strong"
-        >
-          {PROFICIENCY_LEVELS.map((lvl) => (
-            <option key={lvl} value={lvl}>
-              {lvl}
-            </option>
-          ))}
-        </select>
+        <div className="sm:w-44">
+          <Select
+            aria-label="Proficiency level"
+            value={level}
+            onChange={(e) => setLevel(e.target.value)}
+          >
+            {PROFICIENCY_LEVELS.map((lvl) => (
+              <option key={lvl} value={lvl}>
+                {lvl}
+              </option>
+            ))}
+          </Select>
+        </div>
 
-        <button
+        <Button
           type="button"
+          size="lg"
+          leftIcon={<Plus size={18} />}
           onClick={handleAdd}
-          className="h-12 rounded-xl bg-btn px-6 font-medium text-btn-text hover:bg-btn-hover"
+          className="w-full sm:w-auto"
         >
           Add
-        </button>
+        </Button>
       </div>
 
-      <div className="flex flex-wrap gap-3">
+      <ul className="flex flex-wrap gap-2">
         {languages.map((language) => (
-          <div
+          <li
             key={language.name}
-            className="flex items-center gap-2 rounded-full bg-btn-hover-bg px-4 py-2 text-sm text-subheading"
+            className="flex max-w-full items-center gap-2 rounded-full bg-btn-hover-bg py-2 pl-4 pr-3 text-sm text-subheading"
           >
-            {/* Language name */}
-            <span className="font-medium">{language.name}</span>
+            <span className="min-w-0 font-medium [overflow-wrap:anywhere]">
+              {language.name}
+            </span>
 
             {/* Level dropdown */}
             <select
               value={language.level}
+              aria-label={`${language.name} proficiency`}
               onChange={(e) =>
                 updateLanguageLevel(language.name, e.target.value)
               }
-              className="cursor-pointer appearance-none border-0 bg-transparent p-0 text-xs text-subheading outline-none focus:ring-0"
+              className="cursor-pointer appearance-none border-0 bg-transparent p-0 text-xs text-subheading underline decoration-dotted underline-offset-2 outline-none focus:ring-0"
             >
               {PROFICIENCY_LEVELS.map((lvl) => (
                 <option key={lvl} value={lvl}>
@@ -112,17 +119,17 @@ export default function LanguagesSection() {
               ))}
             </select>
 
-            {/* Remove */}
             <button
               type="button"
               onClick={() => removeLanguage(language.name)}
-              className="ml-1 flex items-center justify-center rounded-full hover:bg-border-popup"
+              aria-label={`Remove ${language.name}`}
+              className="flex shrink-0 items-center justify-center rounded-full p-1 hover:bg-border-popup"
             >
               <X size={15} />
             </button>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 }

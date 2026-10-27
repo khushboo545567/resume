@@ -6,6 +6,7 @@ import { X, Pencil } from "lucide-react";
 
 import { useResumeStore } from "../../../../store/resume.store";
 import { uploadProfilePhoto } from "../../../../services/upload.service";
+import Input from "../../../../components/ui/Input";
 import SuggestInput from "../../../../components/ui/SuggestInput";
 import { searchRoles } from "../../config/jobRoles";
 
@@ -274,20 +275,14 @@ export default function PersonalInfoSection() {
 
       {/* Personal Information */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
-        <div>
-          <label className="font-medium">Full Name</label>
-
-          <input
-            {...register("fullName", {
-              onChange: (e) =>
-                updatePersonalInfo({
-                  fullName: e.target.value,
-                }),
-            })}
-            className="mt-2 h-12 w-full rounded-lg border border-border px-4"
-            placeholder="Hemendra Gour"
-          />
-        </div>
+        <Input
+          label="Full Name"
+          placeholder="Hemendra Gour"
+          autoComplete="name"
+          {...register("fullName", {
+            onChange: (e) => updatePersonalInfo({ fullName: e.target.value }),
+          })}
+        />
 
         <Controller
           name="title"
@@ -309,96 +304,61 @@ export default function PersonalInfoSection() {
           )}
         />
 
-        <div>
-          <label className="font-medium">Email</label>
+        <Input
+          label="Email"
+          type="email"
+          placeholder="hemendra@gmail.com"
+          autoComplete="email"
+          {...register("email", {
+            onChange: (e) => updatePersonalInfo({ email: e.target.value }),
+          })}
+        />
 
-          <input
-            type="email"
-            {...register("email", {
-              onChange: (e) =>
-                updatePersonalInfo({
-                  email: e.target.value,
-                }),
-            })}
-            className="mt-2 h-12 w-full rounded-lg border border-border px-4"
-            placeholder="hemendra@gmail.com"
-          />
-        </div>
-
-        <div>
-          <label className="font-medium">Phone</label>
-
-          <input
-            type="tel"
-            {...register("phone", {
-              onChange: (e) =>
-                updatePersonalInfo({
-                  phone: e.target.value,
-                }),
-            })}
-            className="mt-2 h-12 w-full rounded-lg border border-border px-4"
-            placeholder="+91 9876543210"
-          />
-        </div>
+        <Input
+          label="Phone"
+          type="tel"
+          placeholder="+91 9876543210"
+          autoComplete="tel"
+          {...register("phone", {
+            onChange: (e) => updatePersonalInfo({ phone: e.target.value }),
+          })}
+        />
 
         <div className="sm:col-span-2">
-          <label className="font-medium">Address</label>
-
-          <input
-            {...register("address", {
-              onChange: (e) =>
-                updatePersonalInfo({
-                  address: e.target.value,
-                }),
-            })}
-            className="mt-2 h-12 w-full rounded-lg border border-border px-4"
+          <Input
+            label="Address"
             placeholder="Bhopal, India"
-          />
-        </div>
-
-        <div>
-          <label className="font-medium">LinkedIn</label>
-
-          <input
-            {...register("linkedIn", {
-              onChange: (e) =>
-                updatePersonalInfo({
-                  linkedIn: e.target.value,
-                }),
+            autoComplete="street-address"
+            {...register("address", {
+              onChange: (e) => updatePersonalInfo({ address: e.target.value }),
             })}
-            className="mt-2 h-12 w-full rounded-lg border border-border px-4"
-            placeholder="https://linkedin.com/in/..."
           />
         </div>
 
-        <div>
-          <label className="font-medium">GitHub</label>
+        <Input
+          label="LinkedIn"
+          placeholder="https://linkedin.com/in/..."
+          {...register("linkedIn", {
+            onChange: (e) => updatePersonalInfo({ linkedIn: e.target.value }),
+          })}
+        />
 
-          <input
-            {...register("github", {
-              onChange: (e) =>
-                updatePersonalInfo({
-                  github: e.target.value,
-                }),
-            })}
-            className="mt-2 h-12 w-full rounded-lg border border-border px-4"
-            placeholder="https://github.com/..."
-          />
-        </div>
+        <Input
+          label="GitHub"
+          placeholder="https://github.com/..."
+          {...register("github", {
+            onChange: (e) => updatePersonalInfo({ github: e.target.value }),
+          })}
+        />
 
         <div className="sm:col-span-2">
-          <label className="font-medium">Portfolio</label>
-
-          <input
+          <Input
+            label="Portfolio"
             type="url"
-            {...register("portfolio", {
-              onChange: (e) =>
-                updatePersonalInfo({
-                  portfolio: e.target.value,
-                }),
-            })}
-            className="mt-2 h-12 w-full rounded-lg border border-border px-4"
             placeholder="https://portfolio.com"
+            {...register("portfolio", {
+              onChange: (e) => updatePersonalInfo({ portfolio: e.target.value }),
+            })}
           />
         </div>
       </div>

@@ -1,5 +1,9 @@
 import { useResumeStore } from "../../../../store/resume.store";
+import { Plus, Trash2 } from "lucide-react";
+
+import Button from "../../../../components/ui/Button";
 import Input from "../../../../components/ui/Input";
+import Textarea from "../../../../components/ui/Textarea";
 
 export default function StrengthsSection() {
   const resume = useResumeStore((state) => state.resume);
@@ -33,7 +37,7 @@ export default function StrengthsSection() {
         {strengths.map((strength, index) => (
           <div
             key={index}
-            className="rounded-lg border border-border bg-popup p-4 space-y-3"
+            className="space-y-4 rounded-2xl border border-border bg-popup p-4 sm:p-5"
           >
             <Input
               label="Strength"
@@ -47,8 +51,8 @@ export default function StrengthsSection() {
               }
             />
 
-            <textarea
-              className="w-full rounded-lg border border-border bg-navbar p-3 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
+            <Textarea
+              label="Description"
               rows={3}
               placeholder="Describe your strength..."
               value={strength.description}
@@ -60,29 +64,34 @@ export default function StrengthsSection() {
               }
             />
 
-            <button
-              type="button"
-              onClick={() => deleteStrength(index)}
-              className="rounded-lg bg-red-600 px-4 py-2 text-white hover:opacity-90"
-            >
-              Delete
-            </button>
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                variant="danger"
+                size="sm"
+                leftIcon={<Trash2 size={16} />}
+                onClick={() => deleteStrength(index)}
+              >
+                Delete
+              </Button>
+            </div>
           </div>
         ))}
       </div>
 
-      <button
+      <Button
         type="button"
+        variant="outline"
+        leftIcon={<Plus size={18} />}
         onClick={() =>
           addStrength({
             title: "",
             description: "",
           })
         }
-        className="rounded-lg bg-btn px-4 py-2 text-btn-text hover:bg-btn-hover"
       >
-        + Add Strength
-      </button>
+        Add strength
+      </Button>
     </div>
   );
 }

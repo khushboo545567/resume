@@ -1,18 +1,23 @@
-import { useGenerateCoursework } from "../../../ai/hooks/useGenerateCoursework";
-
 import { Controller, useForm } from "react-hook-form";
 
-import Button from "../../../../components/ui/Button";
+import Checkbox from "../../../../components/ui/Checkbox";
+import FormField from "../../../../components/ui/FormField";
+import Input from "../../../../components/ui/Input";
+import Select from "../../../../components/ui/Select";
 import SuggestInput from "../../../../components/ui/SuggestInput";
+import Textarea from "../../../../components/ui/Textarea";
+import { useResumeStore } from "../../../../store/resume.store";
+import type { Resume } from "../../types/resume.types";
+
+import { useGenerateCoursework } from "../../../ai/hooks/useGenerateCoursework";
+import AIGenerateButton from "../../../ai/components/AIGenerateButton";
+import FormCard from "./form/FormCard";
+
 import {
   searchDegrees,
   searchFieldsOfStudy,
 } from "../../config/educationOptions";
 import { searchLocations } from "../../config/locations";
-
-import { useResumeStore } from "../../../../store/resume.store";
-
-import type { Resume } from "../../types/resume.types";
 
 interface Props {
   onClose: () => void;
@@ -39,11 +44,10 @@ const MONTHS = [
 
 export default function EducationForm({
   onClose,
-  editIndex,
   initialData,
+  editIndex,
 }: Props) {
   const addEducation = useResumeStore((state) => state.addEducation);
-
   const updateEducationItem = useResumeStore(
     (state) => state.updateEducationItem,
   );
@@ -66,8 +70,11 @@ export default function EducationForm({
     });
 
   const resume = useResumeStore((state) => state.resume);
-  const degree = watch("degree");
-  const fieldOfStudy = watch("fieldOfStudy");
+  const [degree, fieldOfStudy, isCurrent] = watch([
+    "degree",
+    "fieldOfStudy",
+    "current",
+  ]);
 
   const { mutateAsync: generateCoursework, isPending: isGeneratingCoursework } =
     useGenerateCoursework();
@@ -85,14 +92,12 @@ export default function EducationForm({
         targetRole: resume?.targetRole,
       });
 
-      setValue("coursework", result);
+      setValue("coursework", result, { shouldDirty: true });
     } catch (error) {
       console.error("Coursework generation failed:", error);
       alert("Failed to generate coursework. Please try again.");
     }
   };
-
-  const isCurrent = watch("current");
 
   const onSubmit = (data: EducationFormData) => {
     if (editIndex !== undefined) {
@@ -107,19 +112,17 @@ export default function EducationForm({
   };
 
   return (
-    <form
+    <FormCard
+      title={editIndex !== undefined ? "Edit Education" : "Add Education"}
+      submitLabel={editIndex !== undefined ? "Update Education" : "Save Education"}
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-6 rounded-2xl border border-border bg-popup p-4 sm:p-6"
+      onCancel={onClose}
     >
-      <h2 className="text-base font-bold text-heading sm:text-xl">
-        {editIndex !== undefined ? "Edit Education" : "Add Education"}
-      </h2>
-
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
-        <input
+        <Input
+          label="College / University"
+          placeholder="IIT Bombay"
           {...register("institution")}
-          placeholder="College / University"
-          className="h-12 rounded-lg border border-border bg-navbar px-4 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
         />
 
         <Controller
@@ -127,7 +130,8 @@ export default function EducationForm({
           control={control}
           render={({ field }) => (
             <SuggestInput
-              placeholder="Location (e.g. Hyderabad, India)"
+              label="Location"
+              placeholder="Hyderabad, India"
               emptyHeading="Popular locations"
               name={field.name}
               value={field.value ?? ""}
@@ -143,7 +147,8 @@ export default function EducationForm({
           control={control}
           render={({ field }) => (
             <SuggestInput
-              placeholder="Degree (e.g. B.E., B.Tech)"
+              label="Degree"
+              placeholder="B.E., B.Tech"
               emptyHeading="Popular degrees"
               name={field.name}
               value={field.value ?? ""}
@@ -159,7 +164,8 @@ export default function EducationForm({
           control={control}
           render={({ field }) => (
             <SuggestInput
-              placeholder="Field of Study (e.g. Computer Science)"
+              label="Field of study"
+              placeholder="Computer Science"
               emptyHeading="Popular fields"
               name={field.name}
               value={field.value ?? ""}
@@ -170,90 +176,86 @@ export default function EducationForm({
           )}
         />
 
-        {/* Start date */}
-        <div className="flex gap-2">
-          <select
-            {...register("startMonth")}
-            className="h-12 w-1/2 min-w-0 rounded-lg border border-border bg-navbar px-2 text-heading outline-none focus:border-border-strong"
-          >
-            {MONTHS.map((m) => (
-              <option key={m} value={m}>
-                {m}
-              </option>
-            ))}
-          </select>
+        <FormField label="Start date">
+          <div className="grid grid-cols-2 gap-2">
+            <Select aria-label="Start month" {...register("startMonth")}>
+              {MONTHS.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </Select>
 
-          <input
-            type="number"
-            {...register("startYear", { valueAsNumber: true })}
-            placeholder="Start Year"
-            className="h-12 w-1/2 min-w-0 rounded-lg border border-border bg-navbar px-2 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
-          />
-        </div>
+            <Input
+              type="number"
+              inputMode="numeric"
+              aria-label="Start year"
+              placeholder="Year"
+              {...register("startYear", { valueAsNumber: true })}
+            />
+          </div>
+        </FormField>
 
-        {/* End date */}
-        <div className="flex gap-2">
-          <select
-            {...register("endMonth")}
-            disabled={isCurrent}
-            className="h-12 w-1/2 min-w-0 rounded-lg border border-border bg-navbar px-2 text-heading outline-none focus:border-border-strong disabled:bg-navbar-hover"
-          >
-            {MONTHS.map((m) => (
-              <option key={m} value={m}>
-                {m}
-              </option>
-            ))}
-          </select>
+        <FormField
+          label="End date"
+          hint={isCurrent ? "Present will be shown on the resume." : undefined}
+        >
+          <div className="grid grid-cols-2 gap-2">
+            <Select
+              aria-label="End month"
+              disabled={isCurrent}
+              {...register("endMonth")}
+            >
+              {MONTHS.map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </Select>
 
-          <input
-            type="number"
-            {...register("endYear", { valueAsNumber: true })}
-            disabled={isCurrent}
-            placeholder="End Year"
-            className="h-12 w-1/2 min-w-0 rounded-lg border border-border bg-navbar px-2 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring disabled:bg-navbar-hover"
-          />
-        </div>
+            <Input
+              type="number"
+              inputMode="numeric"
+              aria-label="End year"
+              placeholder="Year"
+              disabled={isCurrent}
+              {...register("endYear", { valueAsNumber: true })}
+            />
+          </div>
+        </FormField>
 
-        <input
+        <Input
+          label="CGPA / GPA"
+          placeholder="7.96/10"
           {...register("cgpa")}
-          placeholder="CGPA / GPA (e.g. 7.96/10)"
-          className="h-12 rounded-lg border border-border bg-navbar px-4 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
         />
 
-        <label className="flex items-center gap-2 text-sm text-nav-text">
-          <input type="checkbox" {...register("current")} />
-          Currently studying here
-        </label>
-      </div>
-
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="text-sm font-medium text-heading">
-            Relevant Coursework
-          </label>
-          <button
-            type="button"
-            onClick={handleGenerateCoursework}
-            disabled={isGeneratingCoursework}
-            className="rounded-lg bg-btn px-3 py-1.5 text-btn-text text-sm flex items-center gap-2 hover:bg-btn-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {isGeneratingCoursework ? "Generating..." : "✨ Generate with AI"}
-          </button>
+        <div className="sm:flex sm:items-end sm:pb-1">
+          <Checkbox label="Currently studying here" {...register("current")} />
         </div>
-        <textarea
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <label
+            htmlFor="education-coursework"
+            className="text-sm font-semibold text-heading"
+          >
+            Relevant coursework
+          </label>
+
+          <AIGenerateButton
+            onClick={handleGenerateCoursework}
+            loading={isGeneratingCoursework}
+          />
+        </div>
+
+        <Textarea
+          id="education-coursework"
+          placeholder="Comma-separated, e.g. OOP, DBMS, DSA, Machine Learning"
           {...register("coursework")}
-          placeholder="Relevant Coursework (comma-separated, e.g. OOP, DBMS, DSA, Machine Learning)"
-          className="min-h-[80px] w-full rounded-lg border border-border bg-navbar px-4 py-3 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
         />
       </div>
-
-      <div className="flex justify-end gap-3">
-        <Button type="button" variant="outline" onClick={onClose}>
-          Cancel
-        </Button>
-
-        <Button type="submit">Save Education</Button>
-      </div>
-    </form>
+    </FormCard>
   );
 }

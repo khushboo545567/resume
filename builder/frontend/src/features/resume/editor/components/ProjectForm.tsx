@@ -1,23 +1,33 @@
 import { useEffect, useState } from "react";
-import { Controller, useForm, useFieldArray } from "react-hook-form";
-import MonthYearPicker from "./MonthYearPicker";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
+import type { KeyboardEvent } from "react";
+import { Plus } from "lucide-react";
+
 import Button from "../../../../components/ui/Button";
+import FormField from "../../../../components/ui/FormField";
 import Input from "../../../../components/ui/Input";
 import SuggestInput from "../../../../components/ui/SuggestInput";
-import { searchProjectRoles } from "../../config/roleOptions";
-import { searchTechnologies } from "../../config/technologyOptions";
 import { useResumeStore } from "../../../../store/resume.store";
 import type { Resume } from "../../types/resume.types";
+import { searchProjectRoles } from "../../config/roleOptions";
+import { searchTechnologies } from "../../config/technologyOptions";
 
 import { useGenerateProject } from "../../../ai/hooks/useGenerateProject";
 import AIProjectContextModal from "../../../ai/components/AIProjectContextModal";
+import AIGenerateButton from "../../../ai/components/AIGenerateButton";
+
+import BulletListField from "./form/BulletListField";
+import ChipList from "./form/ChipList";
+import DateRangeFields from "./form/DateRangeFields";
+import FormCard from "./form/FormCard";
+import { parseBullets } from "../utils/parseBullets";
 
 interface Props {
   onClose: () => void;
   editIndex?: number;
   initialData?: Resume["projects"][number];
 }
-const CURRENT_YEAR = new Date().getFullYear();
+
 interface ProjectFormData {
   title: string;
   role: string;
@@ -31,11 +41,19 @@ interface ProjectFormData {
   link: string;
 }
 
-export default function ProjectForm({
-  onClose,
-  editIndex,
-  initialData,
-}: Props) {
+/** Empty is fine (the field is optional); anything else must be a full URL. */
+function validateOptionalUrl(value: string) {
+  if (!value || value.trim() === "") return true;
+
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return "Please enter a full URL, starting with https://";
+  }
+}
+
+export default function ProjectForm({ onClose, editIndex, initialData }: Props) {
   const addProject = useResumeStore((state) => state.addProject);
   const updateProject = useResumeStore((state) => state.updateProject);
   const templateId = useResumeStore((state) => state.resume?.templateId);
@@ -67,40 +85,23 @@ export default function ProjectForm({
     },
   });
 
-  /*
-   * ---------------------------------------------------------
-   * DESCRIPTION FIELD ARRAY
-   * ---------------------------------------------------------
-   */
-
   const {
     fields: descriptionFields,
     append: addDescription,
     remove: removeDescription,
-  } = useFieldArray({
-    control,
-    name: "description",
-  });
+  } = useFieldArray({ control, name: "description" });
 
-  /*
-   * ---------------------------------------------------------
-   * EDIT MODE
-   * ---------------------------------------------------------
-   */
-
+  // Fill the form when editing an existing project
   useEffect(() => {
     if (initialData) {
       reset({
         title: initialData.title || "",
         role: initialData.role || "",
-
-        // Convert string[] -> { value: string }[]
+        // string[] -> { value: string }[] for the field array
         description: (initialData.description || []).map((description) => ({
           value: description,
         })),
-
         highlight: initialData.highlight || "",
-
         startDate: initialData.startDate || "",
         endDate: initialData.endDate || "",
         currentlyWorking: initialData.currentlyWorking || false,
@@ -111,31 +112,26 @@ export default function ProjectForm({
     }
   }, [initialData, reset]);
 
-  /*
-   * ---------------------------------------------------------
-   * TECHNOLOGIES
-   * ---------------------------------------------------------
-   */
+  const [title, technologies = [], startDate, endDate, currentlyWorking] =
+    watch(["title", "technologies", "startDate", "endDate", "currentlyWorking"]);
 
-  const technologies = watch("technologies") || [];
+  /* ---------- technologies ---------- */
 
   const addTechnology = (picked?: string) => {
     const value = (picked ?? technology).trim();
 
     if (!value) return;
 
-    // Prevent duplicate technologies
-    if (
-      technologies.some((tech) => tech.toLowerCase() === value.toLowerCase())
-    ) {
-      setTechnology("");
-      return;
-    }
+    const alreadyAdded = technologies.some(
+      (tech) => tech.toLowerCase() === value.toLowerCase(),
+    );
 
-    setValue("technologies", [...technologies, value], {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
+    if (!alreadyAdded) {
+      setValue("technologies", [...technologies, value], {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
 
     setTechnology("");
   };
@@ -144,23 +140,21 @@ export default function ProjectForm({
     setValue(
       "technologies",
       technologies.filter((t) => t !== tech),
-      {
-        shouldValidate: true,
-        shouldDirty: true,
-      },
+      { shouldValidate: true, shouldDirty: true },
     );
   };
 
-  /*
-   * ---------------------------------------------------------
-   * AI GENERATION
-   * ---------------------------------------------------------
-   */
+  // SuggestInput already handles Enter when it picks a suggestion.
+  const onTechnologyKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== "Enter" || e.defaultPrevented) return;
+    e.preventDefault();
+    addTechnology();
+  };
+
+  /* ---------- AI generation ---------- */
 
   const { mutateAsync: generateProject, isPending: isGenerating } =
     useGenerateProject();
-
-  const title = watch("title");
 
   const handleGenerateClick = () => {
     if (!title?.trim()) {
@@ -184,35 +178,11 @@ export default function ProjectForm({
         context,
       });
 
-      const bullets = Array.isArray(result) ? result : [];
-
-      /*
-       * AI result:
-       *
-       * [
-       *   "Built a real-time chat application...",
-       *   "Implemented JWT authentication...",
-       *   "Used Socket.IO..."
-       * ]
-       *
-       * Convert to react-hook-form field array:
-       *
-       * [
-       *   { value: "Built..." },
-       *   { value: "Implemented..." },
-       *   { value: "Used..." }
-       * ]
-       */
-
+      // ["Built...", "Used..."] -> [{ value: "Built..." }, ...]
       setValue(
         "description",
-        bullets.map((bullet: string) => ({
-          value: bullet,
-        })),
-        {
-          shouldDirty: true,
-          shouldValidate: true,
-        },
+        parseBullets(result).map((value) => ({ value })),
+        { shouldDirty: true, shouldValidate: true },
       );
 
       setShowContextModal(false);
@@ -222,51 +192,21 @@ export default function ProjectForm({
     }
   };
 
-  /*
-   * ---------------------------------------------------------
-   * SUBMIT
-   * ---------------------------------------------------------
-   */
+  /* ---------- submit ---------- */
 
   const onSubmit = (data: ProjectFormData) => {
-
-    /*
-     * Convert:
-     *
-     * description: [
-     *   { value: "Bullet 1" },
-     *   { value: "Bullet 2" }
-     * ]
-     *
-     * into:
-     *
-     * description: [
-     *   "Bullet 1",
-     *   "Bullet 2"
-     * ]
-     */
-
     const cleanedData = {
       title: data.title.trim(),
-
       role: data.role?.trim() ?? "",
-
       description: data.description
         .map((item) => item.value.trim())
         .filter(Boolean),
-
       highlight: isExecutiveBlue ? (data.highlight?.trim() ?? "") : "",
-
       startDate: data.startDate,
-
       endDate: data.currentlyWorking ? "" : data.endDate,
-
       currentlyWorking: data.currentlyWorking,
-
       technologies: data.technologies,
-
       github: data.github?.trim() ?? "",
-
       link: data.link?.trim() ?? "",
     };
 
@@ -281,46 +221,31 @@ export default function ProjectForm({
     onClose();
   };
 
-  /*
-   * ---------------------------------------------------------
-   * UI
-   * ---------------------------------------------------------
-   */
-
   return (
-    <form
+    <FormCard
+      title={editIndex !== undefined ? "Edit Project" : "Add Project"}
+      submitLabel={editIndex !== undefined ? "Update Project" : "Save Project"}
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-6 rounded-2xl border border-border bg-popup p-4 sm:p-6"
-    >
-      {/* TITLE */}
-
-      <h2 className="text-base font-bold text-heading sm:text-xl">
-        {editIndex !== undefined ? "Edit Project" : "Add Project"}
-      </h2>
-
-      {/* PROJECT TITLE */}
-
-      <div>
-        <label className="text-sm font-semibold text-heading">Project Title</label>
-
-        <input
-          {...register("title", {
-            required: "Project title is required",
-            minLength: {
-              value: 2,
-              message: "Minimum 2 characters required",
-            },
-          })}
-          placeholder="AI Resume Builder using React, Node.js & MongoDB"
-          className="mt-2 h-12 w-full rounded-lg border border-border bg-navbar px-4 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
+      onCancel={onClose}
+      extra={
+        <AIProjectContextModal
+          open={showContextModal}
+          onClose={() => setShowContextModal(false)}
+          onSubmit={handleContextSubmit}
+          loading={isGenerating}
         />
-
-        {errors.title && (
-          <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
-        )}
-      </div>
-
-      {/* ROLE */}
+      }
+    >
+      <Input
+        label="Project title"
+        required
+        placeholder="AI Resume Builder using React, Node.js & MongoDB"
+        error={errors.title?.message}
+        {...register("title", {
+          required: "Project title is required",
+          minLength: { value: 2, message: "Minimum 2 characters required" },
+        })}
+      />
 
       <Controller
         name="role"
@@ -339,151 +264,78 @@ export default function ProjectForm({
         )}
       />
 
-      {/* HIGHLIGHT LINE — Executive Blue template only */}
-
+      {/* Executive Blue template only */}
       {isExecutiveBlue && (
         <Input
-          label="Highlight Line (shown above your bullet points)"
+          label="Highlight line"
+          hint="Shown above your bullet points."
           placeholder="One standout line that summarizes this project's impact"
           {...register("highlight")}
         />
       )}
 
-      {/* DESCRIPTION */}
-
-      <div>
-        <div className="mb-3 flex items-center justify-between">
-          <label className="text-sm font-semibold text-heading">Description</label>
-
-          <button
-            type="button"
+      <BulletListField
+        title="Description"
+        ids={descriptionFields.map((field) => field.id)}
+        addLabel="Add point"
+        onAdd={() => addDescription({ value: "" })}
+        onRemove={removeDescription}
+        actions={
+          <AIGenerateButton
             onClick={handleGenerateClick}
-            disabled={isGenerating}
-            className="flex items-center gap-2 rounded-lg bg-btn px-4 py-2 text-sm text-btn-text transition-colors hover:bg-btn-hover disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isGenerating ? "Generating..." : "✨ Generate with AI"}
-          </button>
-        </div>
+            loading={isGenerating}
+          />
+        }
+        renderInput={(index) => (
+          <Input
+            aria-label={`Description point ${index + 1}`}
+            placeholder={
+              index === 0
+                ? "Built a real-time chat application using Socket.IO"
+                : "Describe another achievement or feature"
+            }
+            error={errors.description?.[index]?.value?.message}
+            {...register(`description.${index}.value`, {
+              // Extra blank rows are dropped on save; only the first is needed.
+              validate: (value) => {
+                const text = value.trim();
 
-        <div className="mt-3 space-y-3">
-          {descriptionFields.map((field, index) => (
-            <div key={field.id} className="flex items-center gap-3">
-              <input
-                {...register(`description.${index}.value`, {
-                  required: "Description is required",
-                  minLength: {
-                    value: 10,
-                    message: "Description must be at least 10 characters",
-                  },
-                })}
-                placeholder={
-                  index === 0
-                    ? "Built a real-time chat application using Socket.IO"
-                    : "Describe another achievement or feature"
+                if (!text) {
+                  return index === 0 ? "Add at least one description point" : true;
                 }
-                className="h-11 min-w-0 flex-1 rounded-lg border border-border bg-navbar px-4 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
-              />
 
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => removeDescription(index)}
-                disabled={descriptionFields.length === 1}
-              >
-                Remove
-              </Button>
-            </div>
-          ))}
-
-          {/* Description validation */}
-
-          {errors.description?.message && (
-            <p className="text-sm text-red-600">{errors.description.message}</p>
-          )}
-
-          {/* ADD DESCRIPTION */}
-
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => addDescription({ value: "" })}
-          >
-            + Add Description
-          </Button>
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {/* START DATE */}
-          <div>
-            <label className="text-sm font-medium text-heading">Start Date</label>
-
-            <Controller
-              name="startDate"
-              control={control}
-              render={({ field }) => (
-                <MonthYearPicker
-                  value={field.value || ""}
-                  onChange={field.onChange}
-                  maxYear={CURRENT_YEAR}
-                  placeholder="Select start month"
-                />
-              )}
-            />
-          </div>
-
-          {/* END DATE */}
-          <div>
-            <label className="text-sm font-medium text-heading">End Date</label>
-
-            <Controller
-              name="endDate"
-              control={control}
-              render={({ field }) => (
-                <MonthYearPicker
-                  value={field.value || ""}
-                  onChange={field.onChange}
-                  maxYear={CURRENT_YEAR}
-                  disabled={watch("currentlyWorking")}
-                  placeholder="Select end month"
-                />
-              )}
-            />
-          </div>
-        </div>
-
-        {/* CURRENTLY WORKING */}
-        <label className="flex items-center gap-2 text-heading">
-          <input
-            type="checkbox"
-            {...register("currentlyWorking", {
-              onChange: (e) => {
-                if (e.target.checked) {
-                  setValue("endDate", "");
-                }
+                return (
+                  text.length >= 10 || "Write at least 10 characters"
+                );
               },
             })}
           />
-          Currently Working
-        </label>
-      </div>
+        )}
+      />
 
-      {/* TECHNOLOGIES */}
+      <DateRangeFields
+        startDate={startDate ?? ""}
+        endDate={endDate ?? ""}
+        current={!!currentlyWorking}
+        onStartChange={(value) =>
+          setValue("startDate", value, { shouldDirty: true })
+        }
+        onEndChange={(value) =>
+          setValue("endDate", value, { shouldDirty: true })
+        }
+        onCurrentChange={(checked) => {
+          setValue("currentlyWorking", checked, { shouldDirty: true });
+          if (checked) setValue("endDate", "", { shouldDirty: true });
+        }}
+        currentLabel="I'm still working on this project"
+      />
 
-      <div>
-        <label className="text-sm font-semibold text-heading">Technologies</label>
-
+      <FormField label="Technologies">
         <div
-          className="mt-2 flex items-start gap-3"
-          onKeyDown={(e) => {
-            // SuggestInput already handled Enter if it picked an option.
-            if (e.key !== "Enter" || e.defaultPrevented) return;
-            e.preventDefault();
-            addTechnology();
-          }}
+          className="flex items-start gap-3"
+          onKeyDown={onTechnologyKeyDown}
         >
-          <div className="flex-1">
+          <div className="min-w-0 flex-1">
             <SuggestInput
               placeholder="React"
               emptyHeading="Popular technologies"
@@ -494,109 +346,35 @@ export default function ProjectForm({
             />
           </div>
 
-          <Button type="button" className="h-12" onClick={() => addTechnology()}>
+          <Button
+            type="button"
+            size="lg"
+            variant="outline"
+            leftIcon={<Plus size={18} />}
+            onClick={() => addTechnology()}
+          >
             Add
           </Button>
         </div>
 
-        {/* TECHNOLOGY TAGS */}
+        <ChipList items={technologies} onRemove={removeTechnology} />
+      </FormField>
 
-        <div className="mt-4 flex flex-wrap gap-2">
-          {technologies.map((tech) => (
-            <button
-              key={tech}
-              type="button"
-              onClick={() => removeTechnology(tech)}
-              className="rounded-full bg-btn-hover-bg px-4 py-2 text-sm text-subheading transition-colors hover:bg-border-popup"
-            >
-              {tech} ✕
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* GITHUB */}
-
-      <div>
-        <label className="text-sm font-semibold text-heading">GitHub URL (Optional)</label>
-
-        <input
-          type="text"
-          {...register("github", {
-            validate: (value) => {
-              if (!value || value.trim() === "") {
-                return true;
-              }
-
-              try {
-                new URL(value);
-                return true;
-              } catch {
-                return "Please enter a valid URL";
-              }
-            },
-          })}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
+        <Input
+          label="GitHub URL (optional)"
           placeholder="https://github.com/username/project"
-          className="mt-2 h-12 w-full rounded-lg border border-border bg-navbar px-4 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
+          error={errors.github?.message}
+          {...register("github", { validate: validateOptionalUrl })}
         />
 
-        {errors.github && (
-          <p className="mt-1 text-sm text-red-600">{errors.github.message}</p>
-        )}
-      </div>
-
-      {/* LIVE DEMO */}
-
-      <div>
-        <label className="text-sm font-semibold text-heading">
-          Live Demo URL (Optional)
-        </label>
-
-        <input
-          type="text"
-          {...register("link", {
-            validate: (value) => {
-              if (!value || value.trim() === "") {
-                return true;
-              }
-
-              try {
-                new URL(value);
-                return true;
-              } catch {
-                return "Please enter a valid URL";
-              }
-            },
-          })}
+        <Input
+          label="Live demo URL (optional)"
           placeholder="https://project.vercel.app"
-          className="mt-2 h-12 w-full rounded-lg border border-border bg-navbar px-4 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
+          error={errors.link?.message}
+          {...register("link", { validate: validateOptionalUrl })}
         />
-
-        {errors.link && (
-          <p className="mt-1 text-sm text-red-600">{errors.link.message}</p>
-        )}
       </div>
-
-      {/* ACTION BUTTONS */}
-
-      <div className="flex justify-end gap-4 pt-4">
-        <Button type="button" variant="outline" onClick={onClose}>
-          Cancel
-        </Button>
-
-        <Button type="submit">
-          {editIndex !== undefined ? "Update Project" : "Save Project"}
-        </Button>
-      </div>
-
-      {/* AI CONTEXT MODAL */}
-
-      <AIProjectContextModal
-        open={showContextModal}
-        onClose={() => setShowContextModal(false)}
-        onSubmit={handleContextSubmit}
-        loading={isGenerating}
-      />
-    </form>
+    </FormCard>
   );
 }

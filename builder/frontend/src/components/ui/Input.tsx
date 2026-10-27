@@ -1,4 +1,5 @@
 // Input.tsx
+import { useId } from "react";
 import type { InputHTMLAttributes, ReactNode } from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -33,10 +34,13 @@ export default function Input({
 
   ...props
 }: InputProps) {
+  const autoId = useId();
+  const id = props.id ?? autoId;
+
   return (
     <div className="space-y-2">
       {label && (
-        <label className="block text-sm font-semibold text-heading">
+        <label htmlFor={id} className="block text-sm font-semibold text-heading">
           {label}
 
           {required && <span className="ml-1 text-red-600">*</span>}
@@ -45,17 +49,20 @@ export default function Input({
 
       <div
         className={`flex h-12 items-center rounded-xl border bg-navbar px-4 transition
+        has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60
 
         ${
           error
-            ? "border-red-500"
-            : "border-border focus-within:border-border-strong"
+            ? "border-red-500 focus-within:ring-2 focus-within:ring-red-200"
+            : "border-border focus-within:border-border-strong focus-within:ring-2 focus-within:ring-ring"
         }`}
       >
         {leftIcon && <div className="mr-3 text-heading/50">{leftIcon}</div>}
 
         <input
-          className={`flex-1 bg-transparent text-heading outline-none placeholder:text-heading/40 ${className}`}
+          id={id}
+          aria-invalid={error ? true : undefined}
+          className={`min-w-0 flex-1 bg-transparent text-heading outline-none placeholder:text-heading/40 ${className}`}
           {...props}
         />
 

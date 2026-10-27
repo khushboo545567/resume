@@ -22,6 +22,10 @@ interface Props {
   disabled?: boolean;
   maxYear?: number;
   placeholder?: string;
+  /** Which edge of the field the calendar popover lines up with. */
+  align?: "start" | "end";
+  /** Older, shorter look (h-11, rounded-lg, top margin) for dense forms. */
+  compact?: boolean;
 }
 
 export default function MonthYearPicker({
@@ -30,6 +34,8 @@ export default function MonthYearPicker({
   disabled,
   maxYear,
   placeholder = "Select month",
+  align = "start",
+  compact = false,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -70,19 +76,28 @@ export default function MonthYearPicker({
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen((v) => !v)}
-        className="mt-1.5 flex h-11 w-full items-center justify-between rounded-lg border border-border bg-navbar px-4 text-left text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+        aria-haspopup="dialog"
+        aria-expanded={isOpen}
+        className={`flex w-full items-center justify-between border border-border bg-navbar px-4 text-left text-heading outline-none transition focus:border-border-strong focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-60 ${
+          compact ? "mt-1.5 h-11 rounded-lg" : "h-12 rounded-xl"
+        }`}
       >
         <span className={value ? "text-heading" : "text-heading/40"}>{label}</span>
         <Calendar size={16} className="text-heading/40" />
       </button>
 
       {isOpen && !disabled && (
-        <div className="absolute z-20 mt-2 w-64 rounded-xl border border-border bg-popup p-3 shadow-lg">
+        <div
+          className={`absolute z-20 mt-2 w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-border bg-popup p-3 shadow-lg ${
+            align === "end" ? "right-0" : "left-0"
+          }`}
+        >
           <div className="mb-2 flex items-center justify-between">
             <button
               type="button"
               onClick={() => setViewYear((y) => y - 1)}
-              className="rounded-lg p-1.5 text-heading/60 hover:bg-navbar"
+              aria-label="Previous year"
+              className="rounded-lg p-2 text-heading/60 hover:bg-navbar"
             >
               <ChevronLeft size={16} />
             </button>
@@ -91,7 +106,8 @@ export default function MonthYearPicker({
               type="button"
               onClick={() => setViewYear((y) => Math.min(y + 1, yearCap))}
               disabled={viewYear >= yearCap}
-              className="rounded-lg p-1.5 text-heading/60 hover:bg-navbar disabled:cursor-not-allowed disabled:opacity-30"
+              aria-label="Next year"
+              className="rounded-lg p-2 text-heading/60 hover:bg-navbar disabled:cursor-not-allowed disabled:opacity-30"
             >
               <ChevronRight size={16} />
             </button>
@@ -115,7 +131,7 @@ export default function MonthYearPicker({
                     onChange(`${viewYear}-${mm}`);
                     setIsOpen(false);
                   }}
-                  className={`rounded-lg px-2 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-30 ${
+                  className={`rounded-lg px-2 py-2.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-30 ${
                     isSelected
                       ? "bg-btn text-btn-text"
                       : "text-heading/70 hover:bg-navbar"
