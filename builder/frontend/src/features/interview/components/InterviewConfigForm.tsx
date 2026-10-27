@@ -9,6 +9,9 @@ import {
   UploadCloud,
 } from "lucide-react";
 
+import SuggestInput from "../../../components/ui/SuggestInput";
+import { searchRoles } from "../../resume/config/jobRoles";
+
 import { useResumes } from "../../resume/hooks/useResumes";
 import { useUploadAndParseResume } from "../../resume/hooks/useUploadAndParseResume";
 
@@ -168,6 +171,14 @@ export default function InterviewConfigForm({
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [totalQuestions, setTotalQuestions] = useState<QuestionCount>(5);
 
+  // Saves typing: fill the role from the chosen resume, but never overwrite
+  // something the user has already typed or picked.
+  const prefillRole = (role?: string) => {
+    if (role?.trim()) {
+      setTargetRole((current) => (current.trim() ? current : role.trim()));
+    }
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
 
@@ -178,6 +189,7 @@ export default function InterviewConfigForm({
     // Newly uploaded resume is saved to the user's resumes and selected.
     setResumeId(resume._id);
     setUploadedName(file.name);
+    prefillRole(resume.targetRole);
 
     // Allow re-selecting the same file later.
     e.target.value = "";
@@ -226,6 +238,10 @@ export default function InterviewConfigForm({
             onChange={(e) => {
               setResumeId(e.target.value);
               setUploadedName("");
+              prefillRole(
+                resumes.find((resume) => resume._id === e.target.value)
+                  ?.targetRole,
+              );
             }}
             disabled={loadingResumes}
             className={fieldClass}
@@ -297,15 +313,17 @@ export default function InterviewConfigForm({
         title="The role"
         description="The more context you give, the more relevant the questions."
       >
-        <Field label="Target role" required>
-          <input
-            type="text"
-            value={targetRole}
-            onChange={(e) => setTargetRole(e.target.value)}
-            placeholder="e.g. Frontend Developer, Data Analyst"
-            className={fieldClass}
-          />
-        </Field>
+        <SuggestInput
+          label="Target role"
+          required
+          placeholder="e.g. Frontend Developer, Data Analyst"
+          hint="Pick a suggestion or type your own. It's filled in from your resume when possible."
+          emptyHeading="Popular roles"
+          leftIcon={<Briefcase size={18} />}
+          value={targetRole}
+          onChange={setTargetRole}
+          getSuggestions={searchRoles}
+        />
 
         <Field
           label="Job description"
