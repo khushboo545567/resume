@@ -110,7 +110,9 @@ export default function DuplicateResumeModal({
                   <img
                     src={template.image}
                     alt={template.name}
-                    className="w-full h-auto block"
+                    loading="lazy"
+                    decoding="async"
+                    className="block aspect-[210/297] w-full object-cover object-top"
                   />
                 </div>
               </div>
