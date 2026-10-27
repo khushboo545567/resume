@@ -32,22 +32,16 @@ export default function ProjectsSection() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0 flex-1 space-y-3">
-          <Input
-            label="Resume Heading"
-            placeholder="College Projects"
-            value={projectSection?.displayTitle ?? ""}
-            onChange={(e) =>
-              renameSectionDisplayTitle("projects", e.target.value)
-            }
-          />
+      <Input
+        label="Resume Heading"
+        placeholder="College Projects"
+        value={projectSection?.displayTitle ?? ""}
+        onChange={(e) => renameSectionDisplayTitle("projects", e.target.value)}
+        hint="Showcase your best work."
+      />
 
-          <p className="text-xs text-heading/60 sm:text-sm">Showcase your best work.</p>
-        </div>
-
+      <div className="flex flex-wrap items-center gap-3">
         <Button
-          className="shrink-0 self-start whitespace-nowrap"
           leftIcon={<Plus size={18} />}
           onClick={() => {
             // Add mode
