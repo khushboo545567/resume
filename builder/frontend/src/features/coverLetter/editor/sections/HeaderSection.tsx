@@ -1,8 +1,14 @@
 import { useCoverLetterStore } from "../../../../store/coverLetter.store";
 import Input from "../../../../components/ui/Input";
+import SuggestInput from "../../../../components/ui/SuggestInput";
 
-const inputClass =
-  "h-12 w-full rounded-xl border border-border px-4 outline-none focus:border-border-strong";
+import { searchLocations } from "../../../resume/config/locations";
+import {
+  searchGreetings,
+  searchRecipientNames,
+  searchSubjects,
+  todayLong,
+} from "../../config/coverLetterOptions";
 
 export default function HeaderSection() {
   const coverLetter = useCoverLetterStore((state) => state.coverLetter);
@@ -33,13 +39,13 @@ export default function HeaderSection() {
               updatePersonalInfo({ fullName: e.target.value })
             }
           />
-          <Input
+          <SuggestInput
             label="Location"
             placeholder="Bengaluru, Karnataka"
+            emptyHeading="Popular cities"
             value={personalInfo.location ?? ""}
-            onChange={(e) =>
-              updatePersonalInfo({ location: e.target.value })
-            }
+            onChange={(value) => updatePersonalInfo({ location: value })}
+            getSuggestions={searchLocations}
           />
           <Input
             label="Phone"
@@ -80,19 +86,27 @@ export default function HeaderSection() {
         </p>
 
         <div className="grid grid-cols-1 @lg:grid-cols-2 gap-4">
-          <Input
+          <SuggestInput
             label="Date"
             placeholder="September 21, 2026"
+            emptyHeading="Today"
             value={recipient.date}
-            onChange={(e) => updateRecipient({ date: e.target.value })}
+            onChange={(value) => updateRecipient({ date: value })}
+            getSuggestions={(text) => {
+              const today = todayLong();
+              return !text.trim() ||
+                today.toLowerCase().includes(text.trim().toLowerCase())
+                ? [today]
+                : [];
+            }}
           />
-          <Input
+          <SuggestInput
             label="Recipient Name"
             placeholder="Hiring Manager"
+            emptyHeading="Common recipients"
             value={recipient.recipientName}
-            onChange={(e) =>
-              updateRecipient({ recipientName: e.target.value })
-            }
+            onChange={(value) => updateRecipient({ recipientName: value })}
+            getSuggestions={searchRecipientNames}
           />
           <Input
             label="Company Name"
@@ -102,44 +116,42 @@ export default function HeaderSection() {
               updateRecipient({ companyName: e.target.value })
             }
           />
-          <Input
+          <SuggestInput
             label="Company Location (optional)"
             placeholder="Bengaluru, Karnataka"
+            emptyHeading="Popular cities"
             value={recipient.companyLocation ?? ""}
-            onChange={(e) =>
-              updateRecipient({ companyLocation: e.target.value })
-            }
+            onChange={(value) => updateRecipient({ companyLocation: value })}
+            getSuggestions={searchLocations}
           />
         </div>
 
         <div className="mt-4 space-y-4">
-          <div>
-            <label className="mb-2 block text-sm font-semibold text-heading/80">
-              Subject Line (optional)
-            </label>
-            <input
-              className={inputClass}
-              placeholder="Application for Full Stack Developer Position"
-              value={recipient.subject ?? ""}
-              onChange={(e) =>
-                updateRecipient({ subject: e.target.value })
-              }
-            />
-          </div>
+          <SuggestInput
+            label="Subject Line (optional)"
+            placeholder="Application for Full Stack Developer Position"
+            emptyHeading="Suggested subject lines"
+            value={recipient.subject ?? ""}
+            onChange={(value) => updateRecipient({ subject: value })}
+            getSuggestions={(text) =>
+              searchSubjects(text, {
+                role: coverLetter.targetRole,
+                company: recipient.companyName,
+                fullName: personalInfo.fullName,
+              })
+            }
+          />
 
-          <div>
-            <label className="mb-2 block text-sm font-semibold text-heading/80">
-              Greeting
-            </label>
-            <input
-              className={inputClass}
-              placeholder="Dear Hiring Manager,"
-              value={recipient.greeting}
-              onChange={(e) =>
-                updateRecipient({ greeting: e.target.value })
-              }
-            />
-          </div>
+          <SuggestInput
+            label="Greeting"
+            placeholder="Dear Hiring Manager,"
+            emptyHeading="Common greetings"
+            value={recipient.greeting}
+            onChange={(value) => updateRecipient({ greeting: value })}
+            getSuggestions={(text) =>
+              searchGreetings(text, recipient.recipientName)
+            }
+          />
         </div>
       </div>
     </div>

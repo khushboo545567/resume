@@ -15,6 +15,9 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   rightIcon?: ReactNode;
 
   required?: boolean;
+
+  /** Slightly shorter field (h-11) for dense forms. */
+  compact?: boolean;
 }
 
 export default function Input({
@@ -29,6 +32,8 @@ export default function Input({
   rightIcon,
 
   required,
+
+  compact,
 
   className = "",
 
@@ -48,7 +53,7 @@ export default function Input({
       )}
 
       <div
-        className={`flex h-12 items-center rounded-xl border bg-navbar px-4 transition
+        className={`flex ${compact ? "h-11" : "h-12"} items-center rounded-xl border bg-navbar px-4 transition
         has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60
 
         ${

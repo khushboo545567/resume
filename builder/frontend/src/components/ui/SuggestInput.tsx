@@ -12,6 +12,7 @@ interface SuggestInputProps {
   leftIcon?: ReactNode;
   autoFocus?: boolean;
   name?: string;
+  compact?: boolean;
 
   value: string;
   onChange: (value: string) => void;

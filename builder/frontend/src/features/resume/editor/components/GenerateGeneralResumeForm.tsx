@@ -1,4 +1,10 @@
-import { Controller, useForm, useFieldArray } from "react-hook-form";
+import {
+  Controller,
+  useForm,
+  useFieldArray,
+  type Control,
+  type Path,
+} from "react-hook-form";
 import { Plus, Sparkles, X, Wand2, Loader2 } from "lucide-react";
 
 import Button from "../../../../components/ui/Button";
@@ -12,6 +18,15 @@ import {
 } from "../utils/skillSuggestions";
 import { useGenerateCoursework } from "../../../ai/hooks/useGenerateCoursework";
 import MonthYearPicker from "./MonthYearPicker";
+import SuggestInput from "../../../../components/ui/SuggestInput";
+import { searchRoles } from "../../config/jobRoles";
+import {
+  searchInternshipRoles,
+  searchProjectRoles,
+} from "../../config/roleOptions";
+import { searchLocations } from "../../config/locations";
+import { searchDegrees, searchFieldsOfStudy } from "../../config/educationOptions";
+import { searchLanguages } from "../../config/languageOptions";
 
 interface Props {
   onGenerate: (data: QuickGenerateFormData) => void;
@@ -32,6 +47,48 @@ const YEAR_OPTIONS = Array.from(
   { length: CURRENT_YEAR + 6 - 1980 + 1 },
   (_, i) => CURRENT_YEAR + 5 - i,
 );
+
+const LANGUAGE_LEVELS = ["Native", "Fluent", "Conversational", "Basic"];
+
+/**
+ * Text field with a suggestion list. Suggestions only save typing: anything
+ * can still be typed. Wrapped in mt-1.5 so it lines up with the plain inputs
+ * (inputClass) next to it.
+ */
+function SuggestField({
+  control,
+  name,
+  placeholder,
+  getSuggestions,
+  emptyHeading,
+}: {
+  control: Control<QuickGenerateFormData>;
+  name: Path<QuickGenerateFormData>;
+  placeholder?: string;
+  getSuggestions: (text: string) => string[];
+  emptyHeading?: string;
+}) {
+  return (
+    <div className="mt-1.5">
+      <Controller
+        name={name}
+        control={control}
+        render={({ field }) => (
+          <SuggestInput
+            compact
+            name={field.name}
+            placeholder={placeholder}
+            emptyHeading={emptyHeading}
+            value={typeof field.value === "string" ? field.value : ""}
+            onChange={field.onChange}
+            onBlur={field.onBlur}
+            getSuggestions={getSuggestions}
+          />
+        )}
+      />
+    </div>
+  );
+}
 
 function RemoveRowButton({ onClick }: { onClick: () => void }) {
   return (
@@ -243,10 +300,12 @@ export default function QuickGenerateForm({
           </div>
           <div>
             <label className={labelClass}>Target Title</label>
-            <input
-              {...register("personalInfo.title")}
-              className={inputClass}
+            <SuggestField
+              control={control}
+              name="personalInfo.title"
               placeholder="Software Developer"
+              emptyHeading="Popular roles"
+              getSuggestions={searchRoles}
             />
           </div>
           <div>
@@ -255,9 +314,12 @@ export default function QuickGenerateForm({
           </div>
           <div>
             <label className={labelClass}>Address</label>
-            <input
-              {...register("personalInfo.address")}
-              className={inputClass}
+            <SuggestField
+              control={control}
+              name="personalInfo.address"
+              placeholder="City, State"
+              emptyHeading="Popular cities"
+              getSuggestions={searchLocations}
             />
           </div>
           <div>
@@ -421,10 +483,12 @@ export default function QuickGenerateForm({
                 placeholder="Project title"
               />
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <input
-                  {...register(`projects.${index}.role`)}
-                  className={inputClass}
+                <SuggestField
+                  control={control}
+                  name={`projects.${index}.role`}
                   placeholder="Your role (optional)"
+                  emptyHeading="Common roles"
+                  getSuggestions={searchProjectRoles}
                 />
                 <div>
                   <label className={labelClass}></label>
@@ -494,10 +558,12 @@ export default function QuickGenerateForm({
                   className={inputClass}
                   placeholder="Company"
                 />
-                <input
-                  {...register(`experience.${index}.position`)}
-                  className={inputClass}
+                <SuggestField
+                  control={control}
+                  name={`experience.${index}.position`}
                   placeholder="Position"
+                  emptyHeading="Popular roles"
+                  getSuggestions={searchRoles}
                 />
                 <div>
                   <label className={labelClass}>Start Date</label>
@@ -530,10 +596,12 @@ export default function QuickGenerateForm({
                     )}
                   />
                 </div>
-                <input
-                  {...register(`experience.${index}.location`)}
-                  className={inputClass}
+                <SuggestField
+                  control={control}
+                  name={`experience.${index}.location`}
                   placeholder="Location"
+                  emptyHeading="Popular cities"
+                  getSuggestions={searchLocations}
                 />
                 <label className="flex items-center gap-2 text-sm text-heading">
                   <input
@@ -614,10 +682,12 @@ export default function QuickGenerateForm({
                   className={inputClass}
                   placeholder="Company"
                 />
-                <input
-                  {...register(`internships.${index}.role`)}
-                  className={inputClass}
+                <SuggestField
+                  control={control}
+                  name={`internships.${index}.role`}
                   placeholder="Role"
+                  emptyHeading="Common internship roles"
+                  getSuggestions={searchInternshipRoles}
                 />
                 <div>
                   <label className={labelClass}>Start Date</label>
@@ -713,15 +783,19 @@ export default function QuickGenerateForm({
                 className={inputClass}
                 placeholder="Institution"
               />
-              <input
-                {...register(`education.${index}.degree`)}
-                className={inputClass}
+              <SuggestField
+                control={control}
+                name={`education.${index}.degree`}
                 placeholder="Degree"
+                emptyHeading="Popular degrees"
+                getSuggestions={searchDegrees}
               />
-              <input
-                {...register(`education.${index}.fieldOfStudy`)}
-                className={inputClass}
+              <SuggestField
+                control={control}
+                name={`education.${index}.fieldOfStudy`}
                 placeholder="Field of study"
+                emptyHeading="Popular fields"
+                getSuggestions={searchFieldsOfStudy}
               />
               <input
                 {...register(`education.${index}.cgpa`)}
@@ -831,17 +905,37 @@ export default function QuickGenerateForm({
         />
         <div className="space-y-3">
           {languages.fields.map((field, index) => (
-            <div key={field.id} className="relative flex gap-3">
-              <input
-                {...register(`languages.${index}.name`)}
-                className={inputClass}
-                placeholder="Language e.g. English"
-              />
-              <input
+            <div key={field.id} className="relative flex items-start gap-3">
+              <div className="min-w-0 flex-1">
+                <SuggestField
+                  control={control}
+                  name={`languages.${index}.name`}
+                  placeholder="Language e.g. English"
+                  emptyHeading="Popular languages"
+                  getSuggestions={(text) =>
+                    searchLanguages(
+                      text,
+                      (watch("languages") || [])
+                        .filter((_, i) => i !== index)
+                        .map((l) => l?.name || ""),
+                    )
+                  }
+                />
+              </div>
+              <select
                 {...register(`languages.${index}.level`)}
-                className={inputClass}
-                placeholder="Level e.g. Fluent"
-              />
+                className={`${inputClass} min-w-0 flex-1`}
+                defaultValue=""
+              >
+                <option value="" disabled>
+                  Level
+                </option>
+                {LANGUAGE_LEVELS.map((level) => (
+                  <option key={level} value={level}>
+                    {level}
+                  </option>
+                ))}
+              </select>
               <button
                 type="button"
                 onClick={() => languages.remove(index)}

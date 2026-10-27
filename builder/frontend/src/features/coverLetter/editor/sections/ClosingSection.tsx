@@ -1,5 +1,7 @@
 import { useCoverLetterStore } from "../../../../store/coverLetter.store";
-import Input from "../../../../components/ui/Input";
+import SuggestInput from "../../../../components/ui/SuggestInput";
+
+import { searchSignOffs } from "../../config/coverLetterOptions";
 
 export default function ClosingSection() {
   const coverLetter = useCoverLetterStore((state) => state.coverLetter);
@@ -7,7 +9,7 @@ export default function ClosingSection() {
 
   if (!coverLetter) return null;
 
-  const { closing } = coverLetter;
+  const { closing, personalInfo } = coverLetter;
 
   return (
     <div className="space-y-6">
@@ -19,17 +21,23 @@ export default function ClosingSection() {
       </div>
 
       <div className="grid grid-cols-1 @lg:grid-cols-2 gap-4">
-        <Input
+        <SuggestInput
           label="Sign-off"
           placeholder="Sincerely,"
+          emptyHeading="Common sign-offs"
           value={closing.signOff}
-          onChange={(e) => updateClosing({ signOff: e.target.value })}
+          onChange={(value) => updateClosing({ signOff: value })}
+          getSuggestions={searchSignOffs}
         />
-        <Input
+        <SuggestInput
           label="Your Name"
           placeholder="Aarav Sharma"
+          emptyHeading="From your details"
           value={closing.fullName}
-          onChange={(e) => updateClosing({ fullName: e.target.value })}
+          onChange={(value) => updateClosing({ fullName: value })}
+          getSuggestions={() =>
+            personalInfo.fullName.trim() ? [personalInfo.fullName.trim()] : []
+          }
         />
       </div>
     </div>

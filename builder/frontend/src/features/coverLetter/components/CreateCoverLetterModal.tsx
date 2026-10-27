@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Briefcase, FileText } from "lucide-react";
 
 import PreviewModal from "../../../components/ui/PreviewModal";
 import Button from "../../../components/ui/Button";
 import Input from "../../../components/ui/Input";
+import SuggestInput from "../../../components/ui/SuggestInput";
+
+import { searchRoles } from "../../resume/config/jobRoles";
 
 import { createCoverLetter } from "../services/coverLetter.service";
 import type { CoverLetterTemplate } from "../types/coverLetter.types";
@@ -34,6 +37,7 @@ export default function CreateCoverLetterModal({
 }: Props) {
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<CreateCoverLetterForm>();
@@ -90,17 +94,30 @@ export default function CreateCoverLetterModal({
           })}
         />
 
-        <Input
-          label="Target role"
-          required
-          autoComplete="off"
-          placeholder="Full Stack Developer"
-          hint="The job you are applying for."
-          leftIcon={<Briefcase size={18} />}
-          error={errors.targetRole?.message}
-          {...register("targetRole", {
-            required: "Target role is required",
-          })}
+        <Controller
+          name="targetRole"
+          control={control}
+          defaultValue=""
+          rules={{
+            validate: (value) =>
+              value.trim().length > 0 || "Target role is required",
+          }}
+          render={({ field }) => (
+            <SuggestInput
+              label="Target role"
+              required
+              placeholder="Full Stack Developer"
+              hint="Start typing and pick your role, or write your own."
+              emptyHeading="Popular roles"
+              leftIcon={<Briefcase size={18} />}
+              error={errors.targetRole?.message}
+              name={field.name}
+              value={field.value}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              getSuggestions={searchRoles}
+            />
+          )}
         />
 
         <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">

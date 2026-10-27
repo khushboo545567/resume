@@ -12,6 +12,7 @@ import {
   type CoverLetterAiCredits,
 } from "../../services/coverLetterAi.service";
 import type { RegenerateCoverLetterTarget } from "../../types/coverLetter.types";
+import { REGENERATE_PRESETS } from "../../config/coverLetterOptions";
 
 interface Props {
   open: boolean;
@@ -49,6 +50,19 @@ export default function RegenerateCoverLetterModal({ open, onClose }: Props) {
     value: `paragraph:${index}` as RegenerateCoverLetterTarget,
     label: `Body Paragraph ${index + 1}`,
   }));
+
+  // Adds a quick pick to what the user has written, instead of replacing it.
+  const addPreset = (preset: string) => {
+    setError(null);
+    setReason((current) => {
+      const base = current.trim().replace(/[.,;\s]+$/, "");
+      return base ? `${base}. ${preset}.` : preset;
+    });
+  };
+
+  const availablePresets = REGENERATE_PRESETS.filter(
+    (preset) => !reason.toLowerCase().includes(preset.toLowerCase()),
+  );
 
   const handleRegenerate = async () => {
     if (outOfCredits) {
@@ -182,6 +196,20 @@ export default function RegenerateCoverLetterModal({ open, onClose }: Props) {
           <label className="mb-2 block text-sm font-semibold text-heading/80">
             What would you like different? (required)
           </label>
+          {availablePresets.length > 0 && (
+            <div className="mb-3 flex flex-wrap gap-2">
+              {availablePresets.map((preset) => (
+                <button
+                  key={preset}
+                  type="button"
+                  onClick={() => addPreset(preset)}
+                  className="rounded-full border border-border px-3 py-1.5 text-xs font-medium text-heading/70 transition hover:border-border-strong hover:text-heading"
+                >
+                  + {preset}
+                </button>
+              ))}
+            </div>
+          )}
           <textarea
             value={reason}
             onChange={(e) => setReason(e.target.value)}

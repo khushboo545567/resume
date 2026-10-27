@@ -5,6 +5,9 @@ import { Sparkles, UploadCloud, FileText, Lock } from "lucide-react";
 import Modal from "../../../components/ui/Modal";
 import Button from "../../../components/ui/Button";
 import Input from "../../../components/ui/Input";
+import SuggestInput from "../../../components/ui/SuggestInput";
+
+import { searchRoles } from "../../resume/config/jobRoles";
 
 import { getResumes } from "../../resume/services/resume.service";
 import type { Resume } from "../../resume/types/resume.types";
@@ -216,11 +219,13 @@ export default function GenerateCoverLetterWithAiModal({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-          <Input
+          <SuggestInput
             label="Target Role"
             placeholder="Full Stack Developer"
+            emptyHeading="Popular roles"
             value={targetRole}
-            onChange={(e) => setTargetRole(e.target.value)}
+            onChange={setTargetRole}
+            getSuggestions={searchRoles}
           />
         </div>
 
@@ -319,7 +324,16 @@ export default function GenerateCoverLetterWithAiModal({
           {resumeSource === "existing" ? (
             <select
               value={resumeId}
-              onChange={(e) => setResumeId(e.target.value)}
+              onChange={(e) => {
+                setResumeId(e.target.value);
+
+                // Saves typing: use that resume's target role, unless the
+                // user has already typed or picked one.
+                const role = resumes
+                  .find((r) => r._id === e.target.value)
+                  ?.targetRole?.trim();
+                if (role) setTargetRole((current) => current.trim() || role);
+              }}
               className="h-12 w-full rounded-xl border border-border-navbar bg-navbar-hover px-4 text-heading outline-none focus:border-border-strong focus:ring-2 focus:ring-ring"
             >
               <option value="">
