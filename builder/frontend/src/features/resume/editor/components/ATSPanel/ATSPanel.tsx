@@ -106,30 +106,30 @@ export default function ATSPanel({
 
       {/* panel */}
       <aside
-        className={`fixed right-0 top-0 z-50 h-full w-full overflow-y-auto bg-background shadow-2xl transition-transform duration-300 sm:w-1/2 sm:min-w-[480px] ${
+        className={`fixed right-0 top-0 z-50 h-full w-full overflow-y-auto bg-background shadow-2xl transition-transform duration-300 sm:w-1/2 sm:min-w-[480px] sm:max-w-[960px] ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Top sticky bar */}
-        <div className="sticky top-0 z-10 flex items-center justify-between bg-navbar/95 px-6 py-4 shadow-sm backdrop-blur-xs">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-subheading" />
-            <h2 className="text-lg font-bold text-heading">
+        <div className="sticky top-0 z-10 flex items-center justify-between gap-3 bg-navbar/95 px-4 py-3 shadow-sm backdrop-blur-xs sm:px-6 sm:py-4">
+          <div className="flex min-w-0 items-center gap-2">
+            <Sparkles className="h-5 w-5 shrink-0 text-subheading" />
+            <h2 className="truncate text-base font-bold text-heading sm:text-lg">
               ATS Scanner & Deep Dive
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-2 text-heading/60 hover:bg-navbar hover:text-heading transition"
+            className="shrink-0 rounded-lg p-2 text-heading/60 hover:bg-navbar hover:text-heading transition"
             aria-label="Close ATS Panel"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <div className="space-y-6 p-6">
+        <div className="space-y-4 p-4 sm:space-y-6 sm:p-6">
           {/* Analysis Form Header Card */}
-          <div className="rounded-2xl bg-navbar p-5 shadow-sm space-y-4">
+          <div className="space-y-4 rounded-2xl bg-navbar p-4 shadow-sm sm:p-5">
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-heading mb-1.5">
                 Target Role <span className="text-red-600">*</span>
@@ -180,7 +180,7 @@ export default function ATSPanel({
               {isAnalyzingATS ? (
                 <>
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                  <span>Analyzing Resume against ATS Standards...</span>
+                  <span className="text-center">Analyzing Resume against ATS Standards...</span>
                 </>
               ) : (
                 <>

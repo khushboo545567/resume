@@ -37,10 +37,10 @@ export default function ATSKeywordMatch({
   return (
     <section
       id="ats-keyword-match"
-      className="rounded-2xl bg-navbar p-6 shadow-sm scroll-mt-24"
+      className="rounded-2xl bg-navbar p-4 shadow-sm scroll-mt-24 sm:p-6"
     >
       {/* Header */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-border-navbar pb-4">
+      <div className="flex flex-col gap-2 @xl:flex-row @xl:items-center @xl:justify-between border-b border-border-navbar pb-4">
         <div>
           <div className="flex items-center gap-2">
             <Tag className="h-5 w-5 text-subheading" />
@@ -54,7 +54,7 @@ export default function ATSKeywordMatch({
         </div>
 
         {totalKeywords > 0 && (
-          <div className="flex items-center gap-2 self-start sm:self-auto rounded-lg bg-navbar-hover px-3 py-1.5">
+          <div className="flex items-center gap-2 self-start @xl:self-auto rounded-lg bg-navbar-hover px-3 py-1.5">
             <span className="text-xs text-heading/60">Match Rate:</span>
             <span className="text-xs font-bold text-heading">{matchRate}%</span>
             <span className="text-[11px] text-heading/40">
@@ -65,9 +65,9 @@ export default function ATSKeywordMatch({
       </div>
 
       {/* Two Columns Layout */}
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-4 @xl:grid-cols-2 @xl:gap-6">
         {/* Matched Keywords Column */}
-        <div className="rounded-xl bg-navbar-hover p-4">
+        <div className="min-w-0 rounded-xl bg-navbar-hover p-3 sm:p-4">
           <div className="flex items-center justify-between border-b border-border-navbar pb-3">
             <div className="flex items-center gap-2">
               <div className="flex h-5 w-5 items-center justify-center rounded-full bg-green-600/20 text-green-700">
@@ -91,7 +91,7 @@ export default function ATSKeywordMatch({
                   {displayedMatched.map((kw, idx) => (
                     <span
                       key={`matched-${kw}-${idx}`}
-                      className="inline-flex items-center gap-1 rounded-lg bg-green-700/10 px-2.5 py-1 text-xs font-semibold text-green-700 transition hover:bg-green-600/20"
+                      className="inline-flex max-w-full items-center gap-1 break-words rounded-lg bg-green-700/10 px-2.5 py-1 text-xs font-semibold text-green-700 transition hover:bg-green-600/20"
                     >
                       <Check className="h-3 w-3 stroke-[2.5]" />
                       {kw}
@@ -123,7 +123,7 @@ export default function ATSKeywordMatch({
         </div>
 
         {/* Missing Keywords Column */}
-        <div className="rounded-xl bg-navbar-hover p-4">
+        <div className="min-w-0 rounded-xl bg-navbar-hover p-3 sm:p-4">
           <div className="flex items-center justify-between border-b border-border-navbar pb-3">
             <div className="flex items-center gap-2">
               <div className="flex h-5 w-5 items-center justify-center rounded-full bg-red-600/20 text-red-600">
@@ -148,7 +148,7 @@ export default function ATSKeywordMatch({
                   {displayedMissing.map((kw, idx) => (
                     <span
                       key={`missing-${kw}-${idx}`}
-                      className="inline-flex items-center gap-1 rounded-lg bg-red-600/10 px-2.5 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-600/20"
+                      className="inline-flex max-w-full items-center gap-1 break-words rounded-lg bg-red-600/10 px-2.5 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-600/20"
                     >
                       <X className="h-3 w-3 stroke-[2.5]" />
                       {kw}

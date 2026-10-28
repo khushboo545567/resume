@@ -53,7 +53,7 @@ export default function ATSCategoryBreakdown({ categories, onCategorySelect }: P
   }, [categories]);
 
   return (
-    <section className="rounded-2xl bg-navbar p-6 shadow-sm">
+    <section className="rounded-2xl bg-navbar p-4 shadow-sm sm:p-6">
       {/* Header */}
       <div className="border-b border-border-navbar pb-4">
         <div className="flex items-center gap-2">
@@ -78,8 +78,8 @@ export default function ATSCategoryBreakdown({ categories, onCategorySelect }: P
               onClick={() => onCategorySelect?.(cat.category)}
               className="group w-full overflow-hidden rounded-xl bg-navbar-hover p-4 text-left transition-all hover:bg-navbar/30"
             >
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-3">
+              <div className="flex flex-col gap-3 @lg:flex-row @lg:items-center @lg:justify-between">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
                   <span className="text-sm font-bold text-heading">{cat.title}</span>
                   <span
                     className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${statusInfo.badgeClass}`}
@@ -88,8 +88,8 @@ export default function ATSCategoryBreakdown({ categories, onCategorySelect }: P
                   </span>
                 </div>
 
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
+                <div className="flex items-center justify-between gap-4 @lg:justify-end">
+                  <div className="@lg:text-right">
                     <span className="text-sm font-bold text-heading">{cat.score}</span>
                     <span className="text-xs font-medium text-heading/50">
                       {" "}

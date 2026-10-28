@@ -84,14 +84,14 @@ export default function ATSOverallScore({
     : null;
 
   return (
-    <div className="w-full rounded-2xl bg-navbar p-6 shadow-sm transition-all">
+    <div className="w-full rounded-2xl bg-navbar p-4 shadow-sm transition-all sm:p-6">
       {/* Top Meta Header */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-border-navbar pb-4">
+      <div className="flex flex-col gap-3 @xl:flex-row @xl:items-center @xl:justify-between border-b border-border-navbar pb-4">
         <div className="flex flex-wrap items-center gap-2">
           {targetRole && (
             <div className="inline-flex items-center gap-1.5 rounded-lg bg-navbar-hover px-3 py-1 text-xs font-semibold text-heading">
               <Briefcase className="h-3.5 w-3.5 text-subheading" />
-              <span>{targetRole}</span>
+              <span className="break-words">{targetRole}</span>
             </div>
           )}
 
@@ -124,8 +124,8 @@ export default function ATSOverallScore({
       </div>
 
       {/* Main Score & Grade Block */}
-      <div className="mt-6 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-5">
+      <div className="mt-6 flex flex-col gap-4 @xl:flex-row @xl:items-center @xl:justify-between @xl:gap-6">
+        <div className="flex items-center gap-4 sm:gap-5">
           {/* Grade Badge */}
           <div
             className={`flex h-20 w-20 shrink-0 flex-col items-center justify-center rounded-2xl shadow-sm ${tier.gradeBadgeClass}`}
@@ -140,7 +140,7 @@ export default function ATSOverallScore({
           <div>
             <div className="flex items-baseline gap-2">
               <span
-                className={`text-5xl font-black tracking-tight ${tier.scoreTextClass}`}
+                className={`text-4xl font-black tracking-tight sm:text-5xl ${tier.scoreTextClass}`}
               >
                 {roundedScore}
               </span>
@@ -157,7 +157,7 @@ export default function ATSOverallScore({
         </div>
 
         {/* Short Advice Callout */}
-        <div className="max-w-md rounded-xl bg-navbar-hover p-3.5 text-xs text-heading/80">
+        <div className="w-full rounded-xl bg-navbar-hover p-3.5 text-xs text-heading/80 @xl:max-w-md">
           <p className="flex items-start gap-2">
             {roundedScore >= 70 ? (
               <CheckCircle2 className="h-4 w-4 shrink-0 text-green-700 mt-0.5" />
@@ -181,7 +181,7 @@ export default function ATSOverallScore({
         </div>
 
         {/* Milestone Scale */}
-        <div className="mt-2 flex justify-between text-[11px] font-medium text-heading/40">
+        <div className="mt-2 flex flex-wrap justify-between gap-x-3 gap-y-1 text-[11px] font-medium text-heading/40">
           <span>0 (Critical)</span>
           <span>50 (Needs Work)</span>
           <span>75 (Good)</span>

@@ -37,7 +37,7 @@ interface Props {
 function LoadingSkeleton() {
   return (
     <div
-      className="space-y-6 animate-pulse"
+      className="@container space-y-6 animate-pulse"
       aria-busy="true"
       aria-label="Loading ATS analysis"
     >
@@ -68,7 +68,7 @@ function LoadingSkeleton() {
       {/* 3. Keywords Skeleton */}
       <div className="h-48 rounded-2xl bg-navbar/60 p-6 space-y-3">
         <div className="h-6 w-44 rounded-lg bg-btn/20" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <div className="grid grid-cols-1 @xl:grid-cols-2 gap-4 mt-4">
           <div className="h-24 rounded-xl bg-navbar-hover/70" />
           <div className="h-24 rounded-xl bg-navbar-hover/70" />
         </div>
@@ -139,7 +139,7 @@ export default function ATSResultsView({
   }
 
   return (
-    <div className="space-y-6 w-full">
+    <div className="@container w-full space-y-4 sm:space-y-6">
       {/* 1. OVERALL SCORE */}
       <ATSOverallScore
         score={result.atsScore}
