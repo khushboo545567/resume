@@ -11,7 +11,6 @@ import {
   Sparkles,
   User,
   Home,
-  CalendarCheck2,
   Mail,
   Plus,
   Upload,
@@ -118,13 +117,6 @@ const menus: Menu[] = [
     title: "View Users",
     path: "/admin/users",
     icon: User,
-    roles: ["admin"],
-  },
-
-  {
-    title: "Session Requests",
-    path: "/admin/bookings",
-    icon: CalendarCheck2,
     roles: ["admin"],
   },
 ];

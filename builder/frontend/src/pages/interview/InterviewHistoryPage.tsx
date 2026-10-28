@@ -1,42 +1,25 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Loader2, ChevronRight, Calendar, Star } from "lucide-react";
+import { ArrowLeft, Loader2, ChevronRight, Calendar } from "lucide-react";
 
 import { useInterviewHistory } from "../../features/interview/hooks/useInterviewHistory";
-import { useMyBookings } from "../../features/booking/hooks/useBookings";
-import LiveSessionDetailModal from "../../features/booking/components/LiveSessionDetailModal";
-import type { IBookingSession } from "../../features/booking/types/booking.types";
 
 const STATUS_LABELS: Record<string, string> = {
   completed: "Completed",
   ended_early: "Ended Early",
   in_progress: "In Progress",
-  pending: "Pending",
-  confirmed: "Confirmed",
-  cancelled: "Cancelled",
 };
 
 const STATUS_STYLES: Record<string, string> = {
   completed: "bg-green-100 text-green-700",
   ended_early: "bg-amber-100 text-amber-700",
   in_progress: "bg-sidebar/15 text-sidebar",
-  pending: "bg-amber-100 text-amber-700",
-  confirmed: "bg-sidebar/15 text-sidebar",
-  cancelled: "bg-red-100 text-red-700",
 };
-
-type MergedSession =
-  | { type: "ai"; date: number; data: any }
-  | { type: "live"; date: number; data: IBookingSession };
 
 export default function InterviewHistoryPage() {
   const navigate = useNavigate();
-  const { sessions: aiSessions, loading: loadingAi, isError: aiError } = useInterviewHistory();
-  const { data: liveBookings = [], isLoading: loadingLive, isError: liveError } = useMyBookings();
+  const { sessions, loading, isError } = useInterviewHistory();
 
-  const [selectedLiveSession, setSelectedLiveSession] = useState<IBookingSession | null>(null);
-
-  if (loadingAi || loadingLive) {
+  if (loading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
         <Loader2 className="animate-spin text-subheading" size={32} />
@@ -44,7 +27,7 @@ export default function InterviewHistoryPage() {
     );
   }
 
-  if (aiError || liveError) {
+  if (isError) {
     return (
       <div className="mx-auto max-w-lg px-4 py-16 text-center">
         <p className="text-nav-text">
@@ -53,20 +36,6 @@ export default function InterviewHistoryPage() {
       </div>
     );
   }
-
-  // Merge and sort
-  const mergedHistory: MergedSession[] = [
-    ...aiSessions.map((session) => ({
-      type: "ai" as const,
-      date: new Date(session.createdAt).getTime(),
-      data: session,
-    })),
-    ...liveBookings.map((booking) => ({
-      type: "live" as const,
-      date: new Date(booking.createdAt).getTime(),
-      data: booking,
-    })),
-  ].sort((a, b) => b.date - a.date);
 
   return (
     <section className="mx-auto max-w-3xl px-4 py-6 sm:py-10">
@@ -83,136 +52,77 @@ export default function InterviewHistoryPage() {
           Interview History
         </h1>
         <p className="mt-1.5 text-sm text-nav-text sm:mt-2 sm:text-base">
-          Your past AI interview sessions and live mock interviews.
+          Your past AI interview practice sessions.
         </p>
       </div>
 
-      {mergedHistory.length === 0 ? (
+      {sessions.length === 0 ? (
         <p className="text-center text-sm text-heading/60 sm:text-base">
-          You haven't taken any interviews or booked any sessions yet.
+          You haven't taken any AI interviews yet.
         </p>
       ) : (
         <div className="space-y-2.5 sm:space-y-3">
-          {mergedHistory.map((item) => {
-            if (item.type === "ai") {
-              const session = item.data;
-              const answeredCount = session.questions.filter(
-                (q: any) => q.answerText,
-              ).length;
+          {sessions.map((session) => {
+            const answeredCount = session.questions.filter(
+              (q) => q.answerText,
+            ).length;
 
-              return (
-                <button
-                  key={`ai-${session._id}`}
-                  onClick={() =>
-                    navigate(`/interview/ai/session/${session._id}`)
-                  }
-                  className="flex w-full items-start gap-3 rounded-2xl border border-border bg-navbar p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg sm:items-center sm:p-5"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="mb-1 flex flex-wrap items-center gap-x-2 gap-y-1.5">
-                      <h3 className="font-semibold text-heading">
-                        {session.targetRole}
-                      </h3>
-                      <span className="rounded-full bg-btn px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-btn-text">
-                        AI Practice
-                      </span>
-                      <span
-                        className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                          STATUS_STYLES[session.status] ??
-                          "bg-btn-hover-bg text-heading/60"
-                        }`}
-                      >
-                        {STATUS_LABELS[session.status] ?? session.status}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-heading/60 sm:text-sm">
-                      <span className="flex items-center gap-1">
-                        <Calendar size={14} />
-                        {new Date(session.createdAt).toLocaleDateString(
-                          undefined,
-                          { year: "numeric", month: "short", day: "numeric" },
-                        )}
-                      </span>
-                      <span className="capitalize">
-                        {session.questionType} · {session.difficulty}
-                      </span>
-                      <span>
-                        {answeredCount}/{session.totalQuestions} answered
-                      </span>
-                      {session.summary && (
-                        <span className="font-semibold text-subheading">
-                          {session.summary.overallScore}/100
-                        </span>
-                      )}
-                    </div>
+            return (
+              <button
+                key={`ai-${session._id}`}
+                onClick={() =>
+                  navigate(`/interview/ai/session/${session._id}`)
+                }
+                className="flex w-full items-start gap-3 rounded-2xl border border-border bg-navbar p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg sm:items-center sm:p-5"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex flex-wrap items-center gap-x-2 gap-y-1.5">
+                    <h3 className="font-semibold text-heading">
+                      {session.targetRole}
+                    </h3>
+                    <span className="rounded-full bg-btn px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-btn-text">
+                      AI Practice
+                    </span>
+                    <span
+                      className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                        STATUS_STYLES[session.status] ??
+                        "bg-btn-hover-bg text-heading/60"
+                      }`}
+                    >
+                      {STATUS_LABELS[session.status] ?? session.status}
+                    </span>
                   </div>
-                  <ChevronRight
-                    size={20}
-                    className="mt-0.5 shrink-0 text-heading/40 sm:mt-0"
-                  />
-                </button>
-              );
-            } else {
-              const booking = item.data as IBookingSession;
 
-              return (
-                <button
-                  key={`live-${booking._id}`}
-                  onClick={() => setSelectedLiveSession(booking)}
-                  className="flex w-full items-start gap-3 rounded-2xl border border-border bg-navbar p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg sm:items-center sm:p-5"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="mb-1 flex flex-wrap items-center gap-x-2 gap-y-1.5">
-                      <h3 className="font-semibold capitalize text-heading">
-                        {booking.interviewType.replace("_", " ")}
-                      </h3>
-                      <span className="rounded-full border border-border bg-btn-hover-bg px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-heading">
-                        Live Session
-                      </span>
-                      <span
-                        className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                          STATUS_STYLES[booking.status] ??
-                          "bg-btn-hover-bg text-heading/60"
-                        }`}
-                      >
-                        {STATUS_LABELS[booking.status] ?? booking.status}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-heading/60 sm:text-sm">
-                      <span className="flex items-center gap-1">
-                        <Calendar size={14} />
-                        {new Date(booking.preferredDate).toLocaleDateString(
-                          undefined,
-                          { year: "numeric", month: "short", day: "numeric" },
-                        )}
-                      </span>
-                      <span className="capitalize">{booking.timeSlot}</span>
-                      {booking.status === "completed" && booking.feedback && (
-                        <span className="flex items-center gap-1 font-semibold text-green-600">
-                          <Star size={14} className="fill-green-600" />
-                          {booking.feedback.score}/10
-                        </span>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-heading/60 sm:text-sm">
+                    <span className="flex items-center gap-1">
+                      <Calendar size={14} />
+                      {new Date(session.createdAt).toLocaleDateString(
+                        undefined,
+                        { year: "numeric", month: "short", day: "numeric" },
                       )}
-                    </div>
+                    </span>
+                    <span className="capitalize">
+                      {session.questionType} · {session.difficulty}
+                    </span>
+                    <span>
+                      {answeredCount}/{session.totalQuestions} answered
+                    </span>
+                    {session.summary && (
+                      <span className="font-semibold text-subheading">
+                        {session.summary.overallScore}/100
+                      </span>
+                    )}
                   </div>
-                  <ChevronRight
-                    size={20}
-                    className="mt-0.5 shrink-0 text-heading/40 sm:mt-0"
-                  />
-                </button>
-              );
-            }
+                </div>
+                <ChevronRight
+                  size={20}
+                  className="mt-0.5 shrink-0 text-heading/40 sm:mt-0"
+                />
+              </button>
+            );
           })}
         </div>
       )}
-
-      <LiveSessionDetailModal
-        open={!!selectedLiveSession}
-        onClose={() => setSelectedLiveSession(null)}
-        booking={selectedLiveSession}
-      />
     </section>
   );
 }

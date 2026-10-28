@@ -6,7 +6,6 @@ import { Plus, ChevronDown, Gauge, Loader2, Upload } from "lucide-react";
 import { CiMenuBurger } from "react-icons/ci";
 
 import { useAuthStore } from "../../../store/auth.store";
-import NotificationDropdown from "../../notification/components/NotificationDropdown";
 import ProfileModal from "./ProfileModal";
 import type { QuickActions } from "../hooks/useQuickActions";
 
@@ -43,7 +42,7 @@ export default function Navbar({
   return (
     <header className="sticky top-0 z-30 border-b border-border-navbar bg-navbar">
       {/* ================= MOBILE BAR ================= */}
-      {/* Logo, notifications, profile, and the menu burger that opens the side nav */}
+      {/* Logo, profile, and the menu burger that opens the side nav */}
 
       <div
         className={`flex h-16 items-center justify-between px-4 ${
@@ -55,8 +54,6 @@ export default function Navbar({
         </div>
 
         <div className="flex items-center gap-2">
-          <NotificationDropdown />
-
           <button
             type="button"
             onClick={() => user && setIsProfileOpen(true)}
@@ -146,10 +143,6 @@ export default function Navbar({
             <Upload size={18} />
             <span>Import Resume</span>
           </button>
-
-          {/* Notifications */}
-
-          <NotificationDropdown />
 
           {/* User */}
 

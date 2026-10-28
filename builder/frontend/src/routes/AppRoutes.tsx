@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 import NavigationProgress from "../components/NavigationProgress";
-import { Routes, Route } from "react-router-dom";
+import { Navigate, Routes, Route } from "react-router-dom";
 
 import ProtectedRoute from "./ProtectedRoute";
 import AdminProtectedRoute from "./AdminProtectedRoute";
@@ -48,9 +48,6 @@ const AdminDashboardPage = lazy(
   () => import("../pages/admin/AdminDashboardPage"),
 );
 const UsersPage = lazy(() => import("../pages/admin/UsersPage"));
-const BookingRequestsPage = lazy(
-  () => import("../pages/admin/BookingRequestsPage"),
-);
 const NotFoundPage = lazy(() => import("../pages/NotFoundPage"));
 const InterviewPage = lazy(loadInterviewPage);
 const GenerateInterviewPage = lazy(
@@ -61,9 +58,6 @@ const InterviewSessionPage = lazy(
 );
 const InterviewHistoryPage = lazy(
   () => import("../pages/interview/InterviewHistoryPage"),
-);
-const BookSessionPage = lazy(
-  () => import("../pages/interview/BookSessionPage"),
 );
 
 function PageLoader() {
@@ -129,7 +123,11 @@ export default function AppRoutes() {
             path="/interview/ai/session/:sessionId"
             element={<InterviewSessionPage />}
           />
-          <Route path="/interview/book" element={<BookSessionPage />} />
+          {/* Old bookmark: the live-session booking feature was removed. */}
+          <Route
+            path="/interview/book"
+            element={<Navigate to="/interview" replace />}
+          />
           <Route path="/interview/history" element={<InterviewHistoryPage />} />
 
           <Route path="/resume/:id/edit" element={<ResumeEditorPage />} />
@@ -153,7 +151,10 @@ export default function AppRoutes() {
 
           <Route path="/admin/users" element={<UsersPage />} />
 
-          <Route path="/admin/bookings" element={<BookingRequestsPage />} />
+          <Route
+            path="/admin/bookings"
+            element={<Navigate to="/admin" replace />}
+          />
         </Route>
         <Route path="/404" element={<NotFoundPage />} />
         <Route path="*" element={<NotFoundPage />} />

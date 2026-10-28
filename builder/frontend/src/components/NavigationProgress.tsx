@@ -22,7 +22,7 @@ export default function NavigationProgress() {
   const renderedPath = useRef(pathname);
   renderedPath.current = pathname;
 
-  // Start the bar for EVERY navigation (sidebar, buttons, links, notifications, back
+  // Start the bar for EVERY navigation (sidebar, buttons, links, back
   // button) instead of wiring each click: watch the browser history directly.
   useEffect(() => {
     const startIfChanged = () => {

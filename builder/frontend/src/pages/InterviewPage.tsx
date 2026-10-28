@@ -1,19 +1,12 @@
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  ArrowRight,
-  Bot,
-  CalendarCheck2,
-  Check,
-  MicVocal,
-} from "lucide-react";
+import { ArrowRight, Bot, Check, MicVocal } from "lucide-react";
 
 import StatCard from "../features/dashboard/components/StatCard";
 import DashboardSection from "../features/dashboard/components/DashboardSection";
 import InterviewHistoryBox from "../features/interview/components/InterviewHistoryBox";
 
 import { useInterviewHistory } from "../features/interview/hooks/useInterviewHistory";
-import { useMyBookings } from "../features/booking/hooks/useBookings";
 
 interface OptionProps {
   icon: ReactNode;
@@ -87,13 +80,9 @@ function OptionCard({
 
 export default function InterviewPage() {
   const navigate = useNavigate();
-  const { sessions, loading: loadingAi } = useInterviewHistory();
-  const { data: bookings = [], isLoading: loadingBookings } = useMyBookings();
+  const { sessions, loading } = useInterviewHistory();
 
-  // Show history if the user has EITHER an AI practice session or a live
-  // booked session, since someone might only ever book a live session.
-  const loading = loadingAi || loadingBookings;
-  const hasHistory = !loading && (sessions.length > 0 || bookings.length > 0);
+  const hasHistory = !loading && sessions.length > 0;
 
   return (
     <div className="min-w-0 space-y-8 sm:space-y-10">
@@ -113,15 +102,15 @@ export default function InterviewPage() {
           </h1>
 
           <p className="mt-2 text-sm text-sidebar-text/75 sm:text-base">
-            Practice with AI-generated questions or book a session with a
-            placement expert. The choice is yours.
+            Practice with AI-generated questions tailored to your resume and
+            get instant feedback on every answer.
           </p>
         </div>
       </div>
 
       {/* Options */}
-      <DashboardSection title="Choose how to practice">
-        <div className="grid min-w-0 gap-4 sm:gap-6 md:grid-cols-2">
+      <DashboardSection title="Practice with AI">
+        <div className="grid min-w-0 gap-4 sm:gap-6 md:max-w-xl">
           <OptionCard
             icon={<Bot size={26} />}
             tag="Instant"
@@ -135,20 +124,6 @@ export default function InterviewPage() {
             cta="Start AI interview"
             onClick={() => navigate("/interview/ai")}
           />
-
-          <OptionCard
-            icon={<CalendarCheck2 size={26} />}
-            tag="Live expert"
-            title="Book a session"
-            description="Talk to a placement expert for 1:1 mock interviews and career guidance."
-            points={[
-              "1:1 mock interview with an expert",
-              "Personal feedback on your answers",
-              "Career guidance for your target role",
-            ]}
-            cta="Book a session"
-            onClick={() => navigate("/interview/book")}
-          />
         </div>
       </DashboardSection>
 
@@ -159,7 +134,6 @@ export default function InterviewPage() {
         <div className="space-y-4">
           <div className="grid min-w-0 grid-cols-2 gap-3 sm:gap-5">
             <StatCard title="AI practice sessions" value={sessions.length} />
-            <StatCard title="Booked sessions" value={bookings.length} />
           </div>
 
           <InterviewHistoryBox />
