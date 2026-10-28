@@ -24,13 +24,8 @@ export default function SectionNavList({
     <div className="flex h-full min-h-0 flex-col">
       {/* Section list */}
       <div className="flex-1 min-h-0 overflow-y-auto px-2 py-3">
-        <SortableSectionList
-          activeSection={activeSection}
-          onSectionChange={onSectionChange}
-        />
-
         {/* Utility section nav */}
-        <div className="mt-4 border-t border-heading/15 pt-3 space-y-0.5">
+        <div className="mb-3 border-b border-heading/15 pb-3 space-y-0.5">
           <button
             onClick={() => onSectionChange("templates")}
             className={`w-full flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition ${
@@ -55,6 +50,11 @@ export default function SectionNavList({
             Settings
           </button>
         </div>
+
+        <SortableSectionList
+          activeSection={activeSection}
+          onSectionChange={onSectionChange}
+        />
       </div>
 
       {/* Add section button */}

@@ -111,7 +111,6 @@ export default function HomePage() {
     handleCheckATSScore,
     handleOpenUploadResume,
     isCreatingAtsResume,
-    isCreatingAiResume,
   } = useOutletContext<QuickActions>();
 
   const firstName = user?.fullName?.split(" ")[0];
@@ -169,11 +168,10 @@ export default function HomePage() {
             <button
               type="button"
               onClick={handleCreateResumeWithAI}
-              disabled={isCreatingAiResume}
-              className="flex h-12 items-center justify-center gap-2 rounded-xl bg-btn px-5 text-base font-semibold text-btn-text transition hover:bg-btn-hover disabled:cursor-not-allowed disabled:opacity-50 sm:px-7"
+              className="flex h-12 items-center justify-center gap-2 rounded-xl bg-btn px-5 text-base font-semibold text-btn-text transition hover:bg-btn-hover sm:px-7"
             >
               <Sparkles size={18} />
-              {isCreatingAiResume ? "Preparing..." : "Create Resume with AI"}
+              Create Resume with AI
             </button>
 
             <button
@@ -319,11 +317,10 @@ export default function HomePage() {
           <button
             type="button"
             onClick={handleCreateResumeWithAI}
-            disabled={isCreatingAiResume}
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-btn px-5 text-base font-semibold text-btn-text transition hover:bg-btn-hover disabled:cursor-not-allowed disabled:opacity-50 sm:mx-auto sm:w-fit sm:px-7"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-btn px-5 text-base font-semibold text-btn-text transition hover:bg-btn-hover sm:mx-auto sm:w-fit sm:px-7"
           >
             <Sparkles size={18} />
-            {isCreatingAiResume ? "Preparing..." : "Create Resume with AI"}
+            Create Resume with AI
           </button>
         </div>
       </section>

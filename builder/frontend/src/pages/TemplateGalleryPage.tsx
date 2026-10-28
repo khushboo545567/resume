@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { SearchX, Star, X } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Loader2, SearchX, Star, X } from "lucide-react";
 
 import {
   templates,
@@ -8,6 +9,7 @@ import {
   type ExperienceLevel,
 } from "../features/resume/config/templates";
 import CreateResumeModal from "../features/resume/components/CreateResumeModal";
+import { useCreateResume } from "../features/resume/hooks/useCreateResume";
 
 import { useAuthStore } from "../store/auth.store";
 import { redirectToLogin } from "../config/auth.config";
@@ -32,6 +34,15 @@ export default function TemplateGalleryPage() {
   const user = useAuthStore((state) => state.user);
   const isAuthLoading = useAuthStore((state) => state.isLoading);
 
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Opened from "Create Resume with AI": picking a template creates the
+  // resume straight away and opens the AI form (no naming step).
+  const isAiMode = searchParams.get("ai") === "1";
+  const createResumeMutation = useCreateResume();
+  const [aiError, setAiError] = useState<string | null>(null);
+
   const [selectedTemplate, setSelectedTemplate] =
     useState<TemplateOption | null>(null);
   const [domainFilter, setDomainFilter] = useState<Domain | "all">("all");
@@ -46,15 +57,33 @@ export default function TemplateGalleryPage() {
     setLevelFilter("all");
   };
 
-  const handleTemplateClick = (template: TemplateOption) => {
-    if (isAuthLoading) return;
+  const handleTemplateClick = async (template: TemplateOption) => {
+    if (isAuthLoading || createResumeMutation.isPending) return;
 
     if (!user) {
       redirectToLogin();
       return;
     }
 
-    setSelectedTemplate(template);
+    if (!isAiMode) {
+      setSelectedTemplate(template);
+      return;
+    }
+
+    try {
+      setAiError(null);
+
+      const resume = await createResumeMutation.mutateAsync({
+        title: "Untitled Resume",
+        targetRole: "",
+        templateId: template.id,
+      });
+
+      navigate(`/resume/${resume._id}/edit`, { state: { openGenerate: true } });
+    } catch (error) {
+      console.error("Failed to create resume for AI generation:", error);
+      setAiError("We couldn't create your resume. Please try again.");
+    }
   };
 
   const filteredTemplates = useMemo(() => {
@@ -74,12 +103,19 @@ export default function TemplateGalleryPage() {
       {/* Header */}
       <div className="mb-6 text-center">
         <h1 className="text-2xl font-bold text-display sm:text-3xl">
-          Choose a template
+          {isAiMode ? "Pick a template for your AI resume" : "Choose a template"}
         </h1>
         <p className="mx-auto mt-2 max-w-xl text-sm text-subheading sm:text-base">
-          Every layout is ATS-friendly. You can switch templates anytime in the
-          editor.
+          {isAiMode
+            ? "Next, tell the AI about yourself and it fills in this template. You can switch templates anytime in the editor."
+            : "Every layout is ATS-friendly. You can switch templates anytime in the editor."}
         </p>
+
+        {aiError && (
+          <p className="mx-auto mt-4 max-w-md rounded-lg bg-red-600/10 px-3 py-2 text-sm text-red-600">
+            {aiError}
+          </p>
+        )}
       </div>
 
       {/* Domain tabs */}
@@ -219,6 +255,15 @@ export default function TemplateGalleryPage() {
               </p>
             </button>
           ))}
+        </div>
+      )}
+
+      {createResumeMutation.isPending && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="flex items-center gap-3 rounded-xl bg-popup px-5 py-4 text-sm font-medium text-heading shadow-xl">
+            <Loader2 size={18} className="animate-spin" />
+            Setting up your resume…
+          </div>
         </div>
       )}
 

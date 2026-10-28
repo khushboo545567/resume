@@ -12,7 +12,6 @@ export function useQuickActions() {
   const isAuthLoading = useAuthStore((state) => state.isLoading);
 
   const [isCreatingAtsResume, setIsCreatingAtsResume] = useState(false);
-  const [isCreatingAiResume, setIsCreatingAiResume] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isCreateChooserOpen, setIsCreateChooserOpen] = useState(false);
   const [isCreatingQuickResume, setIsCreatingQuickResume] = useState(false);
@@ -109,9 +108,10 @@ export function useQuickActions() {
     }
   };
 
-  // Creates a blank resume on the default ATS template and opens the editor
-  // with the "Generate with AI" form already showing.
-  const handleCreateResumeWithAI = async () => {
+  // "Create Resume with AI" first sends the user to the templates page in AI
+  // mode. Once they pick a template, that page creates the resume and opens
+  // the editor with the "Generate with AI" form already showing.
+  const handleCreateResumeWithAI = () => {
     if (isAuthLoading) return;
 
     if (!user) {
@@ -119,21 +119,7 @@ export function useQuickActions() {
       return;
     }
 
-    setIsCreatingAiResume(true);
-
-    try {
-      const resume = await createResumeMutation.mutateAsync({
-        title: "Untitled Resume",
-        targetRole: "",
-        templateId: ResumeTemplates.ATS,
-      });
-
-      navigate(`/resume/${resume._id}/edit`, { state: { openGenerate: true } });
-    } catch (error) {
-      console.error("Failed to create resume for AI generation:", error);
-    } finally {
-      setIsCreatingAiResume(false);
-    }
+    navigate("/templates?ai=1");
   };
 
   return {
@@ -144,7 +130,6 @@ export function useQuickActions() {
     isCreateChooserOpen,
     closeCreateChooser: () => setIsCreateChooserOpen(false),
     handleCreateResumeWithAI,
-    isCreatingAiResume,
     handleCheckATSScore,
     handleOpenUploadResume,
     isCreatingAtsResume,
