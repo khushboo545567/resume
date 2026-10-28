@@ -40,7 +40,7 @@ export default function Modal({
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-start justify-between border-b border-border-popup p-3 xs:p-4 sm:p-6 sticky top-0 bg-popup">
+          <div className="flex items-start justify-between border-b border-border-popup p-3 xs:p-4 sm:p-6 sticky top-0 z-10 bg-popup">
             <div className="pr-4">
               <h2 className="text-lg xs:text-xl sm:text-2xl font-bold text-heading">{title}</h2>
 
