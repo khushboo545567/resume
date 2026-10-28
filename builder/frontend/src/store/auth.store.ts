@@ -2,7 +2,11 @@ import axios from "axios";
 import { create } from "zustand";
 
 import type { AuthState } from "../types/auth.types";
-import { getMe, logoutUser } from "../services/auth.service";
+import {
+  getMe,
+  getProfilePhotoUrl,
+  logoutUser,
+} from "../services/auth.service";
 import { THRONE8_URL } from "../config/auth.config";
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -57,6 +61,19 @@ export const useAuthStore = create<AuthState>((set) => ({
         isLoading: false,
         authError: false,
       });
+
+      // Photo loads after the page is already usable. Ignore the result if the
+      // user changed or logged out in the meantime.
+      if (user.profilePhotoId) {
+        void getProfilePhotoUrl(user.profilePhotoId).then((avatarUrl) => {
+          if (!avatarUrl) return;
+          set((state) =>
+            state.user?._id === user._id
+              ? { user: { ...state.user, avatarUrl } }
+              : {},
+          );
+        });
+      }
     } catch (error) {
       // 401/403 = there really is no valid session -> logged out.
       // Anything else (network down, 5xx, timeout) is NOT a logout: keep the

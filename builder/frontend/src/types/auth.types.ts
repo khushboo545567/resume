@@ -40,6 +40,8 @@ export interface User {
   role: UserRole;
   /** Cloudinary URL of the Throne8 profile photo, or null when none / not loadable. */
   avatarUrl?: string | null;
+  /** Used to load the photo in the background after the session check. */
+  profilePhotoId?: string | null;
   /** Optional, so anything that only needs id/name/email/role is unaffected. */
   profile?: UserProfile;
 }

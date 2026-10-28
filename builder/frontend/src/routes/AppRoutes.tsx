@@ -17,8 +17,26 @@ const CoverLetterGalleryPage = lazy(
 const AiPage = lazy(() => import("../pages/AiPage"));
 const PublicResumePage = lazy(() => import("../pages/PublicResumePage"));
 
-const DashboardPage = lazy(() => import("../pages/DashboardPage"));
-const MyResumePage = lazy(() => import("../pages/MyResumePage"));
+// Protected pages only render after the session check finishes. Without this, their
+// code would only START downloading after that (check -> download -> render). Starting
+// the download now makes it run alongside the session check instead.
+const loadDashboardPage = () => import("../pages/DashboardPage");
+const loadMyResumePage = () => import("../pages/MyResumePage");
+const loadInterviewPage = () => import("../pages/InterviewPage");
+
+const PRELOAD_ON_START: Record<string, () => Promise<unknown>> = {
+  "/dashboard": loadDashboardPage,
+  "/myresume": loadMyResumePage,
+  "/interview": loadInterviewPage,
+};
+
+if (typeof window !== "undefined") {
+  const path = window.location.pathname.replace(/\/+$/, "") || "/";
+  void PRELOAD_ON_START[path]?.();
+}
+
+const DashboardPage = lazy(loadDashboardPage);
+const MyResumePage = lazy(loadMyResumePage);
 const AnalyticsPage = lazy(() => import("../pages/AnalyticsPage"));
 const Settings = lazy(() => import("../pages/SettingsPage"));
 const ResumeEditorPage = lazy(() => import("../pages/resume/ResumeEditorPage"));
@@ -34,7 +52,7 @@ const BookingRequestsPage = lazy(
   () => import("../pages/admin/BookingRequestsPage"),
 );
 const NotFoundPage = lazy(() => import("../pages/NotFoundPage"));
-const InterviewPage = lazy(() => import("../pages/InterviewPage"));
+const InterviewPage = lazy(loadInterviewPage);
 const GenerateInterviewPage = lazy(
   () => import("../pages/interview/GenerateInterviewPage"),
 );

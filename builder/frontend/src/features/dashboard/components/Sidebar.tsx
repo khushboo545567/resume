@@ -211,9 +211,9 @@ export default function Sidebar({
             forceCollapsed ? "" : "[@media(min-width:1400px)]:justify-center"
           }`}
         >
-          <h1>
+          <div>
             <BrandWordmark tone="light" className="text-2xl" />
-          </h1>
+          </div>
 
           <button
             type="button"
@@ -328,7 +328,7 @@ export default function Sidebar({
             <div className="m-4 shrink-0 rounded-2xl bg-btn p-4 text-btn-text">
               <Sparkles className="mb-2 text-btn-hover-bg" size={20} />
 
-              <h3 className="text-sm font-bold">Upgrade to Pro</h3>
+              <p className="text-sm font-bold">Upgrade to Pro</p>
 
               <p className="mt-1.5 text-xs opacity-90">
                 Unlock AI Resume Builder, ATS Pro, Unlimited Resume Downloads

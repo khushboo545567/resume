@@ -119,18 +119,6 @@ export default function InterviewPage() {
         </div>
       </div>
 
-      {/* Your numbers + history */}
-      {hasHistory && (
-        <div className="space-y-4">
-          <div className="grid min-w-0 grid-cols-2 gap-3 sm:gap-5">
-            <StatCard title="AI practice sessions" value={sessions.length} />
-            <StatCard title="Booked sessions" value={bookings.length} />
-          </div>
-
-          <InterviewHistoryBox />
-        </div>
-      )}
-
       {/* Options */}
       <DashboardSection title="Choose how to practice">
         <div className="grid min-w-0 gap-4 sm:gap-6 md:grid-cols-2">
@@ -163,6 +151,20 @@ export default function InterviewPage() {
           />
         </div>
       </DashboardSection>
+
+      {/* Your numbers + history. Sits below the cards on purpose: it appears
+          after the data loads, and anything above the cards would push them down
+          (layout shift). */}
+      {hasHistory && (
+        <div className="space-y-4">
+          <div className="grid min-w-0 grid-cols-2 gap-3 sm:gap-5">
+            <StatCard title="AI practice sessions" value={sessions.length} />
+            <StatCard title="Booked sessions" value={bookings.length} />
+          </div>
+
+          <InterviewHistoryBox />
+        </div>
+      )}
     </div>
   );
 }

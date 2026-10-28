@@ -50,9 +50,9 @@ export default function Navbar({
           forceCollapsed ? "" : "[@media(min-width:1400px)]:hidden"
         }`}
       >
-        <h1>
+        <div>
           <BrandWordmark tone="dark" className="text-xl" />
-        </h1>
+        </div>
 
         <div className="flex items-center gap-2">
           <NotificationDropdown />

@@ -16,6 +16,7 @@ export default function UserAvatar({ src, initial, className = "" }: UserAvatarP
       <img
         src={src}
         alt=""
+        decoding="async"
         referrerPolicy="no-referrer"
         onError={() => setFailed(true)}
         className={`${className} object-cover`}

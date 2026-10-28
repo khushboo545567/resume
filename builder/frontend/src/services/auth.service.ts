@@ -8,11 +8,26 @@ import type { User, UserProfile } from "../types/auth.types";
  * into a URL with GET /profile/profile-photo/get-photo/:id, so we do the same here.
  * Never throws: a missing photo must not break login, the UI falls back to initials.
  */
-const getProfilePhotoUrl = async (photoId?: string | null): Promise<string | null> => {
+/**
+ * The avatar is shown at 36-96px, but Cloudinary serves the original upload (often
+ * 100KB+). Ask Cloudinary for a small face-cropped WebP/AVIF instead. Only the
+ * standard versioned URL form is rewritten; anything else is returned unchanged.
+ */
+const optimizeAvatarUrl = (url: string): string => {
+  if (!url.includes("res.cloudinary.com")) return url;
+  if (!/\/image\/upload\/v\d+\//.test(url)) return url;
+  return url.replace(
+    "/image/upload/",
+    "/image/upload/c_fill,g_face,w_160,h_160,f_auto,q_auto/",
+  );
+};
+
+export const getProfilePhotoUrl = async (photoId?: string | null): Promise<string | null> => {
   if (!photoId) return null;
   try {
     const res = await authApi.get(`/profile/profile-photo/get-photo/${photoId}`);
-    return res.data?.data?.photo?.cloudinarySecureUrl ?? null;
+    const url: string | undefined = res.data?.data?.photo?.cloudinarySecureUrl;
+    return url ? optimizeAvatarUrl(url) : null;
   } catch {
     return null;
   }
@@ -31,15 +46,16 @@ export const getMe = async (): Promise<User> => {
     .join(" ")
     .trim();
 
-  const avatarUrl = await getProfilePhotoUrl(profile.profilePhotoId);
-
+  // The photo is fetched in the background (see auth.store) so that this extra
+  // request does not hold the whole app behind the loading spinner.
   return {
     _id: profile.userId,
     fullName: fullName || profile.email,
     email: profile.email,
     // Throne8 also has "moderator" / "mentor"; this app only distinguishes admins.
     role: profile.role === "admin" ? "admin" : "user",
-    avatarUrl,
+    avatarUrl: null,
+    profilePhotoId: profile.profilePhotoId ?? null,
     profile: mapProfileDetails(profile),
   };
 };

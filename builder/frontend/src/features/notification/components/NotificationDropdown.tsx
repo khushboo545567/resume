@@ -83,7 +83,14 @@ export default function NotificationDropdown() {
   return (
     <div className="relative" ref={dropdownRef}>
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
+        aria-label={
+          unreadCount > 0
+            ? `Notifications, ${unreadCount} unread`
+            : "Notifications"
+        }
+        aria-expanded={isOpen}
         className="relative rounded-xl p-3 transition hover:bg-navbar-hover focus:outline-none focus:ring-2 focus:ring-ring"
       >
         <Bell size={19} />

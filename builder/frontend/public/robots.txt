@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /myresume
+Disallow: /interview
+Disallow: /settings
+Disallow: /admin
+Disallow: /cover-letter/
+Disallow: /resume/
+Allow: /resume/public/
