@@ -4,6 +4,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "../features/dashboard/components/Sidebar";
 import Navbar from "../features/dashboard/components/Navbar";
 import UploadResumeModal from "../features/resume/components/UploadResumeModal";
+import AiTemplatePickerModal from "../features/resume/components/AiTemplatePickerModal";
 import CreateResumeChooserModal from "../features/resume/components/CreateResumeChooserModal";
 import { useQuickActions } from "../features/dashboard/hooks/useQuickActions";
 
@@ -22,6 +23,11 @@ export default function MainLayout() {
     closeUploadModal,
     isCreateChooserOpen,
     closeCreateChooser,
+    isAiTemplatePickerOpen,
+    closeAiTemplatePicker,
+    handleCreateAiResume,
+    isCreatingAiResume,
+    aiPickerError,
     ...quickActions
   } = useQuickActions();
   const { pathname } = useLocation();
@@ -72,6 +78,14 @@ export default function MainLayout() {
         onImport={quickActions.handleOpenUploadResume}
         onQuickStart={quickActions.handleQuickStart}
         quickStartLoading={quickActions.isCreatingQuickResume}
+      />
+
+      <AiTemplatePickerModal
+        open={isAiTemplatePickerOpen}
+        onClose={closeAiTemplatePicker}
+        onSelect={handleCreateAiResume}
+        loading={isCreatingAiResume}
+        error={aiPickerError}
       />
 
       <UploadResumeModal open={isUploadModalOpen} onClose={closeUploadModal} />
