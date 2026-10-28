@@ -2,11 +2,7 @@ import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Bot, Check, MicVocal } from "lucide-react";
 
-import StatCard from "../features/dashboard/components/StatCard";
 import DashboardSection from "../features/dashboard/components/DashboardSection";
-import InterviewHistoryBox from "../features/interview/components/InterviewHistoryBox";
-
-import { useInterviewHistory } from "../features/interview/hooks/useInterviewHistory";
 
 interface OptionProps {
   icon: ReactNode;
@@ -80,9 +76,6 @@ function OptionCard({
 
 export default function InterviewPage() {
   const navigate = useNavigate();
-  const { sessions, loading } = useInterviewHistory();
-
-  const hasHistory = !loading && sessions.length > 0;
 
   return (
     <div className="min-w-0 space-y-8 sm:space-y-10">
@@ -126,19 +119,6 @@ export default function InterviewPage() {
           />
         </div>
       </DashboardSection>
-
-      {/* Your numbers + history. Sits below the cards on purpose: it appears
-          after the data loads, and anything above the cards would push them down
-          (layout shift). */}
-      {hasHistory && (
-        <div className="space-y-4">
-          <div className="grid min-w-0 grid-cols-2 gap-3 sm:gap-5">
-            <StatCard title="AI practice sessions" value={sessions.length} />
-          </div>
-
-          <InterviewHistoryBox />
-        </div>
-      )}
     </div>
   );
 }
