@@ -4,7 +4,6 @@ import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import {
   ArrowRight,
   Bot,
-  CalendarCheck2,
   Check,
   CheckCircle2,
   FileUp,
@@ -430,9 +429,8 @@ export default function HomePage() {
             </h2>
 
             <p className="mt-4 text-sm leading-7 text-sidebar-text/80 sm:text-base">
-              Get mock interview questions based on your resume and target role
-              with instant feedback, or book a 1:1 session with a placement
-              expert.
+              Get mock interview questions based on your resume and target role,
+              with instant feedback on your answers.
             </p>
           </div>
 
@@ -444,15 +442,6 @@ export default function HomePage() {
             >
               <Bot size={18} className="shrink-0" />
               Try AI interview
-            </button>
-
-            <button
-              type="button"
-              onClick={() => goToInterview("/interview/book")}
-              className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-sidebar-text/30 px-5 text-sm font-semibold text-sidebar-text transition hover:bg-sidebar-hover sm:flex-1 md:w-auto md:flex-none"
-            >
-              <CalendarCheck2 size={18} className="shrink-0" />
-              Book a session
             </button>
           </div>
         </div>
