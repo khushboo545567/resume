@@ -20,7 +20,7 @@ import {
   X,
 } from "lucide-react";
 import { BriefcaseBusiness } from "lucide-react";
-import { NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 
 import { useAuthStore } from "../../../store/auth.store";
 import { useNavProgress } from "../../../store/navProgress.store";
@@ -320,16 +320,20 @@ export default function Sidebar({
             <div className="m-4 shrink-0 rounded-2xl bg-btn p-4 text-btn-text">
               <Sparkles className="mb-2 text-btn-hover-bg" size={20} />
 
-              <p className="text-sm font-bold">Upgrade to Pro</p>
+              <p className="text-sm font-bold">Get more AI credits</p>
 
               <p className="mt-1.5 text-xs opacity-90">
-                Unlock AI Resume Builder, ATS Pro, Unlimited Resume Downloads
-                and Premium Templates.
+                Buy AI resume, cover letter and interview packs. One-time
+                payment, no subscription.
               </p>
 
-              <button className="mt-3 w-full rounded-xl bg-navbar py-2 text-sm font-semibold text-heading transition hover:bg-btn-hover-bg">
+              <Link
+                to="/pricing"
+                onClick={onClose}
+                className="mt-3 block w-full rounded-xl bg-navbar py-2 text-center text-sm font-semibold text-heading transition hover:bg-btn-hover-bg"
+              >
                 Upgrade
-              </button>
+              </Link>
             </div>
           )}
         </div>

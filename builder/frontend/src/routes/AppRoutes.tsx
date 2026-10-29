@@ -15,6 +15,7 @@ const CoverLetterGalleryPage = lazy(
   () => import("../pages/CoverLetterGalleryPage"),
 );
 const AiPage = lazy(() => import("../pages/AiPage"));
+const PricingPage = lazy(() => import("../pages/PricingPage"));
 const PublicResumePage = lazy(() => import("../pages/PublicResumePage"));
 
 // Protected pages only render after the session check finishes. Without this, their
@@ -91,6 +92,8 @@ export default function AppRoutes() {
           <Route path="/templates" element={<TemplateGalleryPage />} />
 
           <Route path="/cover-letters" element={<CoverLetterGalleryPage />} />
+
+          <Route path="/pricing" element={<PricingPage />} />
 
           {!isRouteDisabled("/ai") && (
             <Route path="/ai" element={<AiPage />} />
