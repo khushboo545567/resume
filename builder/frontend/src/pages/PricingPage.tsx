@@ -10,7 +10,6 @@ import {
   FREE_FEATURES,
   INTERVIEW_QUESTION_OPTIONS,
   RESUME_PLANS,
-  formatPerUnit,
   formatPrice,
   getInterviewPlans,
 } from "../features/pricing/plans";
@@ -45,8 +44,6 @@ function PlanCard({
   plan: Plan;
   onBuy: (plan: Plan) => void;
 }) {
-  const perUnit = formatPerUnit(plan);
-
   return (
     <div className="flex flex-col rounded-2xl border border-border-popup bg-navbar p-5 sm:p-6">
       <h3 className="text-base font-bold text-heading">{plan.name}</h3>
@@ -57,8 +54,6 @@ function PlanCard({
         </span>
         <span className="text-sm text-subheading">one-time</span>
       </div>
-
-      {perUnit && <p className="mt-1 text-sm text-subheading">{perUnit}</p>}
 
       <ul className="mt-5 flex-1 space-y-2.5">
         {plan.features.map((feature) => (

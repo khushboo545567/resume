@@ -9,9 +9,6 @@ export interface Plan {
   name: string;
   price: number;
   features: string[];
-  /** Number of uses the price is split across (for "per run" text). */
-  units?: number;
-  unitLabel?: string;
 }
 
 export const INTERVIEW_QUESTION_OPTIONS = [5, 10, 15] as const;
@@ -31,8 +28,6 @@ export const RESUME_PLANS: Plan[] = [
     category: "resume",
     name: "Starter",
     price: 25,
-    units: 5,
-    unitLabel: "run",
     features: ["5 AI resume runs", "10 AI edits"],
   },
   {
@@ -40,8 +35,6 @@ export const RESUME_PLANS: Plan[] = [
     category: "resume",
     name: "Plus",
     price: 50,
-    units: 10,
-    unitLabel: "run",
     features: ["10 AI resume runs", "20 AI edits"],
   },
 ];
@@ -52,8 +45,6 @@ export const COVER_LETTER_PLANS: Plan[] = [
     category: "cover-letter",
     name: "Starter",
     price: 19,
-    units: 2,
-    unitLabel: "run",
     features: ["2 AI cover letter runs", "4 AI edits"],
   },
   {
@@ -61,8 +52,6 @@ export const COVER_LETTER_PLANS: Plan[] = [
     category: "cover-letter",
     name: "Plus",
     price: 29,
-    units: 5,
-    unitLabel: "run",
     features: ["5 AI cover letter runs", "10 AI edits"],
   },
 ];
@@ -80,8 +69,6 @@ export const getInterviewPlans = (questions: InterviewQuestions): Plan[] => [
     category: "interview",
     name: "2 sessions",
     price: INTERVIEW_PRICES[questions].two,
-    units: 2,
-    unitLabel: "session",
     features: [`2 AI interview sessions`, `${questions} questions each`],
   },
   {
@@ -89,8 +76,6 @@ export const getInterviewPlans = (questions: InterviewQuestions): Plan[] => [
     category: "interview",
     name: "5 sessions",
     price: INTERVIEW_PRICES[questions].five,
-    units: 5,
-    unitLabel: "session",
     features: [`5 AI interview sessions`, `${questions} questions each`],
   },
 ];
@@ -108,11 +93,3 @@ export const ALL_IN_ONE_PLAN: Plan = {
 };
 
 export const formatPrice = (price: number): string => `₹${price}`;
-
-/** "₹5 per run" — rounded to a whole rupee when it divides evenly. */
-export const formatPerUnit = (plan: Plan): string | null => {
-  if (!plan.units || !plan.unitLabel) return null;
-  const per = plan.price / plan.units;
-  const text = Number.isInteger(per) ? `${per}` : per.toFixed(1);
-  return `₹${text} per ${plan.unitLabel}`;
-};
