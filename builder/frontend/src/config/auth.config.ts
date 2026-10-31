@@ -37,6 +37,15 @@ export function isLoginRedirectCoolingDown(): boolean {
   }
 }
 
+/** Call once a session is confirmed, so a later expiry is never mistaken for a redirect loop. */
+export function clearLoginRedirectMarker(): void {
+  try {
+    sessionStorage.removeItem(LOGIN_REDIRECT_KEY);
+  } catch {
+    /* sessionStorage unavailable: nothing to clear */
+  }
+}
+
 export function redirectToLogin(returnTo: string = window.location.href): boolean {
   if (isLoginRedirectCoolingDown()) return false;
 

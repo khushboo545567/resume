@@ -7,7 +7,7 @@ import {
   getProfilePhotoUrl,
   logoutUser,
 } from "../services/auth.service";
-import { THRONE8_URL } from "../config/auth.config";
+import { clearLoginRedirectMarker, THRONE8_URL } from "../config/auth.config";
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
@@ -55,6 +55,9 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     try {
       const user = await getMe();
+
+      // Valid session confirmed: any earlier "sent to login" marker is now stale.
+      clearLoginRedirectMarker();
 
       set({
         user,
