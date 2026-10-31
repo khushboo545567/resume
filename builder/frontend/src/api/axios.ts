@@ -1,6 +1,7 @@
 import axios, { type InternalAxiosRequestConfig } from "axios";
 
 import { AUTH_API_URL } from "../config/auth.config";
+import { queryClient } from "../lib/react-query";
 
 // The session lives in httpOnly cookies set by the Throne8 backend on `.throne8.com`.
 // The browser attaches them automatically (withCredentials). JavaScript never sees a token.
@@ -88,5 +89,84 @@ const attachRefreshInterceptor = (instance: typeof api) => {
 
 attachRefreshInterceptor(api);
 attachRefreshInterceptor(authApi);
+
+/* ------------------------------------------------------------------ */
+/* AI credits                                                          */
+/* ------------------------------------------------------------------ */
+
+/** Query key for the user's credit balances (see features/pricing/hooks/useCredits). */
+export const CREDITS_QUERY_KEY = ["credits"] as const;
+
+/** Fired when the server answers 402: the user has no credits for that AI action. */
+export const CREDITS_REQUIRED_EVENT = "credits:required";
+
+export interface CreditsRequiredDetail {
+  message: string;
+  /** Which pricing tab and (for interviews) question count to open. */
+  tab: "resume" | "cover-letter" | "interview";
+  questions?: 5 | 10 | 15;
+}
+
+/** True when an error is the server's "no credits left" answer (HTTP 402). */
+export const isOutOfCreditsError = (error: unknown): boolean =>
+  axios.isAxiosError(error) && error.response?.status === 402;
+
+const NO_CREDITS_FALLBACK =
+  "You have no AI credits left for this action. Buy a pack to continue.";
+
+const toCreditsDetail = (error: {
+  config?: InternalAxiosRequestConfig;
+  response?: { data?: { message?: unknown } };
+}): CreditsRequiredDetail => {
+  const url = error.config?.url ?? "";
+  const message =
+    typeof error.response?.data?.message === "string"
+      ? error.response.data.message
+      : NO_CREDITS_FALLBACK;
+
+  if (url.includes("cover-letter")) return { message, tab: "cover-letter" };
+
+  if (url.includes("/interview/")) {
+    let questions: CreditsRequiredDetail["questions"];
+    try {
+      const body = JSON.parse(String(error.config?.data ?? "{}"));
+      if ([5, 10, 15].includes(body?.totalQuestions)) {
+        questions = body.totalQuestions;
+      }
+    } catch {
+      // Body was not JSON: just open the interview tab.
+    }
+    return { message, tab: "interview", questions };
+  }
+
+  return { message, tab: "resume" };
+};
+
+// 402 -> ask the app to show the "buy credits" prompt (see OutOfCreditsModal).
+// Success on an AI route -> the balance changed, so refresh it.
+api.interceptors.response.use(
+  (response) => {
+    const url = response.config.url ?? "";
+    const isPost = response.config.method === "post";
+    const spentCredit =
+      isPost && (url.startsWith("/ai/") || url === "/interview/start");
+
+    if (spentCredit) {
+      void queryClient.invalidateQueries({ queryKey: CREDITS_QUERY_KEY });
+    }
+
+    return response;
+  },
+  (error) => {
+    if (isOutOfCreditsError(error)) {
+      window.dispatchEvent(
+        new CustomEvent<CreditsRequiredDetail>(CREDITS_REQUIRED_EVENT, {
+          detail: toCreditsDetail(error),
+        }),
+      );
+    }
+    return Promise.reject(error);
+  },
+);
 
 export default api;

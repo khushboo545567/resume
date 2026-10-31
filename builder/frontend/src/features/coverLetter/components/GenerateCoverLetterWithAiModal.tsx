@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Sparkles, UploadCloud, FileText, Lock } from "lucide-react";
 
 import Modal from "../../../components/ui/Modal";
@@ -81,7 +81,7 @@ export default function GenerateCoverLetterWithAiModal({
   }, [open]);
 
   const hasJD = jobDescription.trim().length > 0;
-  const outOfCredits = credits !== null && credits.remaining <= 0;
+  const outOfCredits = credits !== null && credits.runs <= 0;
 
   const handleFileSelect = (file: File | null) => {
     setError(null);
@@ -199,14 +199,17 @@ export default function GenerateCoverLetterWithAiModal({
               <div className="flex items-center gap-2">
                 <Lock size={16} className="shrink-0" />
                 <span>
-                  You've used all {credits.limit} free AI generations. Buy
-                  more credits to continue.
+                  You've used all your AI generations.{" "}
+                  <Link to="/pricing" className="font-semibold underline">
+                    Buy more credits
+                  </Link>{" "}
+                  to continue.
                 </span>
               </div>
             ) : (
               <span>
-                {credits.remaining} of {credits.limit} free AI generations
-                left (regenerate uses these too).
+                {credits.runs} AI generation{credits.runs === 1 ? "" : "s"}{" "}
+                left.
               </span>
             )}
           </div>

@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Bot } from "lucide-react";
 
 import InterviewConfigForm from "../../features/interview/components/InterviewConfigForm";
+import { isOutOfCreditsError } from "../../api/axios";
 import { useStartInterview } from "../../features/interview/hooks/useStartInterview";
 
 import type { StartInterviewPayload } from "../../features/interview/types/interview.types";
@@ -43,7 +44,7 @@ export default function GenerateInterviewPage() {
         submitting={startInterview.isPending}
       />
 
-      {startInterview.isError && (
+      {startInterview.isError && !isOutOfCreditsError(startInterview.error) && (
         <p className="mt-4 text-center text-sm text-red-500">
           Something went wrong starting your interview. Please try again.
         </p>

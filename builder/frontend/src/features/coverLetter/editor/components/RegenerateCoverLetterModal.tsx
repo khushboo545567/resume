@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Lock } from "lucide-react";
 
 import Modal from "../../../../components/ui/Modal";
@@ -44,7 +45,7 @@ export default function RegenerateCoverLetterModal({ open, onClose }: Props) {
 
   if (!coverLetter) return null;
 
-  const outOfCredits = credits !== null && credits.remaining <= 0;
+  const outOfCredits = credits !== null && credits.edits <= 0;
 
   const paragraphOptions = coverLetter.body.paragraphs.map((_, index) => ({
     value: `paragraph:${index}` as RegenerateCoverLetterTarget,
@@ -157,14 +158,16 @@ export default function RegenerateCoverLetterModal({ open, onClose }: Props) {
               <div className="flex items-center gap-2">
                 <Lock size={16} />
                 <span>
-                  You've used all {credits.limit} free AI generations. Buy
-                  more credits to continue.
+                  You've used all your AI edits.{" "}
+                  <Link to="/pricing" className="font-semibold underline">
+                    Buy more credits
+                  </Link>{" "}
+                  to continue.
                 </span>
               </div>
             ) : (
               <span>
-                {credits.remaining} of {credits.limit} free AI generations
-                left.
+                {credits.edits} AI edit{credits.edits === 1 ? "" : "s"} left.
               </span>
             )}
           </div>

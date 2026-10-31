@@ -27,6 +27,7 @@ import {
 import { searchLocations } from "../../config/locations";
 import { searchDegrees, searchFieldsOfStudy } from "../../config/educationOptions";
 import { searchLanguages } from "../../config/languageOptions";
+import { isOutOfCreditsError } from "../../../../api/axios";
 
 interface Props {
   onGenerate: (data: QuickGenerateFormData) => void;
@@ -860,8 +861,10 @@ export default function QuickGenerateForm({
                             );
                             setCourseworkLoadingIndex(null);
                           },
-                          onError: () => {
+                          onError: (error) => {
                             setCourseworkLoadingIndex(null);
+                            // No credits: the app-wide "buy credits" prompt is showing.
+                            if (isOutOfCreditsError(error)) return;
                             alert(
                               "Couldn't generate coursework. Please try again.",
                             );

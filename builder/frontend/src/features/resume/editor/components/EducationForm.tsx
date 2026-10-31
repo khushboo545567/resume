@@ -18,6 +18,7 @@ import {
   searchFieldsOfStudy,
 } from "../../config/educationOptions";
 import { searchLocations } from "../../config/locations";
+import { isOutOfCreditsError } from "../../../../api/axios";
 
 interface Props {
   onClose: () => void;
@@ -94,6 +95,8 @@ export default function EducationForm({
 
       setValue("coursework", result, { shouldDirty: true });
     } catch (error) {
+      // No credits: the app-wide "buy credits" prompt is already showing.
+      if (isOutOfCreditsError(error)) return;
       console.error("Coursework generation failed:", error);
       alert("Failed to generate coursework. Please try again.");
     }

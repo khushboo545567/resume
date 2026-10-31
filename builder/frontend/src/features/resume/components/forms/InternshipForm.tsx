@@ -16,6 +16,7 @@ import BulletListField from "../../editor/components/form/BulletListField";
 import DateRangeFields from "../../editor/components/form/DateRangeFields";
 import FormCard from "../../editor/components/form/FormCard";
 import { parseBullets } from "../../editor/utils/parseBullets";
+import { isOutOfCreditsError } from "../../../../api/axios";
 
 interface Props {
   onClose: () => void;
@@ -139,6 +140,8 @@ export default function InternshipForm({
 
       setShowContextModal(false);
     } catch (error) {
+      // No credits: the app-wide "buy credits" prompt is already showing.
+      if (isOutOfCreditsError(error)) return;
       console.error("Generate failed:", error);
       alert("Failed to generate with AI. Please try again.");
     }

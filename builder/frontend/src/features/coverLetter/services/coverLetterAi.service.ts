@@ -11,8 +11,11 @@ export type GeneratedCoverLetterContent = Pick<
 >;
 
 export interface CoverLetterAiCredits {
-  used: number;
-  limit: number;
+  /** AI cover letter generations left. */
+  runs: number;
+  /** AI cover letter edits (regenerate) left. */
+  edits: number;
+  /** Credits left for the action that was just called. */
   remaining: number;
 }
 

@@ -10,12 +10,14 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { queryClient } from "./lib/react-query";
 import AuthInitializer from "./features/auth/component/AuthInitializer";
+import OutOfCreditsModal from "./features/pricing/components/OutOfCreditsModal";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
     <QueryClientProvider client={queryClient}>
       <AuthInitializer>
         <AppRoutes />
+        <OutOfCreditsModal />
       </AuthInitializer>
 
       <ReactQueryDevtools initialIsOpen={false} />

@@ -20,6 +20,7 @@ import QuickGenerateForm from "../../features/resume/editor/components/GenerateG
 import { mapResumeToQuickGenerateFormData } from "../../features/resume/editor/utils/mapResumeToGenerateForm";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ChevronRight, List, Loader2, PanelLeftOpen } from "lucide-react";
+import { isOutOfCreditsError } from "../../api/axios";
 
 type MobileTab = "edit" | "preview";
 
@@ -86,6 +87,8 @@ export default function ResumeEditorPage() {
         localStorage.setItem(`ai-generated:${resumeId}`, "true");
       }
     } catch (error) {
+      // No credits: the app-wide "buy credits" prompt is already showing.
+      if (isOutOfCreditsError(error)) return;
       console.error("Resume generation failed:", error);
       alert(
         "Something went wrong while generating your resume. Please try again.",

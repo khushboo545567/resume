@@ -21,6 +21,7 @@ import ChipList from "./form/ChipList";
 import DateRangeFields from "./form/DateRangeFields";
 import FormCard from "./form/FormCard";
 import { parseBullets } from "../utils/parseBullets";
+import { isOutOfCreditsError } from "../../../../api/axios";
 
 interface Props {
   onClose: () => void;
@@ -187,6 +188,8 @@ export default function ProjectForm({ onClose, editIndex, initialData }: Props) 
 
       setShowContextModal(false);
     } catch (error) {
+      // No credits: the app-wide "buy credits" prompt is already showing.
+      if (isOutOfCreditsError(error)) return;
       console.error("Generate failed:", error);
       alert("Failed to generate with AI. Please try again.");
     }

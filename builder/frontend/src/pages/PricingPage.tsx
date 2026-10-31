@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Check, FileText, Mail, MessageSquare, Sparkles } from "lucide-react";
 
 import { useAuthStore } from "../store/auth.store";
@@ -18,6 +19,9 @@ import type {
   Plan,
   PlanCategory,
 } from "../features/pricing/plans";
+import { useCheckout } from "../features/pricing/hooks/useCheckout";
+import CheckoutStatusModal from "../features/pricing/components/CheckoutStatusModal";
+import CreditsSummary from "../features/pricing/components/CreditsSummary";
 
 /* ---------- tabs ---------- */
 
@@ -37,12 +41,20 @@ const TAB_INTRO: Record<PlanCategory, string> = {
 
 /* ---------- small pieces ---------- */
 
+const isTab = (value: string | null): value is PlanCategory =>
+  TABS.some((item) => item.id === value);
+
+const isQuestionCount = (value: number): value is InterviewQuestions =>
+  (INTERVIEW_QUESTION_OPTIONS as readonly number[]).includes(value);
+
 function PlanCard({
   plan,
   onBuy,
+  disabled,
 }: {
   plan: Plan;
   onBuy: (plan: Plan) => void;
+  disabled?: boolean;
 }) {
   return (
     <div className="flex flex-col rounded-2xl border border-border-popup bg-navbar p-5 sm:p-6">
@@ -67,7 +79,8 @@ function PlanCard({
       <button
         type="button"
         onClick={() => onBuy(plan)}
-        className="mt-6 h-11 w-full rounded-xl bg-btn text-sm font-semibold text-btn-text transition hover:bg-btn-hover"
+        disabled={disabled}
+        className="mt-6 h-11 w-full rounded-xl bg-btn text-sm font-semibold text-btn-text transition hover:bg-btn-hover disabled:cursor-not-allowed disabled:opacity-60"
       >
         Buy for {formatPrice(plan.price)}
       </button>
@@ -80,20 +93,28 @@ function PlanCard({
 export default function PricingPage() {
   const user = useAuthStore((state) => state.user);
 
-  const [tab, setTab] = useState<PlanCategory>("resume");
-  const [questions, setQuestions] = useState<InterviewQuestions>(10);
-  const [notice, setNotice] = useState("");
+  // The "out of credits" prompt links here as /pricing?tab=cover-letter (or
+  // tab=interview&questions=15) so the user lands on the pack they need.
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const questionsParam = Number(searchParams.get("questions"));
 
-  // The one place checkout will be wired in once the payment API exists.
+  const [tab, setTab] = useState<PlanCategory>(
+    isTab(tabParam) ? tabParam : "resume",
+  );
+  const [questions, setQuestions] = useState<InterviewQuestions>(
+    isQuestionCount(questionsParam) ? questionsParam : 10,
+  );
+
+  const checkout = useCheckout();
+
   const handleBuy = (plan: Plan) => {
     if (!user) {
       redirectToLogin();
       return;
     }
 
-    setNotice(
-      `Online payment is not switched on yet, so "${plan.name}" can't be bought right now.`,
-    );
+    void checkout.buy(plan);
   };
 
   const plans: Plan[] =
@@ -117,6 +138,9 @@ export default function PricingPage() {
           renews on its own.
         </p>
       </header>
+
+      {/* ---------- balance (signed-in users) ---------- */}
+      <CreditsSummary />
 
       {/* ---------- free ---------- */}
       <section className="mt-6 rounded-2xl border border-border-popup bg-navbar p-5 sm:p-6">
@@ -150,10 +174,7 @@ export default function PricingPage() {
                 type="button"
                 role="tab"
                 aria-selected={active}
-                onClick={() => {
-                  setTab(item.id);
-                  setNotice("");
-                }}
+                onClick={() => setTab(item.id)}
                 className={`inline-flex h-10 shrink-0 items-center gap-2 rounded-full border px-4 text-sm font-semibold transition ${
                   active
                     ? "border-btn bg-btn text-btn-text"
@@ -205,19 +226,23 @@ export default function PricingPage() {
           }`}
         >
           {plans.map((plan) => (
-            <PlanCard key={plan.id} plan={plan} onBuy={handleBuy} />
+            <PlanCard
+              key={plan.id}
+              plan={plan}
+              onBuy={handleBuy}
+              disabled={checkout.isBusy}
+            />
           ))}
         </div>
 
-        {notice && (
-          <p
-            role="status"
-            className="mt-4 rounded-xl border border-border-popup bg-navbar px-4 py-3 text-sm text-heading"
-          >
-            {notice}
-          </p>
-        )}
+        <p className="mt-4 text-xs text-subheading">
+          Payments are processed securely by Razorpay (UPI, cards, netbanking
+          and wallets). Credits are added to your account as soon as the
+          payment is confirmed.
+        </p>
       </section>
+
+      <CheckoutStatusModal state={checkout.state} onClose={checkout.reset} />
     </div>
   );
 }

@@ -9,6 +9,7 @@ import { useGenerateCustomSection } from "../../../ai/hooks/useGenerateCustomSec
 import AICustomSectionContextModal from "../../../ai/components/AICustomSectionContextModal";
 import AIGenerateButton from "../../../ai/components/AIGenerateButton";
 import MonthYearPicker from "./MonthYearPicker";
+import { isOutOfCreditsError } from "../../../../api/axios";
 
 interface Props {
   sectionId: string;
@@ -72,6 +73,8 @@ export default function CustomSectionItemForm({
       updateCustomSectionItem(sectionId, item.id, "description", result);
       setShowContextModal(false);
     } catch (error) {
+      // No credits: the app-wide "buy credits" prompt is already showing.
+      if (isOutOfCreditsError(error)) return;
       console.error("Generate failed:", error);
       alert("Failed to generate with AI. Please try again.");
     }
