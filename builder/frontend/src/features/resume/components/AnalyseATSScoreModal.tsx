@@ -8,6 +8,8 @@ import Button from "../../../components/ui/Button";
 import Input from "../../../components/ui/Input";
 
 import { uploadAndParseResume } from "../services/resume.service";
+import { isOutOfCreditsError } from "../../../api/axios";
+import { UploadCreditsHint } from "../../pricing/components/CreditHints";
 
 interface Props {
   open: boolean;
@@ -53,6 +55,9 @@ export default function AnalyseATSScoreModal({ open, onClose }: Props) {
       onClose();
       navigate(`/resume/${resume._id}/edit`);
     } catch (err) {
+      // No credits: the app-wide "buy credits" prompt is already showing.
+      if (isOutOfCreditsError(err)) return;
+
       if (axios.isAxiosError(err)) {
         const message = err.response?.data?.message;
         setError(
@@ -95,6 +100,8 @@ export default function AnalyseATSScoreModal({ open, onClose }: Props) {
         {loading && (
           <p className="text-sm text-nav-text">Parsing your resume...</p>
         )}
+
+        <UploadCreditsHint />
 
         <div className="flex justify-end gap-4">
           <Button

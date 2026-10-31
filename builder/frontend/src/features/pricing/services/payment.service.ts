@@ -7,7 +7,9 @@ export type CreditType =
   | "coverEdits"
   | "interview5"
   | "interview10"
-  | "interview15";
+  | "interview15"
+  | "atsChecks"
+  | "resumeUploads";
 
 export type CreditBalances = Record<CreditType, number>;
 

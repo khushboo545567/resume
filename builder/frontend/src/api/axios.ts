@@ -103,7 +103,7 @@ export const CREDITS_REQUIRED_EVENT = "credits:required";
 export interface CreditsRequiredDetail {
   message: string;
   /** Which pricing tab and (for interviews) question count to open. */
-  tab: "resume" | "cover-letter" | "interview";
+  tab: "resume" | "cover-letter" | "interview" | "ats";
   questions?: 5 | 10 | 15;
 }
 
@@ -125,6 +125,7 @@ const toCreditsDetail = (error: {
       : NO_CREDITS_FALLBACK;
 
   if (url.includes("cover-letter")) return { message, tab: "cover-letter" };
+  if (url.includes("/ats/")) return { message, tab: "ats" };
 
   if (url.includes("/interview/")) {
     let questions: CreditsRequiredDetail["questions"];
@@ -149,7 +150,11 @@ api.interceptors.response.use(
     const url = response.config.url ?? "";
     const isPost = response.config.method === "post";
     const spentCredit =
-      isPost && (url.startsWith("/ai/") || url === "/interview/start");
+      isPost &&
+      (url.startsWith("/ai/") ||
+        url === "/interview/start" ||
+        url === "/ats/analyze" ||
+        url.endsWith("/upload-and-parse"));
 
     if (spentCredit) {
       void queryClient.invalidateQueries({ queryKey: CREDITS_QUERY_KEY });

@@ -27,6 +27,13 @@ const GROUPS: {
       { key: "interview15", label: "× 15 questions" },
     ],
   },
+  {
+    label: "ATS & uploads",
+    items: [
+      { key: "atsChecks", label: "ATS checks" },
+      { key: "resumeUploads", label: "free PDF uploads" },
+    ],
+  },
 ];
 
 /** "Your credits" panel: what the user can still use. Hidden until loaded. */
@@ -42,7 +49,7 @@ export default function CreditsSummary() {
     >
       <h2 className="text-base font-bold text-heading">Your credits</h2>
 
-      <div className="mt-3 grid gap-4 sm:grid-cols-3">
+      <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {GROUPS.map((group) => (
           <div key={group.label}>
             <p className="text-sm font-semibold text-heading">{group.label}</p>
@@ -65,7 +72,8 @@ export default function CreditsSummary() {
       </div>
 
       <p className="mt-4 text-xs text-subheading">
-        Credits never expire. Each AI action uses one credit.
+        Credits never expire. Each AI action uses one credit. When your free PDF
+        uploads run out, an upload uses 1 AI resume edit.
       </p>
     </section>
   );

@@ -1,12 +1,20 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Check, FileText, Mail, MessageSquare, Sparkles } from "lucide-react";
+import {
+  Check,
+  FileText,
+  Gauge,
+  Mail,
+  MessageSquare,
+  Sparkles,
+} from "lucide-react";
 
 import { useAuthStore } from "../store/auth.store";
 import { redirectToLogin } from "../config/auth.config";
 import {
   ALL_IN_ONE_PLAN,
+  ATS_PLANS,
   COVER_LETTER_PLANS,
   FREE_FEATURES,
   INTERVIEW_QUESTION_OPTIONS,
@@ -29,6 +37,7 @@ const TABS: { id: PlanCategory; label: string; icon: ReactNode }[] = [
   { id: "resume", label: "Resume AI", icon: <FileText size={16} /> },
   { id: "cover-letter", label: "Cover letter AI", icon: <Mail size={16} /> },
   { id: "interview", label: "AI interview", icon: <MessageSquare size={16} /> },
+  { id: "ats", label: "ATS check", icon: <Gauge size={16} /> },
   { id: "all-in-one", label: "All-in-one", icon: <Sparkles size={16} /> },
 ];
 
@@ -36,6 +45,7 @@ const TAB_INTRO: Record<PlanCategory, string> = {
   resume: "Generate a resume with AI and refine it with AI edits.",
   "cover-letter": "Generate a cover letter and rewrite parts of it with AI.",
   interview: "Practice mock interviews built from your resume and target role.",
+  ats: "Score your resume against a role or job description and get a deep scan of what to fix. Each scan uses 1 check.",
   "all-in-one": "A smaller amount of each AI feature in one pack.",
 };
 
@@ -124,7 +134,9 @@ export default function PricingPage() {
         ? COVER_LETTER_PLANS
         : tab === "interview"
           ? getInterviewPlans(questions)
-          : [ALL_IN_ONE_PLAN];
+          : tab === "ats"
+            ? ATS_PLANS
+            : [ALL_IN_ONE_PLAN];
 
   return (
     <div className="mx-auto w-full max-w-5xl">

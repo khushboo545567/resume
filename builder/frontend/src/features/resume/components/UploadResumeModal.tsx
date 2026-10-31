@@ -11,6 +11,8 @@ import {
 import Modal from "../../../components/ui/Modal";
 import { templates } from "../config/templates";
 import { useUploadAndParseResume } from "../hooks/useUploadAndParseResume";
+import { isOutOfCreditsError } from "../../../api/axios";
+import { UploadCreditsHint } from "../../pricing/components/CreditHints";
 
 interface Props {
   open: boolean;
@@ -146,6 +148,8 @@ export default function UploadResumeModal({ open, onClose }: Props) {
       navigate(`/resume/${resume._id}/edit`);
     } catch (err) {
       console.error(err);
+      // No credits: the app-wide "buy credits" prompt is already showing.
+      if (isOutOfCreditsError(err)) return;
       setError("We couldn't read this PDF. Please check the file and try again.");
     }
   };
@@ -168,6 +172,12 @@ export default function UploadResumeModal({ open, onClose }: Props) {
         <p className="mb-4 rounded-lg bg-red-600/10 px-3 py-2 text-sm text-red-600">
           {error}
         </p>
+      )}
+
+      {step === "template" && (
+        <div className="mb-4">
+          <UploadCreditsHint />
+        </div>
       )}
 
       {/* ============ STEP 1: UPLOAD ============ */}

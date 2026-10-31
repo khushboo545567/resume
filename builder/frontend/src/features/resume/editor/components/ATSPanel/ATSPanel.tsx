@@ -6,6 +6,11 @@ import { uploadAndParseIntoResume } from "../../../services/resume.service";
 import { useLatestATS, useAnalyzeATS } from "../../../../ats/hooks/useATSScore";
 import ATSResultsView from "../../../../ats/components/ATSResultsView";
 import JobDescriptionInput from "./JobDescriptionInput";
+import { isOutOfCreditsError } from "../../../../../api/axios";
+import {
+  AtsChecksHint,
+  UploadCreditsHint,
+} from "../../../../pricing/components/CreditHints";
 interface Props {
   isOpen: boolean;
   onClose: () => void;
@@ -39,6 +44,7 @@ export default function ATSPanel({
     mutate: analyzeATS,
     isPending: isAnalyzingATS,
     isError: isAnalyzeError,
+    error: analyzeError,
     isSuccess: isAnalyzeSuccess,
   } = useAnalyzeATS();
 
@@ -88,7 +94,10 @@ export default function ATSPanel({
       }
     } catch (error) {
       console.error(error);
-      setUploadError("Failed to parse this PDF. Please try a different file.");
+      // No credits: the app-wide "buy credits" prompt is already showing.
+      if (!isOutOfCreditsError(error)) {
+        setUploadError("Failed to parse this PDF. Please try a different file.");
+      }
     } finally {
       setIsParsingUpload(false);
     }
@@ -164,6 +173,9 @@ export default function ATSPanel({
                     onChange={(e) => handleFileUpload(e.target.files?.[0])}
                   />
                 </label>
+                <div className="mt-2 text-center">
+                  <UploadCreditsHint />
+                </div>
                 {uploadError && (
                   <p className="mt-2 text-xs font-semibold text-red-600">
                     {uploadError}
@@ -190,7 +202,9 @@ export default function ATSPanel({
               )}
             </button>
 
-            {isAnalyzeError && (
+            <AtsChecksHint />
+
+            {isAnalyzeError && !isOutOfCreditsError(analyzeError) && (
               <p className="text-xs font-semibold text-red-600">
                 ATS analysis failed to complete. Please check the backend
                 connection and try again.

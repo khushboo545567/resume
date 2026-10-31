@@ -1,6 +1,11 @@
 // Prices are in rupees, one-time payments (no subscription). Change prices here only.
 
-export type PlanCategory = "resume" | "cover-letter" | "interview" | "all-in-one";
+export type PlanCategory =
+  | "resume"
+  | "cover-letter"
+  | "interview"
+  | "ats"
+  | "all-in-one";
 
 export interface Plan {
   /** Stable id. The checkout API will receive this later. */
@@ -20,6 +25,8 @@ export const FREE_FEATURES = [
   "1 AI resume with 2 edits",
   "1 AI cover letter with 2 edits",
   "1 AI interview",
+  "2 ATS checks",
+  "5 resume PDF uploads",
 ];
 
 export const RESUME_PLANS: Plan[] = [
@@ -53,6 +60,23 @@ export const COVER_LETTER_PLANS: Plan[] = [
     name: "Plus",
     price: 29,
     features: ["5 AI cover letter runs", "10 AI edits"],
+  },
+];
+
+export const ATS_PLANS: Plan[] = [
+  {
+    id: "ats-ai-3",
+    category: "ats",
+    name: "Starter",
+    price: 25,
+    features: ["3 ATS checks"],
+  },
+  {
+    id: "ats-ai-10",
+    category: "ats",
+    name: "Plus",
+    price: 79,
+    features: ["10 ATS checks"],
   },
 ];
 
